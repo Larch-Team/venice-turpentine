@@ -18,7 +18,7 @@ def _split_keys(dictionary: dict, key: int) -> dict:
 
 class Sentence(list):
 
-    def __init__(self, sen, session: Session, precedenceBaked: Union[dict[str, float], None] = None):
+    def __init__(self, sen, session: Session, precedenceBaked: dict[str, float] = {}):
         self.S = session
         self.precedenceBaked = precedenceBaked
         self._pluggedFS = None
@@ -111,9 +111,9 @@ class Sentence(list):
         """
         if self.precedenceBaked and self._pluggedFS == self.S.config['chosen_plugins']['FormalSystem']:
             return self.precedenceBaked
-        
-        self.precedenceBaked = {}
         self._pluggedFS = self.S.config['chosen_plugins']['FormalSystem']
+
+        self.precedenceBaked = {}
         precedence = self.getPrecedence()
 
         lvl = 0

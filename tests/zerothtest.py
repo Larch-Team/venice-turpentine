@@ -3,9 +3,8 @@ from importlib import import_module
 import os
 import sys
 
-from sentence import Sentence
-
 sys.path.append('../app')
+from sentence import Sentence
 from FormalSystem import zeroth_order_logic as zol
 
 def join_to_string(sentence) -> str:
@@ -19,6 +18,12 @@ def join_to_string(sentence) -> str:
     return "".join(new)
 
 
+class _SessionDummy(object):
+    config = {'chosen_plugins':{'FormalSystem':zol}}
+    
+    def acc(self, arg):
+        return zol
+
 
 def new_notation(func):
     def wrapped(*args):
@@ -26,7 +31,7 @@ def new_notation(func):
         for sent in args:
             sent_list = sent.replace(
                 "(", ">(>").replace(")", ">)>").replace("<", ">").split(">")
-            arg_list.append(Sentence([i for i in sent_list if i != ''], None))
+            arg_list.append(Sentence([i for i in sent_list if i != ''], _SessionDummy()))
         ret = func(*arg_list)
         if isinstance(ret, list):
             if ret == []:
