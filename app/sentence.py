@@ -52,19 +52,6 @@ class Sentence(list):
 
     # Manipulacja zdaniem
 
-    @staticmethod
-    def static_calcPrecedenceVal(connective: str, precedence: dict[str, int], lvl: int = 0, prec_div: int = None) -> float:
-        if prec_div is not None:
-            return lvl + precedence[connective]/prec_div
-        else:
-            return lvl + precedence[connective]/max(precedence.values())+1
-
-
-    def calcPrecedenceVal(self, connective: str, lvl: int = 0, prec_div: int = None) -> float:
-        precedence = self.getPrecedence()
-        return self.static_calcPrecedenceVal(connective, precedence, lvl, prec_div)
-
-
     def reduceBrackets(self) -> _Sentence:
         """Minimalizuje nawiasy w zdaniu; zakłada poprawność ich rozmieszczenia"""
 
@@ -101,6 +88,28 @@ class Sentence(list):
         right = opened_left-opened_right-min_left
         return Sentence(-min_left*["("] + reduced + right*[")"], self.S, new_baked)
 
+
+    @staticmethod
+    def static_calcPrecedenceVal(connective: str, precedence: dict[str, int], lvl: int = 0, prec_div: int = None) -> float:
+        if prec_div is not None:
+            return lvl + precedence[connective]/prec_div
+        else:
+            return lvl + precedence[connective]/max(precedence.values())+1
+
+
+    def getLowest(self, dictionary: dict[int, float]):
+        min_prec = min(dictionary.values())
+        min_prec_indexes = (i for i,j in dictionary.items() if j==min_prec)
+        if min_prec == max(self.getPrecedence().values()):
+            return min(min_prec_indexes)
+        else:
+            return max(min_prec_indexes)
+
+
+    def calcPrecedenceVal(self, connective: str, lvl: int = 0, prec_div: int = None) -> float:
+        precedence = self.getPrecedence()
+        return self.static_calcPrecedenceVal(connective, precedence, lvl, prec_div)
+        
 
     def readPrecedence(self) -> dict[int, float]:
         """
@@ -154,7 +163,7 @@ class Sentence(list):
 
         if len(prec)==0:
             return None, None
-        con_index, _ = min(prec.items(), key=lambda x: x[1])
+        con_index = self.getLowest(prec)
         return sentence[con_index], sentence._split(con_index)
                 
 
