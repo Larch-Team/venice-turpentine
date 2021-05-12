@@ -501,11 +501,29 @@ def run() -> int:
             ptk.print_formatted_text(performer(procedure, session))
 
 
+def inAppDir(func):
+    def wrapper(*args, **kwargs):
+        assert os.getcwd().endswith(("/tests", "\\tests")), "cwd musi być folderem `tests` położonym równolegle do `app`"
+        os.chdir('../app')
+        if not os.path.exists('config/config_copy.json'):
+            from shutil import copy
+            copy('config/config.json', 'config/config_copy.json')
+            
+        ret = func(*args, **kwargs)
+
+        os.chdir('../tests')
+        return ret
+    return wrapper
+
+
 class Runner(object):
+
+    @inAppDir
     def __init__(self) -> None:
         super().__init__()
-        self.session = engine.Session('main', 'config.json')
+        self.session = engine.Session('main', 'config_copy.json')
 
+    @inAppDir
     def __call__(self, command: str) -> str:
         try:
             procedure = parser(command, command_dict)[0]
@@ -514,7 +532,3 @@ class Runner(object):
         except TypeError as e:
             return "błąd: złe argumenty"
         return performer(procedure, self.session)
-
-runner = Runner()
-runner('')
-runner.session.getrules()

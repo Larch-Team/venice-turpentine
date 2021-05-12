@@ -45,6 +45,15 @@ class TestParser(test.TestCase):
         with self.assertRaises(cmd.ParsingError):
             cmd.parser('doesntexist 1', self.comms)
 
+class TestRunner(test.TestCase):
+    def setUp(self):
+        self.r = cmd.Runner()
+
+    def test_plug_switch(self):
+        self.assertEqual(self.r('plugin switch FormalSystem int_seqcal_swiss'), 'Plugin succesfully installed: int_seqcal_swiss')
+
+    def test_new_proof(self):
+        self.assertEqual(self.r('prove p or q'), 'Sentence tokenized successfully \nProof initialized')
 
 if __name__ == "__main__":
     test.main()
