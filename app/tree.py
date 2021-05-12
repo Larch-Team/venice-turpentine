@@ -75,7 +75,6 @@ class ProofElement(object):
 class ProofNode(ProofElement, NodeMixin):
     """Reprezentacja pojedynczego zdania w drzewie"""
     namegen = random.Random()
-    colors = getcolors()
 
     def __init__(self, sentence: Sentence, branch_name: str, layer: int = 0, history: History = None, parent: ProofNode = None, children: tp.Iterable[ProofNode] = []):
         """Reprezentacja pojedynczego zdania w drzewie
@@ -101,7 +100,7 @@ class ProofNode(ProofElement, NodeMixin):
     def gen_name(self, am=2) -> tuple[str]:
         """Zwraca `am` nazw dla gałęzi z czego jedną jest nazwa aktualnej"""
         branch_names = self.getbranchnames()
-        possible = [i for i in self.colors if not i in branch_names]
+        possible = [i for i in self.getcolors() if not i in branch_names]
         if len(possible)<am-1:
             if len(self.leaves) == 1000:
                 raise ProofNodeError("No names exist")
