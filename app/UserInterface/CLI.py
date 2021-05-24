@@ -356,6 +356,11 @@ def do_get_tree(session: engine.Session) -> str:
     return "\n".join(session.gettree())
 
 
+def do_debug_get_methods(session: engine.Session) -> str:
+    """Returns all methods of the session object"""
+    return "\n".join(session.get_methods())
+
+
 command_dict = OrderedDict({
     # Navigation
     'exit': {'comm': do_exit, 'args': []},
@@ -376,6 +381,7 @@ command_dict = OrderedDict({
     'plugin list': {'comm': do_plug_list, 'args': [str]},
     'plugin gen': {'comm': do_plug_gen, 'args': [str, str]},
     'clear': {'comm': do_clear, 'args': []},
+    'debug get methods': {'comm': do_debug_get_methods, 'args': []}
 })
 
 

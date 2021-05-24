@@ -100,7 +100,7 @@ class ProofNode(ProofElement, NodeMixin):
     def gen_name(self, am=2) -> tuple[str]:
         """Zwraca `am` nazw dla gałęzi z czego jedną jest nazwa aktualnej"""
         branch_names = self.getbranchnames()
-        possible = [i for i in self.getcolors() if not i in branch_names]
+        possible = [i for i in getcolors() if not i in branch_names]
         if len(possible)<am-1:
             if len(self.leaves) == 1000:
                 raise ProofNodeError("No names exist")

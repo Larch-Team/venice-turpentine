@@ -465,4 +465,7 @@ class Session(object):
     def _get_node(self):
         return self.proof.getleaves(self.branch)[0]
 
+    def get_methods(self) -> list[str]:
+        return [i for i in dir(self) if callable(getattr(self, i)) and not i.startswith('__')]
+
 # Misc
