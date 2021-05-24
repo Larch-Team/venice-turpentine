@@ -394,7 +394,7 @@ command_dict['?'] = {'comm': do_help, 'args': []}
 
 # Front-end setup
 
-def get_rprompt(session, colors):
+def get_rprompt(session: engine.Session, colors):
     """
     Generuje podgląd gałęzi po prawej
     """
@@ -403,7 +403,7 @@ def get_rprompt(session, colors):
 
     # Proof retrieval
     if session.proof:
-        prompt, closed = session.getbranch()
+        prompt, closed = session.getbranch_strings()
         background = colors.get(session.branch, colors['Grey']) 
     else:
         prompt = DEF_PROMPT

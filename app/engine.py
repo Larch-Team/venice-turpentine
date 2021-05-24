@@ -236,7 +236,7 @@ class Session(object):
             raise EngineError("There is no proof started")
 
         try:
-            branch, _ = self.proof.getleaves(branch_name)[0].getbranch()
+            branch, _ = self.proof.getleaves(branch_name)[0].getbranch_sentences()
             used = self.proof.getleaves(branch_name)[0].gethistory()
         except ValueError as e:
             if e.message == 'not enough values to unpack (expected 2, got 1)':
@@ -298,7 +298,7 @@ class Session(object):
             raise EngineError("Wrong context")
 
         # Statement and used retrieving
-        branch = self._get_node().getbranch()[0][:]
+        branch = self._get_node().getbranch_sentences()[0][:]
         used = self._get_node().gethistory()
 
         # Rule execution
@@ -368,10 +368,10 @@ class Session(object):
 
 
     @DealWithPOP
-    def getbranch(self) -> list[list[str], str]:
+    def getbranch_strings(self) -> list[list[str], str]:
         """Zwraca gałąź oraz stan zamknięcia w formie czytelnej dla użytkownika"""
         try:
-            branch, closed = self._get_node().getbranch()
+            branch, closed = self._get_node().getbranch_sentences()
         except KeyError:
             raise EngineError(
                 f"Branch '{self.branch}' doesn't exist in this proof")

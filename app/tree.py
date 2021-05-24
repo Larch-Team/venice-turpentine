@@ -116,9 +116,9 @@ class ProofNode(ProofElement, NodeMixin):
         return [i.branch for i in self.getleaves()]
 
 
-    def getbranch(self) -> tuple[list[Sentence], Close]:
+    def getbranch_sentences(self) -> tuple[list[Sentence], Close]:
         """Zwraca gałąź dowodu z informacjami o jej zamknięciu"""
-        assert self.is_leaf, "Gałąź nie jest kompletna, gdyż węzeł nie jest drzewem"
+        assert self.is_leaf, "Gałąź nie jest kompletna, gdyż węzeł nie jest liściem"
         return [i.sentence for i in self.path], self.closed
 
 

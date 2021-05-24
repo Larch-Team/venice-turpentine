@@ -141,6 +141,8 @@ class Sentence(list):
         sentence = self.reduceBrackets()
         prec = sentence.readPrecedence(precedence)
 
+        if len(self) == 1:
+            return None, None
         con_index, _ = min(prec.items(), key=lambda x: x[1])
         return sentence[con_index], sentence._split(con_index)
                 

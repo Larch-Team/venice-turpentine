@@ -27,7 +27,7 @@ RULES = {
         docs="Rozkładanie prawdziwej koniunkcji. Wymaga wskazania zdania w gałęzi.",
         func=lambda x: utils.strip_around(x, 'and', False, PRECEDENCE),
         context = None,
-        reusable=True
+        reusable=False
     ),
     'false and': utils.Rule(
         symbolic="~(A and B) / ~A | ~B",
@@ -43,7 +43,7 @@ RULES = {
         func=lambda x: utils.add_prefix(utils.strip_around(
             red_neg(x), 'or', False, PRECEDENCE), 'not', '~'),
         context = None,
-        reusable=True
+        reusable=False
     ),
     'true or': utils.Rule(
         symbolic="(A or B) / A | B",
@@ -57,7 +57,7 @@ RULES = {
         docs="Rozkładanie fałszywej implikacji. Wymaga wskazania zdania w gałęzi.",
         func=lambda x: utils.select(utils.strip_around(red_neg(x),'imp', False, PRECEDENCE), ((False, True),), lambda y: utils.add_prefix(y, 'not', '~')),
         context = None,
-        reusable=True
+        reusable=False
     ),
     'true imp': utils.Rule(
         symbolic="(A -> B) / ~A | B",
@@ -72,7 +72,7 @@ RULES = {
         func=lambda x: utils.reduce_prefix(
             utils.reduce_prefix(utils.empty_creator(x), 'not', PRECEDENCE), 'not', PRECEDENCE),
         context = None,
-        reusable=True
+        reusable=False
     )
 }
 
