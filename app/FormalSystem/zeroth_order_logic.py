@@ -87,8 +87,8 @@ def prepare_for_proving(statement: utils.Sentence) -> utils.Sentence:
 
 def check_closure(branch: list[utils.Sentence], used: set[tuple[str]]) -> tp.Union[None, tuple[utils.close.Close, str]]:
     """Sprawdza możliwość zamknięcia gałęzi, zwraca obiekty zamknięcia oraz komunikat do wyświetlenia"""
-    for num1, statement_1 in enumerate(branch[:-1]):
-        for num2, statement_2 in enumerate(branch[-2:]):
+    for num1, statement_1 in enumerate(branch):
+        for num2, statement_2 in enumerate(branch):
             if statement_1[0].startswith('not') and not statement_2[0].startswith('not'):
                 negated, statement = statement_1, statement_2
             elif statement_2[0].startswith('not') and not statement_1[0].startswith('not'):
@@ -96,8 +96,8 @@ def check_closure(branch: list[utils.Sentence], used: set[tuple[str]]) -> tp.Uni
             else:
                 continue
 
-            if utils.reduce_brackets(negated[1:]) == statement:
-                return utils.close.Contradiction, "Sentences contradict. The branch was closed."
+            if utils.reduce_prefix(negated, 'not', PRECEDENCE) == statement:
+                return utils.close.Contradiction(sentID1 = num1, sentID2=num2), "Sentences contradict. The branch was closed."
 
     return None
                 

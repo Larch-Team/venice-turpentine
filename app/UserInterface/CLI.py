@@ -302,7 +302,7 @@ def do_use(session: engine.Session, command) -> str:
     return "\n".join(out)
 
 
-def do_contra(session, branch: str):
+def do_contra(session: engine.Session, branch: str):
     """Detects contradictions and handles them by closing their branches"""
     cont = session.deal_closure(branch)
     if cont:

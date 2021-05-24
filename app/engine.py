@@ -298,8 +298,9 @@ class Session(object):
             raise EngineError("Wrong context")
 
         # Statement and used retrieving
-        branch = self._get_node().getbranch_sentences()[0][:]
-        used = self._get_node().gethistory()
+        old = self._get_node()
+        branch = old.getbranch_sentences()[0][:]
+        used = old.gethistory()
 
         # Rule execution
         try:
@@ -311,11 +312,13 @@ class Session(object):
         if out is None:
             return None
 
-        old = self._get_node()
-        self._get_node().append(out)
+        old.append(out)
         children = old.children
+        assert len(children) == len(used_extention), "Liczba gałęzi i list komend powinna być taka sama"
         for j, s in zip(children, used_extention):
             j.History(*s)
+            for k in j.descendants:
+                k.History(*s)
         return tuple(i.branch for i in children)
 
 

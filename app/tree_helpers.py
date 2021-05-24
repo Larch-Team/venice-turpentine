@@ -19,7 +19,7 @@ class History(set):
 
     def add_sentence(self, element: Sentence) -> None:
         """Dodaje zdanie `element` do zbioru, o ile już w nim nie jest. Konkretniej dodaje wartość hash zdania."""
-        if isinstance(element, list):
+        if isinstance(element, Sentence):
             return super().add(hash(element))
         else:
             raise TypeError("History can only store sentences")
@@ -50,6 +50,9 @@ class History(set):
                     pass
             else:
                 raise TypeError(f"Historia nie przyjmuje typu {type(command).__name__} (komenda {num+1}.)")
+
+    def __repr__(self) -> str:
+        return super().__repr__()
 
     def __contains__(self, item: Sentence) -> bool:
         return super().__contains__(hash(item))

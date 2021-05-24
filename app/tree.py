@@ -34,7 +34,7 @@ class ProofElement(object):
         self.sentence = sentence
         self.branch = branch
         self.closed = None
-        self.history = History() if history is None else history
+        self.history = History() if history is None else history.copy()
         self.editable = True
         self.layer = layer
 
