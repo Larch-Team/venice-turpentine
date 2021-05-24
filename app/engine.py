@@ -213,7 +213,7 @@ class Session(object):
         problem = self.acc('FormalSystem').check_syntax(tokenized)
         if problem:
             logger.warning(f"{statement} is not a valid statement \n{problem}")
-            raise EngineError(f"Syntax error: {problem}")
+            raise EngineError(problem)
         else:
             tokenized = self.acc('FormalSystem').prepare_for_proving(tokenized)
             

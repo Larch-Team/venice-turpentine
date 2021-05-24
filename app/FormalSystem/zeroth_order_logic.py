@@ -101,22 +101,88 @@ def check_closure(branch: list[utils.Sentence], used: set[tuple[str]]) -> tp.Uni
 
     return None
                 
-        
-def check_syntax(tokenized_statement: utils.Sentence) -> tp.Union[str, None]:
-    """Sprawdza poprawność zapisu tokenizowanego zdania, zwraca informacje o błędach w formule"""
-    return None
-    # TODO: napisać check oparty na redukcji ze sprawdzaniem nawiasów i sprawdzanie czy w każdym występuje "_"
-    # tested = "".join(tokenized_statement).replace("(", "").replace(")", "")
-    # pattern = re.compile(r'(<not_.{1,3}>)?(<sentvar_\w>)<.{2,3}_.{1,3}>(<not_.{1,3}>)?(<sentvar_\w>)')
-    # if pattern.match(tested):
-    #     return None
-    # else:
-    #     after = pattern.sub(tested, '<sentvar_X>')
-    #     if after==tested:
-    #         return "Wrong structure"
-    #     else:
-    #         tested=after[:]
 
+### SYNTAX CHECKING
+
+
+def synchk_transcribe(sentence):
+    s = []
+    for el in sentence:
+        if el in ['(', ')']:
+            s.append(el)
+        else:
+            elem = el.split('_')
+            if elem[0] == 'sentvar':
+                s.append("s")
+            elif elem[0] == 'not':
+                s.append("1")
+            elif elem[0] in ('and', 'or', 'imp'):
+                s.append("2")
+    return "".join(s)
+
+
+def special_replace(string, old, new, index_list):
+    while string.find(old) != -1:
+        a = string.find(old)
+        string = string.replace(old, new, 1)
+        del index_list[a:a+len(old)]
+        index_list.insert(a, None)
+    return string, index_list
+
+
+def reduce_(sentence):
+    prev_sentence = ''
+    sentence = synchk_transcribe(sentence)
+    indexes = list(range(len(sentence)))
+    while prev_sentence != sentence:
+        prev_sentence = sentence
+        for to_replace in ('1s', 's2s', '(s)'):
+            sentence, indexes = special_replace(sentence, to_replace, "s", indexes)
+    return sentence, indexes
+
+
+def find_all(a_str, sub):
+    start = 0
+    while True:
+        start = a_str.find(sub, start)
+        if start == -1:
+            return
+        yield start
+        start += len(sub)
+
+
+def check_syntax(sentence: utils.Sentence) -> tp.Union[str, None]:
+    """Sprawdza poprawność zapisu tokenizowanego zdania, zwraca informacje o błędach w formule"""
+    reduced, indexes = reduce_(sentence)
+    if reduced == 's':
+        # ok
+        return None
+    if 's' not in reduced:
+        return 'Zdanie nie zawiera żadnych zmiennych'
+
+    if 'ss' in reduced:
+        return 'W zdaniu znajdują się dwie zmienne lub formuły niepołączone spójnikiem'
+
+    if '(' in reduced:
+        errors = find_all(reduced, '(')
+        for er in errors:
+            return f'Otwarcie nawiasu na pozycji {indexes[er]+1} nie ma zamknięcia'
+
+    if ')' in reduced:
+        errors = find_all(reduced, '(')
+        for er in errors:
+            return f'Zamknięcie nawiasu na pozycji {indexes[er]+1} nie ma otwarcia'
+
+    if 's2' in reduced:
+        errors = find_all(reduced, 's2')
+        for er in errors:
+            return f'Spójnik dwuargumentowy na pozycji {indexes[er]+2} nie ma prawego argumentu'
+
+    if '2s' in reduced:
+        errors = find_all(reduced, '2s')
+        for er in errors:
+            return f'Spójnik dwuargumentowy na pozycji {indexes[er]+1} nie ma lewego argumentu'
+    raise Exception('Zdanie nie jest poprawne')
 
 def get_rules() -> dict[str, str]:
     """Zwraca reguły rachunku z opisem"""
