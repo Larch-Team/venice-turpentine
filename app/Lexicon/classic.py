@@ -15,7 +15,9 @@ with utils.use_language('propositional'):
     Lex['or'] = 'lub', 'or', r'\|', 'v'
     Lex['imp'] = 'imp', '->'
     with utils.find_new():
-        Lex['sentvar'] = r'[a-z]', r'\w+'
+        Lex['sentvar'] = r'[a-z]'
+    with utils.no_generation():
+        Lex['sentvar'] = r'\w+'
 
 with utils.use_language('predicate'):
     Lex['forall'] = 'forall', '/\\', 'A'
