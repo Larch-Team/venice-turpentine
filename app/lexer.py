@@ -61,13 +61,17 @@ class BuiltLexer(object):
         self.LITERALS = lex.LITERALS
 
         self.find_new = self._get_find_new(lex)
-        used = self._join_rules(self._filter_constraints(lex, kwargs))
-        self.regexes = {key:self._regex_from_list(val) for key, val in used.items()}
+        lex_re = ( (i, j) for i, j, _ in self._filter_constraints(lex, kwargs) )
+        gen_re = ( (i, j) for i, j, for_generation in lex_re if for_generation)
+        self.lexer_regexes = {key:self._regex_from_list(val) for key, val in self._join_rules(lex_re).items()}
+        self.generator_regexes = {key:self._regex_from_list(val) for key, val in self._join_rules(gen_re).items()}
+        if set(self.lexer_regexes).issubset(self.generator_regexes): 
+            raise LrchLexerError("Zbiór leksemów nie pozwala na generowanie nowych zmiennych")
 
         class _Lex:
             _master_re = re
             literals = lex.LITERALS
-            tokens = [i.upper() for i in self.regexes]
+            tokens = [i for i in self.lexer_regexes]
             t_ignore = ' \t'
 
             def __init__(self) -> None:
@@ -88,8 +92,8 @@ class BuiltLexer(object):
                     else:
                         yield f"{i.type}_{i.value}"
 
-        for type_, lexems in sorted(self.regexes.items(), key=lambda x: len(x[1]), reverse=True):
-            setattr(_Lex, f"t_{type_.upper()}", lexems)
+        for type_, lexems in sorted(self.lexer_regexes.items(), key=lambda x: len(x[1]), reverse=True):
+            setattr(_Lex, f"t_{type_}", lexems)
 
         self.lexer = _Lex()
 
@@ -102,15 +106,11 @@ class BuiltLexer(object):
         for def_constr, type_, lexems in lex.rules:
             rewritten_satisfied = sep_items(satisfied)
             if all((i in rewritten_satisfied for i in def_constr if i[0] != 'find_new')):
-                yield type_, lexems
+                yield type_, lexems, any((i[0] == 'no_generation' for i in rewritten_satisfied))
 
     @staticmethod
     def _get_find_new(lex: Lexicon) -> set[str]:
         """Zwraca zbiór wszystkim typów, które określono w kontekście find_new"""
-        # Co jeśli:
-        # with find_new():
-        #   lex['a'] = 'b'
-        # lex['a'] = 'hgh'
         return {type_ for constraints, type_, _ in lex.rules if any((i[0] == 'find_new' for i in constraints))}
 
     @staticmethod
@@ -157,9 +157,9 @@ class BuiltLexer(object):
         :return: Token w formie `[typ]_[leksem]`
         :rtype: str
         """
-        assert type_ in self.regexes, "Type doesn't exist in this Lexicon"
+        assert type_ in self.generator_regexes, "Type doesn't exist in this Lexicon"
         if type_ in self.find_new:
-            new_lexems = generate(self.regexes[type_])
+            new_lexems = generate(self.generator_regexes[type_])
             used_lexems = sentence.getLexems()
 
             try:
@@ -174,7 +174,7 @@ class BuiltLexer(object):
             try:
                 new_lex = max(counted, key=lambda x: x[1])[0]
             except ValueError:
-                return getone(self.regexes[type_])
+                return getone(self.generator_regexes[type_])
             else:
                 return f"{type_}_{new_lex}"          
 

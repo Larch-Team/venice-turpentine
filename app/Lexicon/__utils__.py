@@ -10,3 +10,8 @@ class find_new(RuleConstraint):
 
     def __init__(self) -> None:
         super().__init__('')
+
+class no_generation(RuleConstraint):
+
+    def __init__(self) -> None:
+        super().__init__('')

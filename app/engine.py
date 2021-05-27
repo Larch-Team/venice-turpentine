@@ -390,8 +390,7 @@ class Session(object):
                 f"Branch '{self.branch}' doesn't exist in this proof")
         except AttributeError:
             raise EngineError("There is no proof started")
-        #TODO: USUNĄĆ WSZYSTKIE MENTIONS .get_lexem
-        reader = lambda x: self.acc('Output').get_readable(x, self.acc('Lexicon').get_lexem)
+        reader = lambda x: self.acc('Output').get_readable(x)
         if closed:
             return [reader(i) for i in branch], str(closed)
         else:
@@ -421,7 +420,7 @@ class Session(object):
                 "There is no proof started")
         
         printed = self.proof.gettree()
-        return self.acc('Output').write_tree(printed, self.acc('Lexicon').get_lexem)
+        return self.acc('Output').write_tree(printed)
 
 
     def next(self) -> None:

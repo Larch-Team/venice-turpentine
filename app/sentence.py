@@ -39,7 +39,7 @@ class Sentence(list):
         return [i.split('_') for i in self]
 
     def getReadable(self) -> str:
-        return self.S.acc('Output').get_readable(self, self.S.acc('Lexicon').get_lexem)
+        return self.S.acc('Output').get_readable(self)
 
     def getUnique(self) -> list[str]:
         """Zwraca zapis unikalny dla tego zdania; odporne na różnice w formacie zapisu"""
