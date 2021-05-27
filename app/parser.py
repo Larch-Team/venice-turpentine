@@ -48,9 +48,9 @@ class BuiltLexer(object):
             def error(self, t):
                 raise LrchLexerError(f'{t} is not tokenizable')
 
-        self.findnew = self._get_findnew(lex)
+        self.find_new = self._get_find_new(lex)
         used = self._join_rules(self._filter_constraints(lex, kwargs))
-        self.regexes = {key:r"|".join((f"({resc(i)})" for i in val)) for key, val in used.items()}
+        self.regexes = {key:self._regex_from_list(val) for key, val in used.items()}
 
         for type_, lexems in sorted(self.regexes.items(), key=lambda x: len(x[1]), reverse=True):
             setattr(_Lex, type_, lexems)
@@ -59,15 +59,23 @@ class BuiltLexer(object):
         self.lexer = _Lex()
 
     @staticmethod
+    def _regex_from_list(lst: list[str]):
+        return r"|".join((f"({resc(i)})" for i in lst))
+
+    @staticmethod
     def _filter_constraints(lex: Lexicon, const: dict[str, Any]) -> Iterable[tuple[str, tuple[str]]]:
         for constraints, type_, lexems in lex.rules:
-            if all((i in const.items() for i in constraints if i[0] != 'findnew')):
+            if all((i in const.items() for i in constraints if i[0] != 'find_new')):
                 yield type_, lexems
 
     @staticmethod
-    def _get_findnew(lex: Lexicon) -> set[str]:
-        """Zwraca zbiór wszystkim typów, które określono w kontekście findnew"""
-        return {type_ for constraints, type_, _ in lex.rules if any((i[0] == 'findnew' for i in constraints))}
+    def _get_find_new(lex: Lexicon) -> set[str]:
+        """Zwraca zbiór wszystkim typów, które określono w kontekście find_new"""
+        # Co jeśli:
+        # with find_new():
+        #   lex['a'] = 'b'
+        # lex['a'] = 'hgh'
+        return {type_ for constraints, type_, _ in lex.rules if any((i[0] == 'find_new' for i in constraints))}
 
     @staticmethod
     def _join_rules(rules: Iterable[tuple[str, tuple[str]]]) -> dict[str, tuple[str]]:
@@ -124,7 +132,7 @@ class BuiltLexer(object):
         :rtype: str
         """
         assert type_ in self.regexes, "Type doesn't exist in this Lexicon"
-        if type_ in self.findnew:
+        if type_ in self.find_new:
             new_lexems = generate(self.regexes[type_])
             used_lexems = sentence.getLexems()
 

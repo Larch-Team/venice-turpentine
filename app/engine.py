@@ -9,7 +9,7 @@ import pop_engine as pop
 from sentence import Sentence
 from tree import ProofNode
 from close import Close
-import parser
+from parser import BuiltLexer
 
 Module = pop.Module
 
@@ -36,7 +36,7 @@ def EngineChangeLog(func):
 
 
 def DealWithPOP(func):
-    """A decorator which convert all PluginErrors to EngineErrors for simpler handling in the UI socket"""
+    """Converts all PluginErrors to EngineErrors for simpler handling in the UI socket"""
     def new(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -144,6 +144,9 @@ class Session(object):
         self.config['chosen_plugins'][socket_name] = new
         self.write_config()
 
+        # Deal with parser
+        if socket_name == 'Lexicon':
+            self.compileLexer()
 
     def plug_list(self, socket: str) -> list[str]:
         """Zwraca listę wszystkich pluginów dla danej nazwy.
@@ -174,6 +177,14 @@ class Session(object):
             raise EngineError(f"There is no socket named {socket}")
         else:
             sock.generate_template(name)
+
+
+    # Lexer
+
+    def compileLexer(self) -> None:
+        self.parser = BuiltLexer(self.acc('Lexicon').get_lex(),
+            use_language = self.acc('FormalSystem').get_tags()
+        ) 
 
 
     # Config reading and writing
