@@ -13,6 +13,8 @@ import FormalSystem.__utils__ as utils
 SOCKET = 'FormalSystem'
 VERSION = '0.0.1'
 
+def get_tags() -> tuple[str]:
+    return 'sequent calculus', 'propositional'
 
 USED_TYPES = ('and', 'or', 'imp', 'sentvar', 'sep', 'turnstile','falsum')
 PRECEDENCE = {

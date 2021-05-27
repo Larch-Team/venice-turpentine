@@ -9,7 +9,7 @@ import pop_engine as pop
 from sentence import Sentence
 from tree import ProofNode
 from close import Close
-from parser import BuiltLexer
+import lexer
 
 Module = pop.Module
 
@@ -96,6 +96,8 @@ class Session(object):
         self.proof = None
         self.branch = ""
 
+        self.compileLexer()
+
 
     def __repr__(self):
         return f"Session({self.id=})"
@@ -144,7 +146,7 @@ class Session(object):
         self.config['chosen_plugins'][socket_name] = new
         self.write_config()
 
-        # Deal with parser
+        # Deal with lexer
         if socket_name == 'Lexicon':
             self.compileLexer()
 
@@ -182,7 +184,7 @@ class Session(object):
     # Lexer
 
     def compileLexer(self) -> None:
-        self.parser = BuiltLexer(self.acc('Lexicon').get_lex(),
+        self.lexer = lexer.BuiltLexer(self.acc('Lexicon').get_lexicon(),
             use_language = self.acc('FormalSystem').get_tags()
         ) 
 
@@ -217,9 +219,8 @@ class Session(object):
         :raises EngineError: Takie zdanie nie może istnieć
         """
         try:
-            tokenized = self.acc('Lexicon').tokenize(
-                statement, self.acc('FormalSystem').get_used_types(), self.defined)
-        except self.acc('Lexicon').utils.CompilerError as e:
+            tokenized = self.lexer.tokenize(statement)
+        except lexer.LrchLexerError as e:
             raise EngineError(str(e))
         tokenized = Sentence(tokenized, self)
         problem = self.acc('FormalSystem').check_syntax(tokenized)
@@ -389,6 +390,7 @@ class Session(object):
                 f"Branch '{self.branch}' doesn't exist in this proof")
         except AttributeError:
             raise EngineError("There is no proof started")
+        #TODO: USUNĄĆ WSZYSTKIE MENTIONS .get_lexem
         reader = lambda x: self.acc('Output').get_readable(x, self.acc('Lexicon').get_lexem)
         if closed:
             return [reader(i) for i in branch], str(closed)

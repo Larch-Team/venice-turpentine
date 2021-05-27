@@ -4,11 +4,10 @@ from re import escape as resc, compile
 from typing import Any, Iterable, Union, NewType
 from sentence import Sentence
 from exrex import generate, getone
+import re
 
-import sly
-from sly.lex import LexError
-
-LITERALS = {'(', ')'}
+import ply.lex as plex
+from ply.lex import LexError
 
 token_type = NewType('Token', str)
 
@@ -18,20 +17,39 @@ class LrchLexerError(Exception):
     pass
 
 
+def join_items(tuples):
+    d = {}
+    for k, v in tuples:
+        if k in d:
+            d[k].extend(v)
+        else:
+            d[k] = list(v)
+    return {k:tuple(v) for k,v in d.items()}
+
+def sep_items(tuples):
+    d = []
+    for k, v in tuples.items():
+        if isinstance(v, (tuple, list)):
+            d.extend([(k,i) for i in v])
+        else:
+            d.append((k,v))
+    return tuple(d)
+
 class Lexicon(object):
     STACK = []
+    LITERALS = {'(', ')'}
 
     def __init__(self) -> None:
         super().__init__()
         self.rules = set()
-        self.is_lowercase = False
+        self.needs_casing = False
 
     def __setitem__(self, type_: str, lexems: Union[str, Iterable[str]]) -> None:
         if isinstance(lexems, str):
-            self.rules.add(LexerRule(self.STACK.copy(), type_, [lexems]))
+            self.rules.add(LexerRule(tuple(self.STACK), type_, (lexems,)))
             self.needs_casing |= lexems.isupper()
-        elif isinstance(Iterable):
-            self.rules.add(LexerRule(self.STACK.copy(), type_, lexems))
+        elif isinstance(lexems, (list, tuple, set)):
+            self.rules.add(LexerRule(tuple(self.STACK), type_, lexems))
             self.needs_casing |= any((i.isupper() for i in lexems))
 
 
@@ -40,32 +58,50 @@ class BuiltLexer(object):
     def __init__(self, lex: Lexicon, **kwargs: dict[str, Any]) -> None:
         super().__init__()
         self.needs_casing = lex.needs_casing
-
-        class _Lex(sly.Lexer):
-            literals = LITERALS
-            tokens = set()
-
-            def error(self, t):
-                raise LrchLexerError(f'{t} is not tokenizable')
+        self.LITERALS = lex.LITERALS
 
         self.find_new = self._get_find_new(lex)
         used = self._join_rules(self._filter_constraints(lex, kwargs))
         self.regexes = {key:self._regex_from_list(val) for key, val in used.items()}
 
+        class _Lex:
+            _master_re = re
+            literals = lex.LITERALS
+            tokens = [i.upper() for i in self.regexes]
+            t_ignore = ' \t'
+
+            def __init__(self) -> None:
+                self.num_count = 0
+                self.build()
+
+            def t_error(self, t):
+                raise LrchLexerError(f'{t} is not tokenizable')
+
+            def build(self, **kwargs):
+                self.lexer = plex.lex(object=self,**kwargs)
+
+            def tokenize(self, s: str):
+                self.lexer.input(s)    
+                while (i := self.lexer.token()):
+                    if i.value in self.literals:
+                        yield i.value
+                    else:
+                        yield f"{i.type}_{i.value}"
+
         for type_, lexems in sorted(self.regexes.items(), key=lambda x: len(x[1]), reverse=True):
-            setattr(_Lex, type_, lexems)
-            _Lex.tokens.add(type_)
+            setattr(_Lex, f"t_{type_.upper()}", lexems)
 
         self.lexer = _Lex()
 
     @staticmethod
     def _regex_from_list(lst: list[str]):
-        return r"|".join((f"({resc(i)})" for i in lst))
+        return r"|".join((f"({i})" for i in lst))
 
     @staticmethod
-    def _filter_constraints(lex: Lexicon, const: dict[str, Any]) -> Iterable[tuple[str, tuple[str]]]:
-        for constraints, type_, lexems in lex.rules:
-            if all((i in const.items() for i in constraints if i[0] != 'find_new')):
+    def _filter_constraints(lex: Lexicon, satisfied: dict[str, Any]) -> Iterable[tuple[str, tuple[str]]]:
+        for def_constr, type_, lexems in lex.rules:
+            rewritten_satisfied = sep_items(satisfied)
+            if all((i in rewritten_satisfied for i in def_constr if i[0] != 'find_new')):
                 yield type_, lexems
 
     @staticmethod
@@ -87,13 +123,8 @@ class BuiltLexer(object):
         :return: reguły po złączeniu
         :rtype: dict[str, tuple[str]]
         """
-        d = {}
-        for type_, lexems in rules:
-            if type_ in d:
-                d[type_].extend(lexems)
-            else:
-                d[type_] = lexems
-        return d
+        d = join_items(rules)
+        return {k:sorted(i, reverse=True) for k,i in d.items()}
 
     def tokenize(self, formula: str) -> list[token_type]:
         """
@@ -108,13 +139,8 @@ class BuiltLexer(object):
         if not self.needs_casing:
             formula = formula.lower()
         
-        sentence = []
         try:
-            for i in self.lexer.tokenize(formula):
-                if i.value in LITERALS:
-                    sentence.append(i.value)
-                else:
-                    sentence.append(f"{i.type}_{i.value}")
+            sentence = list(self.lexer.tokenize(formula))
         except LexError as e:
             raise LrchLexerError(e)
         else:
@@ -166,6 +192,6 @@ class RuleConstraint(ABC):
         return
 
 
-    def __exit__(self) -> None:
+    def __exit__(self, *args) -> None:
         Lexicon.STACK.pop()
         return

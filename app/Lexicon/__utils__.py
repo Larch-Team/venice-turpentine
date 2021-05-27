@@ -1,12 +1,10 @@
-from parser import RuleConstraint
-from typing import Iterable
-
+from lexer import RuleConstraint, Lexicon
 # Rule Constraints
 
 class use_language(RuleConstraint):
 
-    def __init__(self, *args: Iterable[str]) -> None:
-        super().__init__(args)
+    def __init__(self, arg: str) -> None:
+        super().__init__(arg)
 
 class find_new(RuleConstraint):
 
