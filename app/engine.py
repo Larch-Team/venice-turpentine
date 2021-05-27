@@ -9,6 +9,7 @@ import pop_engine as pop
 from sentence import Sentence
 from tree import ProofNode
 from close import Close
+import parser
 
 Module = pop.Module
 

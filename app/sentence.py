@@ -34,6 +34,10 @@ class Sentence(list):
         """Zwraca ze zdania leksemy użyte przez użytkownika"""
         return [i.split('_')[-1] for i in self]
 
+    def getItems(self) -> list[tuple[str, str]]:
+        """Zwraca listę kolejno występujących typów w zdaniu"""
+        return [i.split('_') for i in self]
+
     def getReadable(self) -> str:
         return self.S.acc('Output').get_readable(self, self.S.acc('Lexicon').get_lexem)
 
