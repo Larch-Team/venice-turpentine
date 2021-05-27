@@ -14,15 +14,17 @@ with utils.use_language('propositional'):
     Lex['and'] = 'oraz', 'and', r'\^', '&'
     Lex['or'] = 'lub', 'or', r'\|', 'v'
     Lex['imp'] = 'imp', '->'
-    Lex['sentvar'] = r'[a-z]', r'\w+'
+    with utils.find_new():
+        Lex['sentvar'] = r'[a-z]', r'\w+'
 
 with utils.use_language('predicate'):
     Lex['forall'] = 'forall', '/\\', 'A'
     Lex['exists'] = 'exists', '\\/', 'E'
-    Lex['constant'] = r'[a-t]', r'\d'
-    Lex['indvar'] = r'[u-z]'
-    Lex['predicate'] = r'[P-Z]'
-    Lex['function'] = r'[F-O]'
+    with utils.find_new():
+        Lex['constant'] = r'[a-t]', r'\d'
+        Lex['indvar'] = r'[u-z]'
+        Lex['predicate'] = r'[P-Z]'
+        Lex['function'] = r'[F-O]'
 
 with utils.use_language('sequent calculus'):
     Lex['turnstile'] = '=>', '|-'
