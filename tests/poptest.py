@@ -304,7 +304,7 @@ class TestPlugging(test.TestCase):
         ))
         self.socket = pop_engine.Socket(
             'example_project', exampleproject_path, "0.0.0", funcs)
-        with self.assertRaises(SyntaxError):
+        with self.assertRaises(pop_engine.PluginError):
             self.socket.plug("example_wrong_ver_for")
 
     def test_wrong_folder(self):
