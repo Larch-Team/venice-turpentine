@@ -1,4 +1,6 @@
-import engine
+"""
+Tutaj umieść dokumentację swojego pluginu
+"""
 
 SOCKET = 'UserInterface'
 VERSION = '0.0.1'
@@ -6,10 +8,10 @@ VERSION = '0.0.1'
 
 def run() -> int:
     """
-    Should be used similarly to `if __name__=="__main__"`. Function is ran by the program to generate a working UI.
-    A `main.Session` object should be created for every user. To interact with the app engine use it's methods.
+    Traktować to podobnie, jak `if __name__=="__main__"`. Funkcja uruchomiona powinna inicjalizować działające UI.
+    Obiekt `main.Session` powinien być generowany dla każdego użytkownika. Wystarczy używać metod tego obiektu do interakcji z programem.
 
-    Returns:
-        int: Exit code; -1 will restart the app
+    :return: Exit code, -1 restartuje aplikację
+    :rtype: int
     """
     pass

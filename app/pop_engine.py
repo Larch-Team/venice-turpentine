@@ -123,9 +123,13 @@ class Socket(object):
         Returns:
             list[str]: List of all plugins in the socket's directory
         """
-        plugs = [file[:-3] for file in os.listdir(self.dir) if (
-            file.endswith(".py") and not (file in {f"{self.template}.py", f"{self.name}.py", "__init__.py"}))]
-        return plugs
+        return [
+            file[:-3]
+            for file in os.listdir(self.dir)
+            if file.endswith(".py")
+            and file
+            not in {f"{self.template}.py", "__utils__.py", "__init__.py"}
+        ]
 
     def unplug(self) -> None:
         """Unplugs the current plugin, not recommended"""
@@ -150,7 +154,7 @@ class Socket(object):
         assert self.dir != "<> test <>"
         if plugin_name.endswith(".py"):
             plugin_name = plugin_name[:-3]
-        if not plugin_name in self.find_plugins():
+        if plugin_name not in self.find_plugins():
             logger.error(f"{plugin_name} doesn't exist in {self.dir}")
             raise FileNotFoundError(
                 f"{plugin_name} doesn't exist in {self.dir}")
@@ -174,15 +178,19 @@ class Socket(object):
         if module:
             self.cache.move_to_end((self.name, plugin_name))
         else:
-            sys.path.insert(0, self.dir)
-            spec = importlib.util.spec_from_file_location(
-                plugin_name, f"{self.dir}/{plugin_name}.py")
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-            sys.path.pop(0)
-            if plugin_name != self.template:
-                self.cache[(self.name, plugin_name)] = module
+            module = self._only_import(plugin_name)
         return module
+
+    def _only_import(self, plugin_name):
+        sys.path.insert(0, self.dir)
+        spec = importlib.util.spec_from_file_location(
+            plugin_name, f"{self.dir}/{plugin_name}.py")
+        result = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(result)
+        sys.path.pop(0)
+        if plugin_name != self.template:
+            self.cache[(self.name, plugin_name)] = result
+        return result
 
     # Verification
 
@@ -198,9 +206,8 @@ class Socket(object):
         assert 'SOCKET' in dir(plugin), "No socket name in the plugin"
         if plugin.SOCKET != self.name:
             raise PluginError(message)
-        else:
-            logger.debug(f"Checked socket")
-            return True
+        logger.debug(f"Checked socket")
+        return True
 
     def check_version(self, plugin: Module, message: str) -> None:
         """Verifies plugin versions. Supported format: "x.x.z", changes on "z level" will be omitted in version checking
@@ -218,11 +225,11 @@ class Socket(object):
                 f"Wrong version format in the plugin: {str(plugin.VERSION)}")
             raise PluginError(
                 f"Wrong version format used in the plugin: {str(plugin.VERSION)}")
-        if plugin_ver[:-1] == self.version[:-1]:
-            logger.debug(f"Checked version")
-            return True
-        else:
+        if plugin_ver[:-1] != self.version[:-1]:
             raise VersionError(message)
+
+        logger.debug(f"Checked version")
+        return True
 
     def fits(self, plugin: Module) -> bool:
         """Function checks if module is connectable to the socket
@@ -250,11 +257,10 @@ class Socket(object):
         Raises:
             FunctionInterfaceError: Socket doesn't allow this function interface - wrong type of arguments/returned value.
         """
-        if self.functions.get(func.__name__, None) == None:
+        if self.functions.get(func.__name__, None) is None:
             return True
         sig = inspect.signature(func)
-        args = tuple(
-            [sig.parameters[j].annotation for j in sig.parameters.keys()])
+        args = tuple(sig.parameters[j].annotation for j in sig.parameters.keys())
         proper = self.functions[func.__name__]
 
         # Argument checking
@@ -266,9 +272,9 @@ class Socket(object):
             raise FunctionInterfaceError(
                 False, self, func, sig.return_annotation)
         else:
-            return True
             logger.debug(f"{func.__name__} compatible")
-
+            return True
+            
     def read_template(self, template: tp.Union[str, dict[str, tuple[tuple[tp.Any], tp.Any]]]):
         """
         Reads/Retrieves a template and modifies the shape of the socket according to the objects given in the template
@@ -279,9 +285,8 @@ class Socket(object):
             if not os.path.isfile(f"{self.dir}/{template}.py"):
                 raise FileNotFoundError(
                     f"{template}.py doesn't exist in {self.dir}")
-            else:
-                self.template = template
-                self.functions = self._get_functions_from_template(template)
+            self.template = template
+            self.functions = self._get_functions_from_template(template)
         else:
             self.template = None
             self.functions = template
@@ -304,13 +309,12 @@ class Socket(object):
             template, f"{template.__name__} can be a socket of {template.SOCKET}, not {self.name}")
 
         # Template reading
-        funcs = dict()
+        funcs = {}
         for i in inspect.getmembers(template, callable):
             if i[0].endswith('Error'):
                 continue
             sig = inspect.signature(i[1])
-            args = tuple(
-                [sig.parameters[j].annotation for j in sig.parameters.keys()])
+            args = tuple(sig.parameters[j].annotation for j in sig.parameters.keys())
             funcs[i[0]] = (args, inspect.signature(i[1]).return_annotation)
         return funcs
 

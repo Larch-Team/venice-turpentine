@@ -1,5 +1,14 @@
+"""
+Rachunek sekwentów z mechanizmem kontroli pętli na podstawie: 
+Howe, J. M. (1997, May). Two loop detection mechanisms: a comparison. In International Conference on Automated Reasoning with Analytic Tableaux and Related Methods (pp. 188-200). Springer, Berlin, Heidelberg.
+
+Dowody mogą czasem się nie udać.
+
+Implementacja opisana w:
+https://github.com/PogromcaPapai/Larch/blob/24e1391c183d08842aa0cf7df971eeb01a1a9885/media/int_seqcal%20-%20implementacja.pdf
+"""
 import typing as tp
-import FormalSystem as utils
+import FormalSystem.__utils__ as utils
 
 SOCKET = 'FormalSystem'
 VERSION = '0.0.1'
@@ -25,61 +34,7 @@ def is_sequent(l, s) -> bool:
                 buffor = []
         else:
             buffor.append(i)
-    if buffor == s:
-        return True
-    return False
-
-
-def get_part(sentence: utils.Sentence, split_type: str, sent_num: int):
-    """
-    Returns n-th part of the sentence (split_types is the type of separator)
-
-    Changes the sentence!!
-    """
-    split_count = 0
-    start_split = 0
-    for s in sentence:
-        if s.startswith(f"{split_type}_"):
-            split_count += 1
-        if split_count == sent_num:
-            break
-        start_split += 1
-
-    if len(sentence) <= start_split or split_count<sent_num:
-        raise IndexError("sent_num is too big")
-
-    part = []
-    if split_count>0:
-        sentence.pop(start_split)
-    
-    while start_split<len(sentence) and not sentence[start_split].startswith(f"{split_type}_"):
-        part.append(sentence.pop(start_split))
-
-    if len(sentence)>0 and split_count == 0:
-        sentence.pop(start_split)
-    return part
-
-
-def merge_tupstruct(left: tuple[tuple[str]], right: tuple[tuple[str]], glue: str):
-    """
-    Merges two tuple structures into one
-    """
-    if isinstance(left, tuple) and isinstance(left, tuple):
-        assert len(left) == len(right), "Tuples not of equal length"
-        end = []
-        for l, r in zip(left, right):
-            end.append(merge_tupstruct(l, r, glue))
-        return tuple(end)
-    elif isinstance(left, list) and isinstance(left, list):
-        return left + [glue] + right
-    else:
-        # Bug reporting
-        l_correct = (isinstance(left, list) or isinstance(left, tuple))
-        r_correct = (isinstance(right, list) or isinstance(right, tuple))
-        if l_correct and r_correct:
-            raise AssertionError("Tuples not of equal depth")
-        else:
-            raise AssertionError((l_correct*"left")+(l_correct*r_correct *' and ')+(r_correct*"right") + "tuple is messed up")
+    return buffor == s
 
 
 def sep(part: utils.Sentence = None) -> list[str]:
@@ -98,7 +53,7 @@ def rule_left_and(left: utils.Sentence, right: utils.Sentence, num: int):
         A&B,... => ...
     """
     try:
-        conj = get_part(left, 'sep', num-1)
+        conj = utils.pop_part(left, 'sep', num-1)
     except IndexError:
         return (None, None)
     
@@ -114,7 +69,7 @@ def rule_right_and(left: utils.Sentence, right: utils.Sentence):
         __________________________
         ... => A&B
     """
-    conj = get_part(right, 'sep', 0)
+    conj = utils.pop_part(right, 'sep', 0)
     if conj is None:
         return (None, None)
 
@@ -130,7 +85,7 @@ def rule_left_or(left: utils.Sentence, right: utils.Sentence, num: int):
         AvB,... => ...
     """
     try:
-        conj = get_part(left, 'sep', num-1)
+        conj = utils.pop_part(left, 'sep', num-1)
     except IndexError:
         return (None, None)
     
@@ -149,7 +104,7 @@ def rule_right_or(left: utils.Sentence, right: utils.Sentence, side: str):
     if not right or side not in ('l', 'r','find'):
         return (None, None)
     
-    subsent = get_part(right, 'sep', 0)
+    subsent = utils.pop_part(right, 'sep', 0)
     split = utils.strip_around(subsent, 'or', False, PRECEDENCE)
     if split is None or split[0] is None:
         return (None, None)
@@ -176,7 +131,7 @@ def rule_left_imp(left: utils.Sentence, right: utils.Sentence, num: int):
         A -> B,... => ...
     """
     try:
-        conj = get_part(left, 'sep', num-1)
+        conj = utils.pop_part(left, 'sep', num-1)
     except IndexError:
         return (None, None)
     
@@ -193,7 +148,7 @@ def rule_right_imp(left: utils.Sentence, right: utils.Sentence):
         ... => A -> B
     """
     try:
-        conj = get_part(right, 'sep', 0)
+        conj = utils.pop_part(right, 'sep', 0)
     except IndexError:
         return (None, None)
     
@@ -209,7 +164,7 @@ def rule_left_strong(left: utils.Sentence, right: utils.Sentence, num: int):
         ..., A => ...
     """
     try:
-        conj = get_part(left, 'sep', num-1)
+        conj = utils.pop_part(left, 'sep', num-1)
     except IndexError:
         return (None, None)
     
@@ -221,7 +176,7 @@ def rule_left_weak(left: utils.Sentence, right: utils.Sentence, num: int):
         ..., A => ...
     """
     try:
-        conj = get_part(left, 'sep', num-1)
+        conj = utils.pop_part(left, 'sep', num-1)
     except IndexError:
         return (None, None)
     
@@ -229,39 +184,39 @@ def rule_left_weak(left: utils.Sentence, right: utils.Sentence, num: int):
 
 RULES = {
     'left and': utils.Rule(
-        symbolic="",
-        docs="",
+        symbolic="A&B, ... => ... // A, B, ... => ...",
+        docs="Rozkładanie koniunkcji po lewej stronie sekwentu",
         func=rule_left_and,
         reusable=None, # Not needed
         context=[utils.ContextDef(
             variable='partID',
             official='Subsentence number',
-            docs='',
+            docs='The number of the sequent\'s element',
             type_=int
         )]
     ),
     'left or': utils.Rule(
-        symbolic="",
-        docs="",
+        symbolic="A v B, ... => ... // A, B, ... => ...",
+        docs="Rozkładanie alternatywy po lewej stronie sekwentu",
         func=rule_left_or,
         reusable=None, # Not needed
         context=[utils.ContextDef(
             variable='partID',
             official='Subsentence number',
-            docs='',
+            docs='The number of the sequent\'s element',
             type_=int
         )]
     ),
     'right and': utils.Rule(
-        symbolic="",
-        docs="",
+        symbolic="... => A & B // ... => A | ... => B",
+        docs="Rozkładanie koniunkcji po prawej stronie sekwentu",
         func=rule_right_and,
         reusable=None, # Not needed
         context=[]
     ),
     'right or': utils.Rule(
-        symbolic="",
-        docs="",
+        symbolic="... => ... v ... // ... => ...",
+        docs="Rozkładanie alternatywy po prawej stronie sekwentu",
         func=rule_right_or,
         reusable=None, # Not needed
         context=[
@@ -273,45 +228,45 @@ RULES = {
         )]
     ),
     'left imp': utils.Rule(
-        symbolic="",
-        docs="",
+        symbolic="..., A -> B => ... // ..., A => B | ..., B => ...",
+        docs="Rozkładanie implikacji po lewej stronie sekwentu",
         func=rule_left_imp,
         reusable=None, # Not needed
         context=[utils.ContextDef(
             variable='partID',
             official='Subsentence number',
-            docs='',
+            docs='The number of the sequent\'s element',
             type_=int
         )]
     ),
     'right imp': utils.Rule(
-        symbolic="",
-        docs="",
+        symbolic="... => A -> B // A, ... => B",
+        docs="Rozkładanie implikacji po prawej stronie sekwentu",
         func=rule_right_imp,
         reusable=None, # Not needed
         context=[]
     ),
     'left weak': utils.Rule(
-        symbolic="",
-        docs="",
+        symbolic="A, A, ... => ... // A, ... => ...",
+        docs="Reguła osłabiania lewej strony",
         func=rule_left_weak,
         reusable=None, # Not needed
         context=[utils.ContextDef(
             variable='partID',
             official='Subsentence number',
-            docs='',
+            docs='The number of the sequent\'s element',
             type_=int
         )]
     ),
     'left strong': utils.Rule(
-        symbolic="",
-        docs="",
+        symbolic="A, ... => ... // A, A, ... => ...",
+        docs="Reguła wzmacniania dla lewej strony",
         func=rule_left_strong,
         reusable=None, # Not needed
         context=[utils.ContextDef(
             variable='partID',
             official='Subsentence number',
-            docs='',
+            docs='The number of the sequent\'s element',
             type_=int
         )]
     ),
@@ -321,14 +276,16 @@ RULES = {
 
 
 def prepare_for_proving(statement: utils.Sentence) -> utils.Sentence:
+    """Przygotowuje zdanie do dowodzenia - czyszczenie, dodawanie elementów"""
     statement = utils.reduce_brackets(statement)
-    if not 'turnstile_=>' in statement:
+    if 'turnstile_=>' not in statement:
         return ['turnstile_=>']+statement
     else:
         return statement
 
 
-def check_contradict(branch: list[utils.Sentence], used: set[tuple[str]]) -> tp.Union[None, tuple[int, str, str]]:
+def check_closure(branch: list[utils.Sentence], used: set[tuple[str]]) -> tp.Union[None, tuple[utils.close.Close, str]]:
+    """Sprawdza możliwość zamknięcia gałęzi, zwraca obiekty zamknięcia oraz komunikat do wyświetlenia"""
     left, right = utils.strip_around(branch[-1], "turnstile", False, PRECEDENCE)[0]
     seps = sum((i.startswith('sep_') for i in left), 1)
 
@@ -336,41 +293,41 @@ def check_contradict(branch: list[utils.Sentence], used: set[tuple[str]]) -> tp.
     empty = len(right)==1
 
     # Left part verification
-    if len(left)==0:
+    if not left:
         return None
-    for i in range(0, seps):
-        f = get_part(left[:], 'sep', i)
+    for i in range(seps):
+        f = utils.pop_part(left[:], 'sep', i)
 
         # F, ... => ...
         if len(f)==1 and f[0].startswith("falsum_"):
-            return 1, f"Falsum", f"Falsum found on the left"
+            return utils.close.Falsum, "Falsum found on the left"
 
         # p, ... => p
         if f==right:
-            return 1, f"Ax", f"Sequent on the right corresponds with a sequent on the left"
+            return utils.close.Axiom, "Sequent on the right corresponds with a sequent on the left"
 
         # Detect finish
         empty &= not any((any((j.startswith(i) for j in f)) for i in ('and_', 'or_', 'imp_')))
 
     if empty:
-        return 0, "", "Nothing more can be done with this branch, so it was closed."
+        return utils.close.Emptiness, "Nothing more can be done with this branch, so it was closed."
 
 
 def check_syntax(tokenized_statement: utils.Sentence) -> tp.Union[str, None]:
-    """Should return string description of the problem in syntax"""
-    return True
+    """Sprawdza poprawność zapisu tokenizowanego zdania, zwraca informacje o błędach w formule"""
+    return None
 
 
 def get_rules() -> dict[str, str]:
-    """Returns the names and documentation of the rules"""
-    rule_dict = dict()
-    for name, rule in RULES.items():
-        rule_dict[name] = "\n".join((rule.symbolic, rule.docs))
-    return rule_dict
+    """Zwraca reguły rachunku z opisem"""
+    return {
+        name: "\n".join((rule.symbolic, rule.docs))
+        for name, rule in RULES.items()
+    }
 
 
 def get_needed_context(rule_name: str) -> tuple[utils.ContextDef]:
-    """Returns needed arguments for the given rule"""
+    """Zwraca informacje o wymaganym przez daną regułę kontekście w formie obiektów ContextDef"""
     if (rule := RULES.get(rule_name, None)):
         return tuple(rule.context)
     else:
@@ -381,27 +338,32 @@ def get_used_types() -> tuple[str]:
     return USED_TYPES
 
 
-def use_rule(name: str, branch: list[utils.Sentence], used: set[utils.Sentence], context: dict[str, tp.Any], auto: bool = False) -> tuple[tp.Union[tuple[tuple[utils.Sentence]], None], int]:
-    """Uses a rule of the given name on the provided branch.
-        Context allows to give the FormalSystem additional arguments. 
-        Use `self.access('FormalSystem').get_needed_context(rule)` to check for needed context
+def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, context: dict[str, tp.Any], auto: bool) -> tuple[tp.Union[tuple[tuple[utils.Sentence]], None], tp.Union[tuple[tuple[tp.Union[int, callable, utils.Sentence]]], None]]:
+    """
+    Używa określonej reguły na podanej gałęzi.
+    Więcej: https://www.notion.so/szymanski/Gniazda-w-Larchu-637a500c36304ee28d3abe11297bfdb2#98e96d34d3c54077834bc0384020ff38
 
-    :param name: Rule name
+    :param name: Nazwa używanej reguły, listę można uzyskać z pomocą FormalSystem.get_rules()
     :type name: str
-    :param branch: List of sentences in a branch
+    :param branch: Lista zdań w gałęzi, na której została użyta reguła
     :type branch: list[utils.Sentence]
-    :param context: Additional arguments
-    :param used: Set of sentences that were already used
-    :type used: set[utils.Sentence]
-    :type context: dict[str,tp.Any]
-    :return: Generated tuple structure with the sentences and sentence ID
-    :rtype: tuple[tp.Union[tuple[tuple[utils.Sentence]], None], int]
+    :param used: Obiekt historii przechowujący informacje o już rozłożonych zdaniach
+    :type used: utils.History
+    :param context: kontekst wymagany do zastosowania reguły, listę można uzyskać z pomocą FormalSystem.get_needed_context(rule)
+        Kontekst reguł: https://www.notion.so/szymanski/Zarz-dzanie-kontekstem-regu-2a5abea2a1bc492e8fa3f8b1c046ad3a
+    :type context: dict[str, tp.Any]
+    :param auto: , defaults to False
+    :type auto: bool, optional
+    :return: Struktura krotek, reprezentująca wynik reguły oraz strukturę reprezentującą operacje do wykonania na zbiorze zamknięcia.
+        Struktury krotek: https://www.notion.so/szymanski/Reprezentacja-dowod-w-w-Larchu-cd36457b437e456a87b4e0c2c2e38bd5#014dccf44246407380c4e30b2ea598a9
+        Zamykanie gałęzi: https://www.notion.so/szymanski/Zamykanie-ga-zi-53249279f1884ab4b6f58bbd6346ec8d
+    :rtype: tuple[tp.Union[tuple[tuple[utils.Sentence]], None], tp.Union[tuple[tuple[tp.Union[int, callable, utils.Sentence]]], None]]
     """
     rule = RULES[name]
 
     start = utils.strip_around(branch[-1], "turnstile", False, PRECEDENCE)
     start_left, start_right = start[0]
-    
+
     # Check sequent number
     if context.get('partID', -1) > sum(i.startswith('sep') for i in start_left)+1:
         raise utils.FormalSystemError("Sequent number is too big")
@@ -428,10 +390,14 @@ def use_rule(name: str, branch: list[utils.Sentence], used: set[utils.Sentence],
     left, right = rule.func(start_left[:], start_right[:], *context.values())
 
     # Outcome return
-    if not (left is None or right is None):
+    if left is not None and right is not None:
         # History length multiplication
         if not history:
             history = [[0]]*len(left)
-        return merge_tupstruct(left, right, "turnstile_=>"), history
+        return utils.merge_tupstruct(left, right, "turnstile_=>"), history
     else:
         return None, None
+
+def get_operator_precedence() -> dict[str, int]:
+    """Zwraca siłę wiązania danych spójników, im wyższa, tym mocniej wiąże (negacja ma najwyższą przykładowo)"""
+    return PRECEDENCE
