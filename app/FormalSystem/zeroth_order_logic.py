@@ -97,7 +97,7 @@ def check_closure(branch: list[utils.Sentence], used: set[tuple[str]]) -> tp.Uni
                 continue
 
             if utils.reduce_prefix(negated, 'not', PRECEDENCE) == statement:
-                return utils.close.Contradiction(sentID1 = num1, sentID2=num2), "Sentences contradict. The branch was closed."
+                return utils.close.Contradiction(sentID1 = num1+1, sentID2 = num2+1), "Sentences contradict. The branch was closed."
 
     return None
                 
