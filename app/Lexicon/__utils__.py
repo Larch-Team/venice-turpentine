@@ -1,4 +1,5 @@
 import typing as tp
+from sentence import Sentence
 
 lexicon = None
 
@@ -14,7 +15,5 @@ class MultipleTypesError(CompilerError):
         msg = "\n".join(("Multiple types found for:", *lists))
         super().__init__(msg, *args, **kwargs)
 
-
-Sentence = tp.NewType("Sentence", list[str])
 
 NON_CONVERTIBLE = ("(", ")")

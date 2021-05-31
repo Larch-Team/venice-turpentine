@@ -1,7 +1,7 @@
 import typing as tp
-import Auto as utils
 from collections import namedtuple
 from math import inf
+import Auto.__utils__ as utils
 
 SOCKET = 'Auto'
 VERSION = '0.0.1'

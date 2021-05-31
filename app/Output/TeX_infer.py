@@ -1,5 +1,8 @@
+"""
+Konwertuje dowód do kodu TeX, który, z pomocą paczki proof.sty dostępnej na stronie http://research.nii.ac.jp/~tatsuta/proof-sty.html, może zostać wyrenderowany do dowodu stylizowanego na rachunek sekwentów.
+"""
 import typing as tp
-import Output as utils
+import Output.__utils__ as utils
 
 SOCKET = 'Output'
 VERSION = '0.0.1'
@@ -17,16 +20,16 @@ TEX_DICTIONARY = {
 }
 
 def get_readable(sentence: utils.Sentence, lexem_parser: callable) -> str:
-    """Returns a readable version of the sentence
+    """Zwraca zdanie w czytelnej formie
 
-    :param sentence: Transcribed sentence
+    :param sentence: Zdanie do transformacji
     :type sentence: Sentence
-    :param lexem_parser: Transforms tokens into lexems to use (get_lexem for example)
+    :param lexem_parser: Funkcja jednoargumentowa konwertująca tokeny na leksemy
     :type lexem_parser: callable
-    :return: Transcribed string
+    :return: Przepisane zdanie
     :rtype: str
     """
-    assert isinstance(sentence, list)
+    assert isinstance(sentence, utils.Sentence)
     readable = []
     for lexem in (lexem_parser(i) for i in sentence):
         if len(lexem) > 1:
@@ -37,7 +40,14 @@ def get_readable(sentence: utils.Sentence, lexem_parser: callable) -> str:
 
 def write_tree(tree: utils.PrintedTree, lexem_parser: callable) -> list[str]:
     """
-    Returns a tree/table representation of the whole proof
+    Zwraca drzewiastą reprezentację dowodu
+
+    :param tree: Drzewo do konwersji
+    :type tree: utils.PrintedTree
+    :param lexem_parser: Funkcja jednoargumentowa konwertująca tokeny na leksemy
+    :type lexem_parser: callable
+    :return: Dowód w liście
+    :rtype: list[str]
     """
     return [_write_tree(tree.sentences, tree.children, lexem_parser)]
 
@@ -56,9 +66,11 @@ def _translate(s: utils.Sentence, lexem_parser: callable):
 
 def _write_tree(sentences, children, lexem_parser: callable) -> str:
     if len(sentences)>0:
-        return "\\infer{%s}{%s}" % (_translate(sentences[0], lexem_parser), 
-            _write_tree(sentences[1:], children, lexem_parser))
+        return _gen_infer(_translate(sentences[0], lexem_parser), _write_tree(sentences[1:], children, lexem_parser))
     elif children is not None:
         return " & ".join((_write_tree(i.sentences, i.children, lexem_parser) for i in children))
     else:
         return ""
+
+def _gen_infer(s1, s2):
+    return "\\infer{%s}{%s}" % (s1, s2)
