@@ -1,3 +1,7 @@
+"""
+WRITE_TREE DOES NOT WORK PROPERLY
+
+"""
 import typing as tp
 import Output as utils
 
@@ -16,7 +20,13 @@ def get_readable(sentence: utils.Sentence, lexem_parser: callable) -> str:
     :rtype: str
     """
     assert isinstance(sentence, list)
-    return "<"+"> <".join(sentence)+">"
+    readable = []
+    for lexem in (lexem_parser(i) for i in sentence):
+        if len(lexem) > 1:
+            readable.append(f" {lexem} ")
+        else:
+            readable.append(lexem)
+    return "".join(readable).replace("  ", " ")
 
 def write_tree(tree: utils.PrintedTree, lexem_parser: callable) -> list[str]:
     """

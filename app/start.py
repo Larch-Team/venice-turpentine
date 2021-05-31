@@ -7,8 +7,18 @@ import pop_engine as pop
 
 DEBUG = True
 
-# Wyjaśnienie sensu istnienia pliku:
-# https://www.notion.so/szymanski/The-curious-case-of-the-UserInterface-socket-ab76cfc810d9486bb8ce9199f0cc7efc
+#             Import schema
+#
+#   pop_engine (imported by everything)
+#           /       |      \
+#    start.py<-UI plugin<-engine.py
+#                    \-----/
+#                  not possible
+#
+# I don't think UI plugin can be connected to engine.py, hence this file.
+# Due to the dependency graph (Import schema) engine.py can't import UI plugins.
+# Maybe there will be a DummySocket, which allows other operations, but doesn't import the package.
+# For now just do what you can to avoid this.
 
 if __name__ == "__main__":
     try:
@@ -27,7 +37,7 @@ if __name__ == "__main__":
         while exit_code == -1:
 
             # App run
-            with open('config/config.json', 'r') as file:
+            with open('config.json', 'r') as file:
                 config = json.load(file)
             UI.plug(config['chosen_plugins']['UserInterface'])
             exit_code = UI().run()

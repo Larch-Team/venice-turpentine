@@ -1,13 +1,10 @@
-"""
-Podstawowy słownik programu, niedługo dojdzie do modyfikacji tego socketu, więc nie opisywałem.
-"""
 import typing as tp
 from collections import namedtuple
 from string import ascii_letters as alphabet
 from functools import lru_cache
 import re
 from functools import reduce
-import Lexicon.__utils__ as utils
+import Lexicon as utils
 
 SOCKET = 'Lexicon'
 VERSION = '0.0.1'
@@ -62,9 +59,9 @@ full_lexicon['types'] = reduce(lambda x, y: x | y, ((
 
 def group_by_value(l: list[tuple[str, str]]) -> dict[str, list[str]]:
     """When given a list of (key, value) returns a dictionary, where keys are grouped by values"""
-    allfound = {}
+    allfound = dict()
     for i in l:
-        if i[0] in allfound:
+        if i[0] in allfound.keys():
             allfound[i[0]].append(i[1])
         else:
             allfound[i[0]] = [i[1]]
@@ -76,18 +73,6 @@ def letter_range(regex: str) -> tuple[int, int]:
     assert regex[1].islower() is regex[3].islower(
     ), "One letter is higher case and one is lower case"
     return alphabet.index(regex[1]), alphabet.index(regex[3])
-
-
-def sign_list(type_: str) -> list[str]:
-    """Zwraca listę potencjalnych znaków dla typów zmiennych (sentvar, predicate itp.)"""
-    for letters, var_type in full_lexicon.get('variables'):
-        if var_type == type_:
-            break
-    else:
-        raise Exception("Taki typ nie został zdefiniowany")
-    
-    i, j = letter_range(letters)
-    return list(alphabet[i:j])
 
 
 def check_range(letter: str, indexA: int, indexB: int) -> bool:
@@ -122,11 +107,11 @@ def simplify_lexicon(used_tokens: frozenset[str], defined: frozenset[tuple[str, 
     # Check for duplicates
     dup_key = [i for i in group_by_value(
         filtered_keywords).items() if len(i[1]) > 1]
-    if dup_key:
+    if len(dup_key) > 0:
         raise utils.MultipleTypesError(dup_key)
     dup_var = [i for i in group_by_value(
         filtered_keywords).items() if len(i[1]) > 1]
-    if dup_var:
+    if len(dup_var) > 0:
         raise utils.MultipleTypesError(dup_var)
 
     # Prepare data

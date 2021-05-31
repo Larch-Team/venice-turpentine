@@ -1,8 +1,5 @@
-"""
-Tabele analityczne KRZ w stylizacji Smullyana bez formuł sygnowanych.
-"""
 import typing as tp
-import FormalSystem.__utils__ as utils
+import FormalSystem as utils
 
 SOCKET = 'FormalSystem'
 VERSION = '0.0.1'
@@ -15,23 +12,22 @@ PRECEDENCE = {
     'and':3,
     'or':3,
     'imp':2,
-    'not':4
 }
 
 def red_neg(x):
-    return utils.reduce_prefix(x, 'not', PRECEDENCE)
+    return utils.reduce_prefix(x, 'not', ('not'))
 
 RULES = {
     'true and': utils.Rule(
         symbolic="A and B / A; B",
-        docs="Rozkładanie prawdziwej koniunkcji. Wymaga wskazania zdania w gałęzi.",
+        docs="Needs sentence ID",
         func=lambda x: utils.strip_around(x, 'and', False, PRECEDENCE),
         context = None,
         reusable=True
     ),
     'false and': utils.Rule(
         symbolic="~(A and B) / ~A | ~B",
-        docs="Rozkładanie fałszywej koniunkcji. Wymaga wskazania zdania w gałęzi.",
+        docs="Needs sentence ID",
         func=lambda x: utils.add_prefix(utils.strip_around(
             red_neg(x), 'and', True, PRECEDENCE), 'not', '~'),
         context = None,
@@ -39,7 +35,7 @@ RULES = {
     ),
     'false or': utils.Rule(
         symbolic="~(A or B) / ~A; ~B",
-        docs="Rozkładanie fałszywej alternatywy. Wymaga wskazania zdania w gałęzi.",
+        docs="Needs sentence ID",
         func=lambda x: utils.add_prefix(utils.strip_around(
             red_neg(x), 'or', False, PRECEDENCE), 'not', '~'),
         context = None,
@@ -47,30 +43,30 @@ RULES = {
     ),
     'true or': utils.Rule(
         symbolic="(A or B) / A | B",
-        docs="Rozkładanie prawdziwej alternatywy. Wymaga wskazania zdania w gałęzi.",
+        docs="Needs sentence ID",
         func=lambda x: utils.strip_around(x, 'or', True, PRECEDENCE),
         context = None,
         reusable=False
     ),
     'false imp': utils.Rule(
         symbolic="~(A -> B) / A; ~B",
-        docs="Rozkładanie fałszywej implikacji. Wymaga wskazania zdania w gałęzi.",
+        docs="Needs sentence ID",
         func=lambda x: utils.select(utils.strip_around(red_neg(x),'imp', False, PRECEDENCE), ((False, True),), lambda y: utils.add_prefix(y, 'not', '~')),
         context = None,
         reusable=True
     ),
     'true imp': utils.Rule(
         symbolic="(A -> B) / ~A | B",
-        docs="Rozkładanie prawdziwej implikacji. Wymaga wskazania zdania w gałęzi.",
+        docs="Needs sentence ID",
         func=lambda x: utils.select(utils.strip_around(x, 'imp', True, PRECEDENCE), ((True,), (False,)), lambda y: utils.add_prefix(y, 'not', '~')),
         context = None,
         reusable=False
     ),
     'double not': utils.Rule(
         symbolic="~~A / A",
-        docs="Usuwanie podwójnej negacji. Wymaga wskazania zdania w gałęzi.",
+        docs="Needs sentence ID",
         func=lambda x: utils.reduce_prefix(
-            utils.reduce_prefix(utils.empty_creator(x), 'not', PRECEDENCE), 'not', PRECEDENCE),
+            utils.reduce_prefix(utils.empty_creator(x), 'not', ('not')), 'not', ('not')),
         context = None,
         reusable=True
     )
@@ -81,12 +77,12 @@ RULES = {
 
 @utils.cleaned
 def prepare_for_proving(statement: utils.Sentence) -> utils.Sentence:
-    """Przygotowuje zdanie do dowodzenia - czyszczenie, dodawanie elementów"""
+    """Cleaning the sentence"""
     return statement
 
 
-def check_closure(branch: list[utils.Sentence], used: set[tuple[str]]) -> tp.Union[None, tuple[utils.close.Close, str]]:
-    """Sprawdza możliwość zamknięcia gałęzi, zwraca obiekty zamknięcia oraz komunikat do wyświetlenia"""
+def check_contradict(branch: list[utils.Sentence], used: set[tuple[str]]) -> tp.Union[None, tuple[int, str, str]]:
+    """Checks for closing sentences"""
     for num1, statement_1 in enumerate(branch[:-1]):
         for num2, statement_2 in enumerate(branch[-2:]):
             if statement_1[0].startswith('not') and not statement_2[0].startswith('not'):
@@ -97,13 +93,17 @@ def check_closure(branch: list[utils.Sentence], used: set[tuple[str]]) -> tp.Uni
                 continue
 
             if utils.reduce_brackets(negated[1:]) == statement:
-                return utils.close.Contradiction, "Sentences contradict. The branch was closed."
+                # return 1, f"XXX ({num1+1}, {num2+1})", f"Sentences {num1+1} and {num2+1} contradict. The branch was closed."
+                # TODO: naprawić printowanie numeru zdań
+                return 1, f"XXX", f"Sentences contradict. The branch was closed."
 
     return None
                 
         
-def check_syntax(tokenized_statement: utils.Sentence) -> tp.Union[str, None]:
-    """Sprawdza poprawność zapisu tokenizowanego zdania, zwraca informacje o błędach w formule"""
+
+
+def check_syntax(sentence: utils.Sentence) -> tp.Union[str, None]:
+    """True if sentence's syntax is correct; Doesn't check brackets"""
     return None
     # TODO: napisać check oparty na redukcji ze sprawdzaniem nawiasów i sprawdzanie czy w każdym występuje "_"
     # tested = "".join(tokenized_statement).replace("(", "").replace(")", "")
@@ -119,63 +119,58 @@ def check_syntax(tokenized_statement: utils.Sentence) -> tp.Union[str, None]:
 
 
 def get_rules() -> dict[str, str]:
-    """Zwraca reguły rachunku z opisem"""
-    return {
-        name: "\n".join((rule.symbolic, rule.docs))
-        for name, rule in RULES.items()
-    }
+    """Returns the names and documentation of the rules"""
+    rule_dict = dict()
+    for name, rule in RULES.items():
+        rule_dict[name] = "\n".join((rule.symbolic, rule.docs))
+    return rule_dict
 
 
 def get_used_types() -> tuple[str]:
     return USED_TYPES
 
 
-def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, context: dict[str, tp.Any], auto: bool = False) -> tuple[tp.Union[tuple[tuple[utils.Sentence]], None], tp.Union[tuple[tuple[tp.Union[int, callable, utils.Sentence]]], None]]:
-    """
-    Używa określonej reguły na podanej gałęzi.
-    Więcej: https://www.notion.so/szymanski/Gniazda-w-Larchu-637a500c36304ee28d3abe11297bfdb2#98e96d34d3c54077834bc0384020ff38
+def use_rule(name: str, branch: list[utils.Sentence], used: set[utils.Sentence], context: dict[str,tp.Any], auto: bool = False) -> tuple[tp.Union[tuple[tuple[utils.Sentence]], None], int]:
+    """Uses a rule of the given name on the provided branch.
+        Context allows to give the FormalSystem additional arguments. 
+        This system only uses sentenceID
 
-    :param name: Nazwa używanej reguły, listę można uzyskać z pomocą FormalSystem.get_rules()
+    :param name: Rule name
     :type name: str
-    :param branch: Lista zdań w gałęzi, na której została użyta reguła
+    :param branch: List of sentences in a branch
     :type branch: list[utils.Sentence]
-    :param used: Obiekt historii przechowujący informacje o już rozłożonych zdaniach
-    :type used: utils.History
-    :param context: kontekst wymagany do zastosowania reguły, listę można uzyskać z pomocą FormalSystem.get_needed_context(rule)
-        Kontekst reguł: https://www.notion.so/szymanski/Zarz-dzanie-kontekstem-regu-2a5abea2a1bc492e8fa3f8b1c046ad3a
-    :type context: dict[str, tp.Any]
-    :param auto: , defaults to False
-    :type auto: bool, optional
-    :return: Struktura krotek, reprezentująca wynik reguły oraz strukturę reprezentującą operacje do wykonania na zbiorze zamknięcia.
-        Struktury krotek: https://www.notion.so/szymanski/Reprezentacja-dowod-w-w-Larchu-cd36457b437e456a87b4e0c2c2e38bd5#014dccf44246407380c4e30b2ea598a9
-        Zamykanie gałęzi: https://www.notion.so/szymanski/Zamykanie-ga-zi-53249279f1884ab4b6f58bbd6346ec8d
-    :rtype: tuple[tp.Union[tuple[tuple[utils.Sentence]], None], tp.Union[tuple[tuple[tp.Union[int, callable, utils.Sentence]]], None]]
+    :param used: Set of sentences that were already used
+    :type used: set[utils.Sentence]
+    :param context: Additional arguments (here it's only sentenceID)
+    :type context: dict[str,tp.Any]
+    :return: Generated tuple structure with the sentences and sentence ID
+    :rtype: tuple[tp.Union[tuple[tuple[utils.Sentence]], None], int]
     """
     
     rule = RULES[name]
     statement_ID = context['sentenceID']
 
     # Sentence getting
-    if statement_ID < 0 or statement_ID > len(branch)-1:
-        raise utils.FormalSystemError("No such sentence")
+    if statement_ID < 0 or statement_ID > len(branch):
+            raise utils.FormalSystemError("No such sentence")
 
     tokenized_statement = branch[statement_ID]
 
-    if not rule.reusable and tokenized_statement in used: # Used sentence filtering
+    if not rule.reusable and tuple(tokenized_statement) in used: # Used sentence filtering
         raise utils.FormalSystemError("This sentence was already used in a non-reusable rule")
 
     # Rule usage
     fin = rule.func(tokenized_statement)
     if fin:
-        return fin, len(fin)*([[0]] if rule.reusable else [[tokenized_statement]])
+        if rule.reusable:
+            u = [[0]]
+        else:
+            u = [[tuple(tokenized_statement)]]
+        return fin, len(fin)*u
     else:
         return None, None
 
 
 def get_needed_context(rule_name: str) -> tuple[utils.ContextDef]:
-    """Zwraca informacje o wymaganym przez daną regułę kontekście w formie obiektów ContextDef"""
-    return tuple([utils.ContextDef(variable='sentenceID', official='Sentence Number', docs='The number of the sentence in this branch', type_='sentenceID')])
-    
-def get_operator_precedence() -> dict[str, int]:
-    """Zwraca siłę wiązania danych spójników, im wyższa, tym mocniej wiąże (negacja ma najwyższą przykładowo)"""
-    return PRECEDENCE
+    """Returns needed arguments for the given rule"""
+    return tuple([utils.ContextDef(variable='sentenceID', official='Sentence Number', docs='', type_='sentenceID')])

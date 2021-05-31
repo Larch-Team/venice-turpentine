@@ -2,13 +2,12 @@ from __future__ import annotations
 
 import json
 import logging
+import logging as log
 import os
 import typing as tp
 
 import pop_engine as pop
-from sentence import Sentence
-from tree import ProofNode
-from close import Close
+from tree import *
 
 Module = pop.Module
 
@@ -69,18 +68,18 @@ def type_translator(type_):
 
 class Session(object):
     """
-    Obekty sesji stanowią pojedyncze instancje działającego silnika.
-    Wszystkie wyjątki określane jako `EngineError` mają wbudowany string w formie "dostępnej dla użytkownika"
+    Session objects allow the UserInterface plugin to interact with the engine
+    All exceptions are EngineErrors and can be shown to the user
     """
     ENGINE_VERSION = '0.0.1'
     SOCKETS = ('FormalSystem', 'Lexicon', 'Output', 'Auto')
 
     def __init__(self, session_ID: str, config_file: str):
-        """Obekty sesji stanowią pojedyncze instancje działającego silnika.
+        """Initializes an empty Session which reads from the config file
 
-        :param session_ID: ID sesji
+        :param session_ID: [description]
         :type session_ID: str
-        :param config_file: nazwa pliku config
+        :param config_file: [description]
         :type config_file: str
         """
         self.id = session_ID
@@ -97,14 +96,14 @@ class Session(object):
 
 
     def __repr__(self):
-        return f"Session({self.id=})"
+        return self.id
 
 
     # Plugin manpiulation
 
 
     def acc(self, socket: str) -> Module:
-        """Zwraca plugin aktualnie podłączony do gniazda o podanej nazwie"""
+        """Returns the module plugges into a socket of the given name"""
         if (sock := self.sockets.get(socket, None)) is None:
             raise EngineError(f"There is no socket named {socket}")
         else:
@@ -113,39 +112,38 @@ class Session(object):
 
     @EngineChangeLog
     def plug_switch(self, socket_or_old: str, new: str) -> None:
-        """Podłącza plugin do gniazda
+        """Plugs a new plugin into a socket
 
-        :param socket_or_old: Nazwa aktualnie podłączonego pluginu, lub gniazda
+        :param socket_or_old: Name of the socket or a plugin that's been plugged in
         :type socket_or_old: str
-        :param new: Nazwa nowego pluginu
+        :param new: The name of the socket to plug in
         :type new: str
-        :raises EngineError: Nie znaleziono pluginu
+        :raises EngineError: Plugin/Socket not found
         """
         # Socket name searching
         socket = self.sockets.get(socket_or_old, None)
-        if socket:
-            socket_name = socket_or_old
-
-        else:
+        if not socket:
             for i in self.config['chosen_plugins'].items():
                 if i[1] == socket_or_old:
                     socket_name = i[0]
                     socket = self.sockets[socket_name]
-        if not socket:
-            raise EngineError(f"Socket/plugin {socket_or_old} not found in the program")
+            if not socket:
+                raise EngineError(f"Socket/plugin {socket_or_old} not found in the program")
+        else:
+            socket_name = socket_or_old
         # Plugging
         try:
             socket.plug(new)
         except (pop.PluginError, pop.LackOfFunctionsError, pop.FunctionInterfaceError, pop.VersionError) as e:
             raise EngineError(str(e))
-
+            
         # Config editing
         self.config['chosen_plugins'][socket_name] = new
         self.write_config()
 
 
     def plug_list(self, socket: str) -> list[str]:
-        """Zwraca listę wszystkich pluginów dla danej nazwy.
+        """Lists all of the plugins available for this socket
 
         :param socket: Socket name
         :type socket: str
@@ -160,7 +158,7 @@ class Session(object):
 
 
     def plug_gen(self, socket: str, name: str) -> None:
-        """Tworzy ze wzorca plik dla pluginu
+        """Generates a template of a plugin
 
         :param socket: Socket name
         :type socket: str
@@ -175,18 +173,18 @@ class Session(object):
             sock.generate_template(name)
 
 
-    # Config reading and writing
+    # config reading and writing
 
 
     def read_config(self):
         logger.debug("Config loading")
-        with open(f"config/{self.config_name}", 'r') as target:
+        with open(self.config_name, 'r') as target:
             self.config = json.load(target)
 
 
     def write_config(self):
         logger.debug("Config writing")
-        with open(f"config/{self.config_name}", 'w') as target:
+        with open(self.config_name, 'w') as target:
             json.dump(self.config, target)
 
 
@@ -196,29 +194,26 @@ class Session(object):
     @EngineLog
     @DealWithPOP
     def new_proof(self, statement: str) -> None:
-        """Parsuje zdanie, testuje poprawność i tworzy z nim dowód
+        """Initializes a tree for a new proof
 
-        :param statement: Zdanie
+        :param statement: Proved statement (will be tokenized)
         :type statement: str
-
-        :raises EngineError: Któryś z pluginów nie został podłączony
-        :raises EngineError: Takie zdanie nie może istnieć
+        :raises EngineError: System lacks Lexicon plugin or FormalSystem plugin
+        :raises ValueError: Wrong statement syntax
         """
         try:
             tokenized = self.acc('Lexicon').tokenize(
                 statement, self.acc('FormalSystem').get_used_types(), self.defined)
         except self.acc('Lexicon').utils.CompilerError as e:
             raise EngineError(str(e))
-        tokenized = Sentence(tokenized, self)
-        problem = self.acc('FormalSystem').check_syntax(tokenized)
+        problem = None#self.acc('FormalSystem').check_syntax(tokenized)
         if problem:
             logger.warning(f"{statement} is not a valid statement \n{problem}")
             raise EngineError(f"Syntax error: {problem}")
         else:
             tokenized = self.acc('FormalSystem').prepare_for_proving(tokenized)
-            
-            self.proof = ProofNode(tokenized, 'Green')
-            self.branch = 'Green'
+            self.proof = Tree(tokenized, branch_name='Linen')
+            self.branch = 'Linen'
 
 
     @EngineLog
@@ -229,15 +224,15 @@ class Session(object):
 
     @EngineLog
     @DealWithPOP
-    def deal_closure(self, branch_name: str) -> tp.Union[None, str]:
-        """Wywołuje proces sprawdzenia zamykalności gałęzi oraz (jeśli można) zamyka ją; Zwraca informacje o podjętych akcjach"""
+    def deal_contradiction(self, branch_name: str) -> tp.Union[None, str]:
+        """Checks whether a sentence contradicting with the newest one exists"""
         # Tests
         if not self.proof:
             raise EngineError("There is no proof started")
 
         try:
             branch, _ = self.proof.getleaves(branch_name)[0].getbranch()
-            used = self.proof.getleaves(branch_name)[0].gethistory()
+            used = self.proof.getleaves(branch_name)[0].get_used()
         except ValueError as e:
             if e.message == 'not enough values to unpack (expected 2, got 1)':
                 raise EngineError(
@@ -246,28 +241,19 @@ class Session(object):
                 raise e
         
         # Branch checking
-        out = self.acc('FormalSystem').check_closure(branch, used)
-
+        out = self.acc('FormalSystem').check_contradict(branch, used)
         if out:
-            closure, info = out
+            code, printed, info = out
             EngineLog(
-                f"Closing {branch_name}: {str(closure)}, {info=}")
-            self.proof.getleaves(branch_name)[0].close(closure)
+                f"Closing {branch_name}: {code=}, {info=}")
+            self.proof.getleaves(branch_name)[0].close(printed, code)
             return f"{branch_name}: {info}"
         else:
             return None
 
    
     def context_info(self, rule: str):
-        """
-        Zwraca kontekst wymagany dla reguły w postaci obiektów ContextDef
-        
-        ContextDef:
-        variable    - Nazwa do przywołań, używana podczas dostarczania kontekstu w `use_rule`
-        official    - Nazwa do wyświetlania użytkownikowi
-        docs        - Dokumentacja dla zmiennej wyświetlalna dla użytkownika
-        type_       - Typ zmiennej, albo jest to dosłownie typ, albo string wyrażony w `TYPE_LEXICON`
-        """
+        """Returns context info for a rule"""
         return self.acc('FormalSystem').get_needed_context(rule)
 
 
@@ -289,9 +275,9 @@ class Session(object):
         if not self.proof:
             raise EngineError(
                 "There is no proof started")
-        if rule not in self.acc('FormalSystem').get_rules().keys():
+        if not rule in self.acc('FormalSystem').get_rules().keys():
             raise EngineError("No such rule")
-
+        
         # Context checking
         context_info = self.acc('FormalSystem').get_needed_context(rule)
         if {i.variable for i in context_info} != set(context.keys()):
@@ -299,8 +285,8 @@ class Session(object):
 
         # Statement and used retrieving
         branch = self._get_node().getbranch()[0][:]
-        used = self._get_node().gethistory()
-
+        used = self._get_node().get_used()
+    
         # Rule execution
         try:
             out, used_extention = self.acc('FormalSystem').use_rule(rule, branch, used, context, auto)
@@ -308,20 +294,25 @@ class Session(object):
             raise EngineError(str(e))
 
         # Adding to used rules and returning
-        if out is None:
+        if out is not None:
+            old = self._get_node()
+            self._get_node().append(out)
+            children = old.getchildren()
+            
+            if not children:
+                assert len(used_extention)==1, "Wrong used_extention length"
+                self._get_node().add_used(used_extention[0])
+                return (old.name,)
+            else:
+                for j, s in zip(children, used_extention):
+                    j.add_used(s)
+                return tuple([i.name for i in children])
+        else:
             return None
-
-        old = self._get_node()
-        self._get_node().append(out)
-        children = old.children
-        for j, s in zip(children, used_extention):
-            j.History(*s)
-        return tuple(i.branch for i in children)
 
 
     @DealWithPOP
     def auto(self) -> tuple[str]:
-        """Opisałbym to, ale i tak powinno zniknąć"""
         # Tests
         if not self.proof:
             raise EngineError("There is no proof started")
@@ -330,7 +321,7 @@ class Session(object):
 
         black = set()
         out = []
-        while len(leaves := [i.branch for i in self.proof.getopen() if not i.branch in black])>0:
+        while len(leaves := [i.name for i in self.proof.getopen() if not i.name in black])>0:
             
             out.append(f"Jumping to {leaves[0]} branch")
             self.jump(leaves[0])
@@ -339,11 +330,11 @@ class Session(object):
             if info:
                 out.append(info)
                 if info=="Branch always loops":
-                    self.proof.getleaves(leaves[0])[0].close(Close.Emptiness)
+                    self.proof.getleaves(leaves[0])[0].close("...", 8)
                     black.add(leaves[0])
                     continue
                 for branch in branches:
-                    o = self.deal_closure(branch)
+                    o = self.deal_contradiction(branch)
                     if o:
                         out.append(o)
             else:
@@ -368,8 +359,8 @@ class Session(object):
 
 
     @DealWithPOP
-    def getbranch(self) -> list[list[str], str]:
-        """Zwraca gałąź oraz stan zamknięcia w formie czytelnej dla użytkownika"""
+    def getbranch(self) -> list[list[str], tp.Union[tuple[int, int], None]]:
+        """Returns the active branch and ID of contradicting sentences if the branch is closed"""
         try:
             branch, closed = self._get_node().getbranch()
         except KeyError:
@@ -378,30 +369,27 @@ class Session(object):
         except AttributeError:
             raise EngineError("There is no proof started")
         reader = lambda x: self.acc('Output').get_readable(x, self.acc('Lexicon').get_lexem)
-        if closed:
-            return [reader(i) for i in branch], str(closed)
-        else:
-            return [reader(i) for i in branch], None
+        return [reader(i) for i in branch], closed
 
 
     def getbranches(self):
-        """Zwraca wszystkie *nazwy* gałęzi"""
+        """Returns all branch names"""
         if not self.proof:
             raise EngineError(
                 "There is no proof started")
 
-        return self.proof.getbranchnames()
+        return list(self.proof.leaves.keys())
 
 
     @DealWithPOP
-    def getrules(self) -> dict[str, str]:
-        """Zwraca nazwy reguł wraz z dokumentacją"""
+    def getrules(self):
+        """Returns all rule names"""
         return self.acc('FormalSystem').get_rules()
 
 
     @DealWithPOP
     def gettree(self) -> list[str]:
-        """Zwraca całość drzewa jako listę ciągów znaków"""
+        """Returns the whole proof as a formatted list of strings"""
         if not self.proof:
             raise EngineError(
                 "There is no proof started")
@@ -411,20 +399,30 @@ class Session(object):
 
 
     def next(self) -> None:
-        """Przeskakuje do następnej otwartej gałęzi"""
+        """Jumps to an open branch"""
         if not self.proof:
             raise EngineError("There is no proof started")
 
-        for node in self.proof.getleaves():
-            if node.branch == self.branch or node.closed:
+        for name, tree in self.proof.leaves.items():
+            if name == self.branch:
                 continue
-            self.branch = node.branch
-            return f"Branch changed to {node.branch}"
+            elif tree.closed:
+                continue
+            else:
+                self.branch = name
+                return f"Branch changed to {name}"
         raise EngineError("All branches are closed")
- 
+
+    
+    def proof_finished(self) -> tuple[bool, bool]:
+        """Checks if proof is finished"""
+        if not self.proof:
+            raise EngineError("There is no proof started")
+        return self.proof.is_finished(), self.proof.is_closed()
+
 
     def jump(self, new: str) -> None:
-        """Skacze do gałęzi o nazwie new, albo na prawego/lewego sąsiadu, jeżeli podamy "left/right"
+        """Jumps between branches of the proof
 
         :param new: Target branch
         :type new: str
@@ -436,33 +434,25 @@ class Session(object):
 
         new = new.upper()
         if new in ('LEFT', 'RIGHT'):
-            changed = self._get_node().getneighbour(new)
+            changed = self._get_node().getbranch_neighbour(new)
             if changed is None:
                 raise EngineError(f"There is no branch on the {new.lower()}")
             else:
-                self.branch = changed.branch
+                self.branch = changed.name
         else:
-            changed = self.proof.getleaves(new.capitalize())
+            changed = self.proof.leaves.get(new.capitalize(), None)
             if not changed:
                 raise EngineError(
                     f"Branch '{new}' doesn't exist in this proof")
             else:
-                self.branch = changed[0].branch
+                self.branch = changed.name
 
-    
-    def proof_finished(self) -> tuple[bool, bool]:
-        """Zwraca informację o zamknięciu wszystkich gałęzi oraz o ich zamknięciu ze względu na zakończenie dowodzenia w nich"""
-        if not self.proof:
-            raise EngineError("There is no proof started")
-        return self.proof.is_closed(), self.proof.is_successful()
-
-        
     # Misc
 
     def get_socket_names(self):
         return self.SOCKETS
 
     def _get_node(self):
-        return self.proof.getleaves(self.branch)[0]
+        return self.proof.leaves[self.branch]
 
 # Misc

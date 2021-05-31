@@ -1,6 +1,3 @@
-"""
-Najbardziej podstawowy interfejs do programu Larch. wykorzystuje paczkę `prompt_toolkit`.
-"""
 import json
 import logging
 import os
@@ -16,13 +13,8 @@ import prompt_toolkit as ptk
 SOCKET = 'UserInterface'
 VERSION = '0.0.1'
 
-def getcolors():
-    """
-    Zwraca słownik kolorów wraz z ich kodami RGB
-    """
-    with open('colors.json') as f:
-        c = json.load(f)
-    return c
+with open('colors.json') as f:
+    colors = json.load(f)
 
 # Logging config
 
@@ -48,15 +40,17 @@ class ParsingError(Exception):
 Command = namedtuple('Command', ('func', 'args', 'docs'))
 
 
-def parser(statement: str, commands: dict) -> list[Command]:
-    """Przetwarza komendę do obiektów Command z oddzielonymi funkcjami i argumentami, lub dokumentacją. 
+def parser(statement: str, _dict: dict) -> list[Command]:
+    """Parses the statement into a list of commands to execute
 
-    :param statement: Komenda/grupa komend
+    :param statement: parsed command
     :type statement: str
-    :param commands: [description]
-    :type commands: dict
-    :raises ParsingError: Błąd w parsowaniu, patrz opis
-    :return: Lista namedtuples (patrz wyżej)
+    :param _dict: Command dict
+    :type _dict: dict
+    :raises ParsingError: Wrong amount of arguments
+    :raises ParsingError: Command not found in `_dict`
+    :raises TypeError: Wrong argument type
+    :return: List of commands to execute
     :rtype: list[Command]
     """
     comm = []
@@ -64,9 +58,10 @@ def parser(statement: str, commands: dict) -> list[Command]:
         # Function parsing
         command = command_raw.strip()
         func = None
-        for comm_, f in commands.items():
-            if command.startswith(comm_):
-                name, func = comm_, f
+        for i in _dict.items():
+            if command.startswith(i[0]):
+                func = i[1]
+                name = i[0]
                 break
         if not func:
             raise ParsingError("Command not found")
@@ -74,45 +69,41 @@ def parser(statement: str, commands: dict) -> list[Command]:
 
         # Invoking the help command
         if '?' in args or '--help' in args or 'help' in args:
-            doc = func['comm'].__doc__ or "Help not found"
+            if func['comm'].__doc__:
+                doc = "\n".join(
+                    (f"Help for '{name}':", func['summary'], func['comm'].__doc__))
+            else:
+                doc = func['summary']
             comm.append(Command(func['comm'], None, doc))
             continue
 
         # Argument conversion
         if func['args'] == 'multiple_strings':
-            converted = parse_multiple_string(command, name)
+            # mechanism for prove
+            converted = command[len(name):].strip()
+            if len(converted) == 0:
+                raise ParsingError("More arguments needed")
         else:
-            converted = parse_args(func, args)
+            # mechanism for other types
+            if len(args) > len(func['args']):
+                raise ParsingError("Too many arguments")
+            elif len(args) < len(func['args']):
+                raise ParsingError("More arguments needed")
+            converted = []
+            for form, val in zip(func['args'], args):
+                try:
+                    new = form(val)
+                except ValueError:
+                    raise TypeError("Wrong argument type")
+                converted.append(new)
 
         comm.append(Command(func['comm'], converted, None))
     return comm
 
 
-def parse_multiple_string(command, name):
-    converted = command[len(name):].strip()
-    if len(converted) == 0:
-        raise ParsingError("More arguments needed")
-    return converted
-
-
-def parse_args(func, args):
-    if len(args) > len(func['args']):
-        raise ParsingError("Too many arguments")
-    elif len(args) < len(func['args']):
-        raise ParsingError("More arguments needed")
-    converted = []
-    for form, val in zip(func['args'], args):
-        try:
-            new = form(val)
-        except ValueError:
-            raise TypeError("Wrong argument type")
-        converted.append(new)
-    return converted
-
-
 @UIlogged
 def performer(command: Command, session: engine.Session) -> str:
-    """Wykonuje funkcję na obiekcie sesji"""
+    """Performs the command on the session"""
     if command.docs:
         return command.docs
     else:
@@ -229,7 +220,6 @@ def do_prove(session: engine.Session, sentence: str) -> str:
 
 
 def do_auto(session: engine.Session):
-    """Not reliable, do not use yet"""
     try:
         out = session.auto()
     except engine.EngineError as e:
@@ -304,7 +294,7 @@ def do_use(session: engine.Session, command) -> str:
 
 def do_contra(session, branch: str):
     """Detects contradictions and handles them by closing their branches"""
-    cont = session.deal_closure(branch)
+    cont = session.deal_contradiction(branch)
     if cont:
         return cont
     else:
@@ -312,7 +302,7 @@ def do_contra(session, branch: str):
 
 
 def do_leave(session) -> str:
-    """Deletes the proof"""
+    """Resets the proof"""
     session.reset_proof()
     return "Proof was deleted"
 
@@ -321,7 +311,7 @@ def do_leave(session) -> str:
 
 
 def do_jump(session: engine.Session, where: str) -> str:
-    """Changes the branch
+    """Changes the branch, 
 
     Arguments:
         - Branch name [str/">"/"right"/"left"/"<"]
@@ -336,7 +326,7 @@ def do_jump(session: engine.Session, where: str) -> str:
 
 
 def do_next(session: engine.Session):
-    """Finds an open branch and jumps onto it"""
+    """Finds an open branch and jumps to it"""
     try:
         session.next()
     except engine.EngineError as e:
@@ -346,36 +336,36 @@ def do_next(session: engine.Session):
 def do_get_rules(session):
     """Returns all of the rules that can be used in this proof system"""
     try:
-        return "\n\n".join(("\n---\n".join(i) for i in session.getrules().items()))
+        return "\n".join((" - ".join(i) for i in session.getrules().items()))
     except engine.EngineError as e:
         return str(e)
 
 
 def do_get_tree(session: engine.Session) -> str:
-    """Returns the proof in the form of a tree"""
     return "\n".join(session.gettree())
 
 
 command_dict = OrderedDict({
     # Navigation
-    'exit': {'comm': do_exit, 'args': []},
-    'get rules': {'comm': do_get_rules, 'args': []},
-    'get tree': {'comm': do_get_tree, 'args': []},
-    'jump': {'comm': do_jump, 'args': [str]},
-    'next': {'comm': do_next, 'args': []},
+    'exit': {'comm': do_exit, 'args': [], 'summary': ''},
+    'get rules': {'comm': do_get_rules, 'args': [], 'summary': ''},
+    'get tree': {'comm': do_get_tree, 'args': [], 'summary': ''},
+    'jump': {'comm': do_jump, 'args': [str], 'summary': ''},
+    'next': {'comm': do_next, 'args': [], 'summary': ''},
     # Proof manipulation
     # Czy zrobić oddzielne save i write? save serializowałoby tylko do wczytania, a write drukowałoby input
-    'write': {'comm': do_write, 'args': [str]},
-    'use': {'comm': do_use, 'args': 'multiple_strings'},
-    'leave': {'comm': do_leave, 'args': []},
-    'prove': {'comm': do_prove, 'args': 'multiple_strings'},
-    'auto': {'comm': do_auto, 'args': []},
+    'write': {'comm': do_write, 'args': [str], 'summary': ''},
+    'use': {'comm': do_use, 'args': 'multiple_strings', 'summary': ''},
+    'leave': {'comm': do_leave, 'args': [], 'summary': ''},
+    'prove': {'comm': do_prove, 'args': 'multiple_strings', 'summary': ''},
+    'auto': {'comm': do_auto, 'args': [], 'summary': ''},
     # Program interaction
-    'plugin switch': {'comm': do_plug_switch, 'args': [str, str]},
-    'plugin list all': {'comm': do_plug_list_all, 'args': []},
-    'plugin list': {'comm': do_plug_list, 'args': [str]},
-    'plugin gen': {'comm': do_plug_gen, 'args': [str, str]},
-    'clear': {'comm': do_clear, 'args': []},
+    'plugin switch': {'comm': do_plug_switch, 'args': [str, str], 'summary': ''},
+    'plugin list all': {'comm': do_plug_list_all, 'args': [], 'summary': ''},
+    'plugin list': {'comm': do_plug_list, 'args': [str], 'summary': ''},
+    'plugin gen': {'comm': do_plug_gen, 'args': [str, str], 'summary': ''},
+    'clear': {'comm': do_clear, 'args': [], 'summary': ''},
+    # 'kaja godek': {'comm': lambda x: "***** ***", 'args': [], 'summary': ''}
 })
 
 
@@ -384,14 +374,13 @@ def do_help(session) -> str:
     return "\n".join(command_dict.keys())
 
 
-command_dict['?'] = {'comm': do_help, 'args': []}
+command_dict['?'] = {'comm': do_help, 'args': [], 'summary': ''}
+
 
 # Front-end setup
 
-def get_rprompt(session, colors):
-    """
-    Generuje podgląd gałęzi po prawej
-    """
+def get_rprompt(session):
+    """Generates the branch preview in the bottom right corner"""
     DEF_PROMPT = "Miejsce na twój dowód".split()
     THRESHOLD = 128
 
@@ -413,18 +402,24 @@ def get_rprompt(session, colors):
 
     # Adding branch closing symbol
     if closed:
-        s = str(closed)
+        s = closed[1]
         spaces = max_len-len(s)+int(log10(i+1))+3
         to_show.append(s+spaces*" ")
 
     # Foreground color calculating
-    foreground = "#000000" if max_color(background) > THRESHOLD else "#FFFFFF"
+    if max_color(background) > THRESHOLD:
+        foreground = "#000000"
+    else:
+        foreground = "#FFFFFF"
+
     new = " \n ".join(to_show)
     return ptk.HTML(f'\n<style fg="{foreground}" bg="{background}"> {escape(new)} </style>')
 
 
 def max_color(rgb_color: str) -> int:
-    """Zwraca najwyższą wartość w kolorze"""
+    """
+    Calculates highest value from the RGB format
+    """
     assert len(rgb_color) == 7
     red = int(rgb_color[1:3], 16)
     green = int(rgb_color[3:5], 16)
@@ -463,27 +458,29 @@ class Autocomplete(ptk.completion.Completer):
                     yield ptk.completion.Completion(i, start_position=-len(last))
             except engine.EngineError:
                 return
+        elif full.startswith('prove '):
+            pass
 
 # run
 
 
 def run() -> int:
     """
-    Traktować to podobnie, jak `if __name__=="__main__"`. Funkcja uruchomiona powinna inicjalizować działające UI.
-    Obiekt `main.Session` powinien być generowany dla każdego użytkownika. Wystarczy używać metod tego obiektu do interakcji z programem.
+    Should be used similarly to `if __name__=="__main__"`. Function is ran by the program to generate a working UI.
+    A `main.Session` object should be created for every user. To interact with the app engine use it's methods.
 
-    :return: Exit code, -1 restartuje aplikację
-    :rtype: int
+    Returns:
+        int: Exit code; -1 will restart the app
     """
     session = engine.Session('main', 'config.json')
     ptk.print_formatted_text(ptk.HTML(
         '<b>Logika -> Psychika</b>\nType ? to get command list; type [command]? to get help'))
     console = ptk.PromptSession(message=lambda: f"{session.branch+bool(session.branch)*' '}# ", rprompt=lambda: get_rprompt(
-        session, getcolors()), complete_in_thread=True, complete_while_typing=True, completer=Autocomplete(session))
+        session), complete_in_thread=True, complete_while_typing=True, completer=Autocomplete(session))
     while True:
-        command = console.prompt().strip()
+        command = console.prompt()
         logger.info(f"Got a command: {command}")
-        if command == '':
+        if command in (' '*n for n in range(100)):
             logger.debug("Command empty")
             continue
         try:
@@ -499,18 +496,3 @@ def run() -> int:
 
         for procedure in to_perform:
             ptk.print_formatted_text(performer(procedure, session))
-
-
-class Runner(object):
-    def __init__(self) -> None:
-        super().__init__()
-        self.session = engine.Session('main', 'config.json')
-
-    def __call__(self, command: str) -> str:
-        try:
-            procedure = parser(command, command_dict)[0]
-        except ParsingError as e:
-            return e
-        except TypeError as e:
-            return "błąd: złe argumenty"
-        return performer(procedure, self.session)

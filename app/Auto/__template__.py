@@ -1,8 +1,5 @@
-"""
-Tutaj umieść dokumentację swojego pluginu
-"""
 import typing as tp
-import Auto.__utils__ as utils
+import Auto as utils
 
 SOCKET = 'Auto'
 VERSION = '0.0.1'

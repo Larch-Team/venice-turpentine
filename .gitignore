@@ -127,8 +127,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-
-
 .vscode
-app/config/.
+app/config.json
 crashes/.
