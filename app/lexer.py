@@ -59,12 +59,14 @@ class BuiltLexer(object):
         super().__init__()
         self.needs_casing = lex.needs_casing
         self.LITERALS = lex.LITERALS
-
         self.find_new = self._get_find_new(lex)
+        
         lex_re = ( (i, j) for i, j, _ in self._filter_constraints(lex, kwargs) )
         gen_re = ( (i, j) for i, j, for_generation in lex_re if for_generation)
+
         self.lexer_regexes = {key:self._regex_from_list(val) for key, val in self._join_rules(lex_re).items()}
         self.generator_regexes = {key:self._regex_from_list(val) for key, val in self._join_rules(gen_re).items()}
+        
         if set(self.lexer_regexes).issubset(self.generator_regexes): 
             raise LrchLexerError("Zbiór leksemów nie pozwala na generowanie nowych zmiennych")
 
