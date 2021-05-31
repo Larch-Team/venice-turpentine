@@ -1,0 +1,1000 @@
+((p & ~(q -> ((q v p) -> ((q v r) v p)))) & (s -> t)) -> q
+p -> (~((p & (q -> (r v ~s))) v (~r v (s -> t))) v p)
+p -> (~~q v (~p -> ((((p -> (r & s)) v t) & t) & p)))
+(p & ~(q -> ((r & (~q -> q)) -> s))) -> (~r -> (t -> q))
+(~~p -> p) -> (~(((q v q) & r) & s) -> ((t -> s) v t))
+p v ((q -> r) -> ~(s & ~(t -> ((~(r -> r) & s) -> q))))
+p v ~(~(q v p) & ~((r -> q) -> ((q -> (s v t)) v t)))
+(((~p -> (q v (p & r))) & s) -> (s v (t -> s))) v (p -> p)
+p -> (~p -> ((q v (((p & q) v r) -> ((p -> s) v t))) v s))
+~(p -> (((q & r) -> s) -> ((s & s) & p))) -> ((t v t) -> p)
+p v ~~(((~((q & p) v r) -> r) & (s & s)) -> (t -> t))
+~((p v (q & r)) v ((q v s) v (q -> (p v t)))) -> (r v p)
+p -> (p v ((q & (~((r v s) & r) & (s -> (p v t)))) & p))
+~(p -> (q -> (~r v ~~~(s v (s -> (t & q)))))) -> p
+(p -> q) v (((r v s) v ((~(t & (s & q)) & q) -> t)) & p)
+p -> ((q & ~(p v ((r -> (s v ~(t & ~q))) & t))) -> r)
+p -> ((q -> r) -> ((~s & ~(r -> ~((q & t) & q))) -> r))
+(((~(p -> q) -> r) & (s & q)) v (p -> (s -> (t v s)))) v s
+(p -> (q -> (((q v q) v ((r v s) v ~s)) & t))) v (t -> r)
+p v (((q & (r v r)) -> (((q & q) -> s) & t)) v (~q -> p))
+~~((p -> q) -> (r v r)) -> ((p v ~(s -> p)) -> (t -> t))
+p -> ((q v ~~r) v (s v ((p & s) v (s -> ~(t -> r)))))
+p v (~((q & (p -> (p & (r & q)))) -> (s v (p v t))) -> q)
+(p v q) -> (p -> (~(((r v (s v q)) v t) & (p & q)) v p))
+(((p v ~q) & (r v q)) & r) v (s -> (t v (p -> (t v s))))
+(p -> ((q -> r) v (~~(~s -> t) -> (s & q)))) v (r -> s)
+~((p -> ~q) v r) -> ((s -> (~p -> r)) v ((s & t) -> r))
+(((p -> q) v ~((r & (s v (t -> p))) v r)) v r) v (s -> p)
+~p -> ((q v ~((r & s) -> ((s & r) v q))) v (t -> ~q))
+p -> (((p -> ((q -> (r -> ~(s -> t))) & t)) v (r -> p)) v r)
+p -> ~(q & ~(r -> ((q v s) v (t v (p & ~(q -> q))))))
+p -> (q -> ((r v s) v (r v ~((s & ((r v t) -> t)) & s))))
+((p v (q -> r)) -> ~~((r -> p) v s)) v ((t & p) v ~s)
+(p -> q) v (r v ((p v s) v (~~s & ~(p & (t -> r)))))
+p -> ((((~((q -> (r & ~r)) v s) & r) & ~t) & q) v p)
+((p -> (q & (q -> r))) & p) -> (s v (t v ((s -> r) v ~q)))
+(~(p -> ~(~((q -> q) & r) v q)) & s) v (r -> (t -> t))
+(p & q) -> ((r -> r) -> (((s & (t v ~~~t)) v q) v t))
+((p -> ((((q v r) v s) -> ~s) v t)) & t) -> (s v (r v t))
+p -> (~((~((~q -> q) -> ~r) & ~p) -> (s v t)) v p)
+((p v q) v (r -> ~s)) v (r v ~(r -> ~((t & q) & q)))
+((((~p & (q v ~r)) -> (s -> ~p)) v ~q) & ~t) v t
+(((~p v (q v ~q)) v r) v ~((s v (s & s)) & s)) v t
+((~p -> ~(~q & r)) -> ~(s & ~(r v (s -> s)))) v t
+p v ((q -> (p v (r -> q))) v (((q & ~r) -> (s v s)) -> t))
+p -> ((((q & ~(p & (r v ((p v s) v t)))) & s) -> s) v s)
+p -> (p v (((~p v q) & ((~(~r v s) & t) v r)) & r))
+(((p & p) & q) -> ((((r -> p) & s) -> t) v ~(r v p))) v q
+p v ((q & (~(~(r v (~p & s)) v q) v (t & p))) -> r)
+(p -> q) v (r v (q v (~q v (((p -> p) & (s -> t)) v r))))
+(p -> (((~q & q) & q) -> r)) v (s v (~~(s v t) & t))
+p -> (q v (((q -> (r v ~r)) v s) v (((p -> p) & q) -> t)))
+((p -> (((((q & p) v p) -> r) -> s) v t)) v (p -> ~t)) v t
+((p & q) -> p) v ~(((r v (p -> s)) v (t v (t -> t))) v t)
+(((p v p) & ((q v (((r -> ~r) -> p) & s)) & q)) & t) -> q
+p v (q -> (p -> ((r -> q) -> (s v (t -> ~(~~t v q))))))
+(p v ~(~q v ~r)) v ((s -> (t -> ~~(r v t))) v t)
+((p & (q & q)) & (~(r & s) -> s)) -> (q & ~~(t v q))
+p v (((p & (q & ((r v ~s) v r))) -> (q & (p -> s))) v t)
+p -> (q v (((r & q) -> (~(p v (q v s)) -> t)) -> (q -> p)))
+((p v (((q -> p) & (r v s)) -> r)) -> ~q) v ((q v t) v p)
+p -> (q v (r -> ((q & r) -> ((~~~s & (t & r)) v t))))
+((~p v q) -> ((r -> s) & (~s -> ~t))) -> (q -> (q v s))
+p -> (q v (~(r -> ~~(~((~s & t) -> r) -> p)) -> s))
+(p & q) -> (((r & s) v (p -> s)) -> ((s & ~t) -> (q v t)))
+(p v (q -> ((((r & s) -> s) -> q) -> (~(r & s) v t)))) v r
+(((~((~p v p) & q) v ~r) v s) v s) v (t v ~~q)
+(p v q) v (p -> (((r -> r) -> (s & (~r & t))) -> (s & p)))
+p -> (~(~q -> ((r & s) v p)) v (((p -> s) & ~p) -> t))
+p v ((~(p & (q -> (p v (~q -> ~r)))) v s) v (t v p))
+((p & ((((p v q) -> p) & (r & (p v s))) & ~q)) & q) -> t
+(p -> (~((q v r) v ((((s -> r) & r) v p) v p)) -> r)) v t
+((((p -> ~(q & (q -> r))) v s) v p) v t) v ((t v r) -> p)
+(p v ((~q -> r) -> r)) -> ((((s v t) -> r) & (t & t)) -> r)
+(p -> (~~(q -> (p v ~r)) v s)) & (p -> (p v (p -> t)))
+~(((p v ~(q & ((r v s) v q))) & r) -> ~(r -> t)) -> t
+(p -> (((~~((q v ~(r v s)) & p) & r) -> t) -> q)) v p
+(~(p & q) v r) v (s v (~p v ((q v ~(t v q)) v r)))
+p v (q v (r -> (r v (~s & (((p v t) -> s) v (r -> r))))))
+(p -> q) v ~~(((p & ((r v s) v s)) -> (p v t)) v ~p)
+(p -> q) v (q v ((r -> p) v ((((~s v p) v t) v p) v r)))
+(p -> (~(((q v r) -> s) v ((s v q) -> p)) -> (t -> p))) v t
+((~(~p -> (p -> ~q)) & (q & r)) & r) -> ((s & p) v t)
+(p -> (~(p v ~~q) & q)) -> (r v (((s & r) & t) -> r))
+~(~(p -> (p v q)) & ((~(r -> (s v t)) v s) -> s)) v s
+(~((p v q) & p) & r) -> (r v ((s & p) -> ((p & t) -> t)))
+p v ((q & (p v (r v (r v (s v (~(t v s) & p)))))) -> q)
+((p -> (q v (r v ~s))) v (t & (q -> t))) v (r -> (t -> q))
+(p & q) -> (q v (p -> ((r -> (((q & q) -> s) v ~q)) & t)))
+~((p & q) & (r v ((~(s -> (s -> t)) -> q) -> ~p))) v q
+((p v p) -> ((q & r) -> q)) v ~(q -> (~(s & t) v ~r))
+(p -> (((q -> (p v r)) v ((s & ~t) & (r v p))) -> p)) v t
+(p -> ((q -> r) & (s v s))) -> ((q v (~(r & p) v r)) v t)
+((p v (q -> r)) v q) & (((p -> s) -> (t v q)) v (~r v r))
+(((p & (((q -> (r v s)) -> t) v p)) & (s v t)) & ~r) -> p
+p v ((((q -> (p -> (r -> (~r v s)))) & (p & q)) v p) -> t)
+p v ~(~q & (q & ((~((r & q) -> s) & (s -> t)) v q)))
+p -> (((~~~q -> q) -> r) v (s v ((t -> r) v (t -> q))))
+p -> (((((q -> (r -> ~r)) v p) & r) -> s) v (q -> (t v r)))
+((((p -> (q v r)) -> p) -> (s -> (t v p))) -> p) v (~p v t)
+(p -> p) v ((q v r) -> (s v (((~q -> r) & s) v (t & t))))
+(p & ~(q -> (((r -> (q -> q)) -> (s v r)) & t))) -> (s v p)
+p v (((q v p) -> ((((q v r) -> (s -> r)) & t) -> ~r)) v t)
+(p v q) v (((~(p v (~r -> s)) -> (s v ~r)) -> q) -> t)
+~(~((p v ~p) v ((((q & (q & r)) v r) v p) -> s)) & t)
+p v ((q -> (r v (~q -> (s -> (t v (t v s)))))) v (s -> t))
+p v ((q v (r v ~(r & s))) v (((r -> p) v (t v q)) & p))
+~~p -> ((p -> (((~(q & (q -> r)) & s) v t) v p)) v s)
+(((p -> q) -> ((r -> (~(r -> s) & s)) v s)) v (t -> r)) v r
+p -> (p v ((~q -> (((r & s) & t) v r)) v (t v (s v s))))
+~(~p v (((q -> (p -> ((r -> s) & ~t))) v p) v s)) -> r
+(p -> (((~((q v r) v r) & s) -> ((t -> q) -> q)) & t)) v p
+((~(p -> (q -> (p -> r))) -> ((s -> r) v q)) & p) -> (t -> t)
+((~(p v ~(~(q -> (r -> q)) & s)) -> s) -> s) -> (t -> s)
+((p & q) & ~((r v (((r -> q) & (q & s)) v s)) v q)) -> t
+((p v (q v r)) & (s & ((t & (p v ~s)) & (p -> t)))) -> s
+(p v q) v (r -> (((q & s) v q) v (s -> ~((s -> t) & q))))
+((p & (q & ~((r -> (r v (s & s))) & p))) & t) -> (p v t)
+~~(((~(p v q) -> r) v s) v (s -> (p v (~~t -> r))))
+p -> ((q -> (~r -> (q v (q v (s -> (p v r)))))) v (q -> t))
+p -> ~((q -> ((r -> (s & (~t v s))) & s)) & ~(p v q))
+((p & q) & r) -> (q v ~((~s v ((r v t) & ~r)) & p))
+(p -> (q v (r v (p v ~(((r -> q) -> s) v (t v p)))))) v s
+((p v (p -> (q v (q v (r -> s))))) v ((~t -> t) -> p)) v r
+p v (q -> ((~~r -> p) -> (s -> (t v (~~~s -> q)))))
+(~p & ((q v r) & r)) -> ~~((s v t) v (s v (p -> r)))
+(((p v q) v r) v (q -> r)) v ((s v ((t -> ~t) -> t)) v s)
+((p & q) & r) v ((s -> (r v (r -> ~t))) v (p & (p & q)))
+(p & ((q & (r -> ~s)) & (s -> t))) -> ((t & (p & r)) -> q)
+(p -> q) v (~((((r & p) v r) & r) -> ((s -> q) & t)) -> r)
+p -> ((q & r) -> ((s v ((r v (t & (t -> q))) & ~r)) -> r))
+(((~~(~~p -> ~q) & r) -> s) -> r) -> (s -> (s v t))
+((((p v q) -> (r v (~s v t))) & p) v (p -> s)) v (r & r)
+~p -> (p -> ((~q -> r) -> (s v ~((q v p) -> (s -> t)))))
+p v ~~~~((p -> ~(q -> (r v ((q v s) -> s)))) v t)
+(p -> ((q & (p & r)) v s)) -> ((t -> t) v ((~t v s) v s))
+~((p -> (q & q)) -> (p & q)) v (~(~r v (s & t)) -> r)
+(((p v q) -> ~((q & q) & r)) & (((r v s) -> s) v t)) v r
+(p -> (~(q & r) -> s)) v ((((r -> t) -> p) -> p) v (r & r))
+(~((~p v q) v (~(~q & ~(r v s)) v t)) -> p) v p
+p v (((~(q v r) v ~r) v ((s v p) v ~t)) v (r v p))
+((~((p -> q) & r) v s) & (q v t)) v (~~r -> (t -> r))
+(p v ((q -> q) v (((~r -> r) -> s) v t))) v (t -> (q -> p))
+p -> (q v ((r v ~p) -> (q -> (((q & s) -> t) -> (r -> s)))))
+(p -> p) v (~~((q & r) & s) v ~(t -> (r & (p -> s))))
+(p -> q) -> ((((r & p) & (s & (t & p))) v (t v t)) v ~t)
+p v (((q & (r v (s v q))) v (~q v t)) -> (s -> (s -> s)))
+(p v q) v (q -> (r & ((q & (~(r -> r) v (s & p))) -> t)))
+((~p v ~q) & (p v ((~q & (r & s)) & r))) -> (q -> t)
+(p -> (q v ~p)) v (p & (q -> (q & ((r & (s v t)) v s))))
+(p v ((p -> q) & (r -> s))) -> (r v (~t v (t & (r -> p))))
+(~(p v ~q) -> (p -> (r v ~(q & ((s & t) -> p))))) v q
+((p & (q & ((q & (q & r)) v s))) & q) -> (p v (q & ~t))
+((p & q) & ((r -> ~s) & ~(r v ~t))) -> (s v (s -> s))
+((p -> (~q & q)) -> r) v ((~~(s & r) v (r & t)) -> q)
+((p & ((q & r) -> r)) -> ((((p v r) & q) v s) -> ~t)) v p
+(p & ~(q v (((r -> (~s -> p)) & r) -> (t -> ~s)))) -> t
+(~p -> ~p) v ((p -> ((q v ((q v r) v ~s)) -> r)) -> t)
+(p & p) v (q v ((r & s) -> (r v (q & (t -> ~(t -> p))))))
+p -> ((~q -> r) v (~(p v (p -> p)) v (~p -> (s & t))))
+~(p & ((q & (r v (s v t))) -> ~s)) v (~s v ~~s)
+(((p & q) & r) -> (r -> (q -> q))) v (p -> (~q v (s & t)))
+((((p v q) v (r & s)) v (s -> s)) -> p) -> (t -> (~r v r))
+((p & (((q v (r -> (s & s))) v t) & (~q & r))) -> r) v p
+(p v q) v ((r v (~((r & (s & q)) -> q) -> (t & q))) v q)
+~(p -> (q v (r & p))) v ((~(s -> p) -> s) v ~(q v t))
+((p & q) -> (r -> ((p -> q) v p))) v ~((s & (p -> t)) -> p)
+p -> (q v ((((q -> p) & r) -> ((q v ~s) -> (t -> r))) v r))
+((p -> (~q v (~q v r))) -> r) v (p v (~s -> (p -> t)))
+(((p & ((q & ~q) v q)) v (q v (q v r))) & s) -> (t v s)
+p -> ((q -> (((r -> (q & (s v s))) -> t) & p)) v ~(t & r))
+p v (q -> (p -> ((~r & (q v (s -> r))) -> (~t & ~s))))
+((~(~(p v q) -> p) v r) v (s -> (q v ~t))) v (q -> t)
+p -> (q v (p v ((r v (s & t)) & ~(s v ((t v q) v t)))))
+~(p & (q & (r & (s v (q v t))))) v (p -> ((q v p) & q))
+((((p -> q) v r) -> (q v r)) & (r & s)) -> (~s v (t -> s))
+(~~p -> q) -> ((r v (~s & r)) v (r -> ((t -> q) & r)))
+~(p -> (p v (q -> (~(q -> r) v (s v q))))) -> ~(t -> t)
+p -> ((q v r) v ((s -> (t -> ~(~(~s & q) v p))) v p))
+(p & ((~p -> (q & r)) v q)) -> (((s & r) v (t & s)) -> p)
+(p -> ((q v (~r v (s & (s -> s)))) v (t v ~p))) v ~s
+p -> (q v ((p & (r & (~((p & r) v q) v (s v t)))) -> r))
+p -> (((q v (r v s)) v (~q v (q v (r -> p)))) & (t -> p))
+((p & q) & ~r) v (r -> ((r v s) & ((p -> (p v t)) v r)))
+((p v (q & (r & s))) v ~s) v (s -> ((p -> (q & s)) v t))
+p v (q v ((~(r -> ~r) & s) v ((p & (~t -> r)) -> s)))
+~~(((p -> ((q & r) & ~s)) & p) & t) v ((t & r) -> t)
+(p & ((~(q v r) v (s -> s)) v ((p v s) & r))) -> (t -> p)
+(~((p v (p v (q -> r))) -> (r & (r v p))) v s) v (t -> t)
+((p & q) -> r) v (q & ~(p & ~((r v ~s) v (s v t))))
+p v ((q v ~r) -> (p -> (((p v s) & (~q v ~t)) & p)))
+p v (q -> (p -> (r -> ((s & ((s -> ~~t) -> ~r)) & q))))
+((((p & ~(((q -> r) -> s) & r)) & q) & t) -> (s v p)) v q
+(((p -> ~(q -> (q -> r))) -> (r v s)) -> q) v (t v (t -> t))
+(((p & q) & r) -> ~s) -> (p v (p -> ((t v p) -> (t & t))))
+p v (q v ((q -> ((~r -> s) & ((t v ~r) & t))) & ~p))
+(p & (((((q -> ~(r v r)) & ~p) & s) & ~q) & s)) -> t
+(p v q) -> (r v (s v ((~q -> (((s v s) & p) -> t)) v s)))
+(p -> p) -> ~(((~q & (r -> r)) -> s) & (t & ~(t v p)))
+~((p v (q & r)) v (((q -> q) -> ~s) v p)) -> (t v ~t)
+~p v ((((((q v r) v (s -> q)) & t) -> (q -> p)) v q) v s)
+((p -> ~q) v (((r & r) v p) -> ~~(q & (s v t)))) v q
+p v ((q -> (~(p -> (r & (p v p))) -> (s v (t -> r)))) v s)
+~(p v ~(p & q)) -> ((q & ~r) v (r & (p -> (s & t))))
+p v (~p v (((q & (r & ((r & s) -> q))) v (s -> s)) v t))
+p v ((q -> q) & ((~(p -> p) v (r v (s -> t))) v (t v s)))
+(p -> q) v (((r v s) & ~q) -> (((r v t) & (q v t)) v p))
+(p & (q v q)) -> (((r v ~((s -> (q -> p)) v p)) -> t) v r)
+(p & ~(((q & (r -> (r & (s & t)))) -> (q -> p)) v t)) -> r
+(p v p) v (~q v (((((r -> s) & s) v ~t) & q) v ~p))
+~((~(p -> (((q & (r v s)) & p) & r)) -> r) & ~(t -> t))
+p v ((~q & r) v (((s & q) -> ~t) v ((~q v t) v s)))
+(p -> (q -> q)) v (((((p v p) & (r -> ~p)) v s) & t) & s)
+~(p -> q) -> (((((r v ~s) & s) -> (q -> t)) & ~p) -> t)
+(p & q) -> (((~(((r -> p) v p) & s) & (p & t)) -> p) v s)
+(p v ((~(~p & (p v (q -> r))) -> s) v ~t)) -> (s -> s)
+(p & ~q) -> (((r -> (~r -> ~q)) v s) v (t v (p v q)))
+p v ~((~((q v (r v s)) -> t) -> (q -> ~t)) -> (p v p))
+(p v q) -> ((p v ((~r -> s) -> (p & ((r & q) v t)))) v q)
+((p -> q) -> (r v ((s v (~s v t)) v ((s -> p) & q)))) v r
+((p -> (~(q & r) & s)) v ((t -> p) & ((q -> r) -> t))) v p
+((p v (p v p)) v p) -> (q -> (~(r -> (s -> t)) -> (p v s)))
+(~p v p) -> (q v (r -> ((((s & s) v p) -> t) v (q v r))))
+(((p v q) & r) v s) v ((t -> ((t -> r) -> (s v ~s))) v t)
+~p v (~q -> (((r v ~s) v ((t & r) v (t & s))) -> p))
+(p v (q -> ~(r -> ((r & (s & p)) v ((t v s) -> t))))) v q
+(p -> (((((~(p v q) & r) -> s) & t) & ~t) -> r)) v ~r
+(((p & q) & r) v s) -> (((r & ((t & ~r) v t)) & s) -> r)
+(p & (q -> ((((r & s) & ~t) v (t & r)) & s))) -> (p & p)
+(p -> (p -> (((~(q & (r v (q -> s))) & t) -> r) v t))) v s
+(~p v ~(((q & p) & ((r v s) v t)) & ~(s -> s))) v r
+(~p & (q & r)) v (~s -> (r v ~((q v t) & (r & p))))
+((p & ~q) -> ~(r & (r v (((~s v t) & p) v t)))) v r
+(~((((p & q) v (r v p)) & s) & (q -> r)) v ~~t) v s
+((~p -> q) -> r) -> (((~~s -> ~q) -> (t -> s)) v ~s)
+(p v ((~q v r) v (s -> (t & (~(t -> ~r) -> s))))) v s
+((p -> q) v q) -> (q v (~((p -> r) -> (q -> (s & t))) -> q))
+(p v q) v (~((r -> r) v s) -> (~(t & p) v (p & ~p)))
+(p & ((q -> r) -> ((s v ~((q & q) v (t -> s))) & q))) -> p
+(((p v q) v (~(r -> ((s v r) -> q)) -> r)) v s) -> (t -> t)
+~p v ((q -> p) v ((~(r -> (q & s)) v s) & (t v ~t)))
+(((~(p v q) v r) & ((s v s) v q)) v (t v t)) v (t -> t)
+p v (((q -> r) & (((~(s -> p) & q) & t) v ~~p)) -> q)
+~(((~((p & q) v r) -> s) v (s v (t -> q))) & (~r & r))
+((p & ((q -> r) -> s)) v q) v (t -> (~(q & s) v (p & t)))
+(p v ((q -> ((r & s) & ~t)) & (p -> ~p))) -> (~p v p)
+(~((p -> q) -> (~(r v (s & ~t)) & t)) v q) -> (t -> t)
+(p -> (q v (~r v (p -> (s -> r))))) v (s & ((t -> r) v p))
+~(((p -> (q & r)) & (p & p)) -> ~s) -> ((~p -> t) v p)
+((~p v ~q) v r) v (~(p -> ((p & (q -> q)) v s)) -> t)
+p v ((q & (~p -> p)) -> (~((r -> ~q) v (s -> q)) & t))
+((p -> ~((q -> (r v s)) -> (~~s -> s))) & ~~t) -> t
+((((p & (~q v p)) -> (q v q)) v r) v ((s & q) -> t)) v q
+p v (q v (r -> ((s -> ((r v r) v ~(t v ~~t))) -> r)))
+p -> (~(q -> (r v r)) -> (((s & (q -> (t -> r))) v s) v p))
+(((((p v (q v r)) v p) & ~(s -> q)) & q) & q) -> (t v t)
+~(p -> (p v (q -> ((r -> r) & (p -> (s & q)))))) -> (t & p)
+(~((p -> q) v ((((r & (p v r)) -> s) & r) -> q)) -> t) v s
+~p -> (~q -> (~(q v ~r) v (p -> (s & (~p & t)))))
+~(~p -> q) -> (((q -> (r v s)) v t) -> (s v (s -> ~t)))
+p -> ((p -> ~(((q v r) & q) v p)) -> (s -> ~(q & ~t)))
+(p & (~q & q)) -> (r & (((s & ((r -> t) v q)) -> q) v q))
+(~~(p & (p -> q)) -> ((((r & ~q) -> s) & t) & s)) v q
+p v (~q v ((r -> (((s -> p) v p) -> s)) v ((p -> t) -> q)))
+(((p -> (q -> (r v r))) v s) v (r -> r)) v ~(r & (t -> p))
+(((p v (p & q)) v r) v (~(p & p) & (r -> s))) v (s -> t)
+(p v p) -> ((~q v ((r -> q) & (p v ((s v t) & t)))) v p)
+(p & ~((((q v r) & s) v ((p v t) & p)) v s)) -> (q -> q)
+((p & (q & (~r & r))) & (q & (((q & s) v p) v t))) -> q
+p -> (((~((p & q) & r) -> ~s) -> (t v ~q)) v (s v q))
+((p -> ~(q & r)) & s) v ((r -> (t & ((q & q) v t))) v r)
+p -> ((q & (r & r)) v (r v ((r & ((~s v s) v t)) -> q)))
+(p & ((p & (((p -> (q & (~r -> s))) -> t) v s)) & s)) -> s
+(p -> (~(((q -> r) -> (s -> t)) & r) & (t v q))) -> (s -> s)
+(p & ~p) -> (((q v (((r & s) v t) v s)) & t) & ~~q)
+((~p -> ((~q v ~(p -> r)) -> ~s)) v t) v ~(t & p)
+(p & (q & (r & q))) -> ((q & r) -> (p v (~(s v p) & t)))
+(p & q) v ((r -> (p -> r)) v ((q -> ((q -> s) -> q)) v ~t))
+p v (((p -> q) -> ((r -> s) -> (t & r))) v (~(p & r) v r))
+p -> ((~~(q & r) v (r -> (((s & t) & p) -> s))) v ~t)
+~(p v (q v (p & ((r -> r) v ((q v s) -> t))))) -> (p -> t)
+((((p -> ~q) v r) & (s & (r & p))) -> p) -> (t v (t -> t))
+(~p v ((q v p) v ((r -> ((s & (t v t)) & r)) -> q))) v r
+((p v ~~(~q v (((r & s) v t) & (s v p)))) & r) -> r
+p -> (~(((((p -> q) & (r v p)) & p) & p) & s) v (p v t))
+~(~(p v q) -> (r -> (r & s))) -> (p -> (p -> (t -> ~s)))
+~(p -> q) v ((~q v r) v (((~q -> s) -> (r -> t)) & q))
+(~p -> (q -> r)) v ((((s v r) & ((t v p) v q)) & r) -> p)
+p v ((p v ((q -> (~(r & s) -> ((t -> s) v r))) v q)) v p)
+((p v (p v (q -> (q & ~r)))) v (s -> (p -> (r -> t)))) v p
+~~(p -> (q v ~(((q v r) v (s -> p)) -> t))) v (q v t)
+(p -> q) v (r -> ((p v ((q & s) v (s & p))) v ~(t -> r)))
+~(~p & ~q) v ((r & ~(s -> t)) -> (t -> (~t & t)))
+~((p & (p v (q -> r))) & (s & (s & (s -> s)))) v (t -> s)
+p v (~(p & q) v (~~~~((r & (q -> s)) & r) & t))
+p v (~q v (q v (r & ~(((r & s) -> (s & ~t)) -> q))))
+(p -> (q -> (r -> q))) v (((s -> (~r & (p -> r))) v s) -> t)
+~~(p v (q v ((~(q v (r & s)) v ~q) & t))) v ~t
+p -> (q v (((r v r) & (((p v s) -> ~(t -> s)) v q)) v p))
+~p -> (q v ((r v ~((s & q) v (s v p))) v (s v ~t)))
+(p -> ~q) v (q v ~(((q -> (r v s)) & t) & (~r -> p)))
+(((~~p & (q & q)) & r) -> q) v ~(q & (r -> (s -> t)))
+p v (q -> (((~q & (r -> ((s v t) -> (q -> p)))) & r) -> p))
+p -> (p & (((((q v r) -> q) v (s v s)) v (t & ~t)) v r))
+((~((p & q) & r) v p) v p) v (s & (((t & p) v p) & r))
+(((((p v ~q) v (r v p)) v q) & q) v (q & s)) v (t -> t)
+(((p v (q & (r -> ~s))) & t) -> (q & t)) -> ((t -> p) v t)
+((p v ~(p & ((p v (~q & (r & s))) v s))) v p) v ~t
+(((p -> q) v ((~(q -> r) & s) -> (s -> t))) v (r v r)) v t
+(p & q) -> (r v ((r -> ((s & ((q v s) & ~t)) v s)) v r))
+(p v (q -> (r v (r & ~(((s v r) v r) & s))))) v (p -> t)
+(p v q) v (((r -> q) & (~(s -> (t v p)) v p)) -> (q -> s))
+((p & (q -> r)) v r) v (q -> (((s v (r v q)) v s) v ~t))
+(~p v (((q -> r) & s) -> t)) v ~(((t -> s) & t) & ~q)
+(p v ((p & (q -> (~(r -> (s v t)) & p))) & p)) -> (p v t)
+((p v (q v (~(r v s) -> ((~q & t) & p)))) v ~r) v s
+~((p v q) & (q & ~((r & ~s) v (t -> (s v ~~t)))))
+p v (p -> (q v ((((r & (s v t)) & t) v q) v (~r & q))))
+((p v ~q) v ((q & p) v r)) v ((s -> t) -> (r -> (t v r)))
+~(p -> ~((p -> q) & ~((~~r & (s v t)) v s))) -> q
+((p & ~q) & q) -> ((r v s) v (q v ((r & t) & (q -> p))))
+((p & (q & ((r -> r) & (((p & r) -> s) v ~t)))) -> q) v q
+(p v (q v r)) v (p v (q -> (q -> ~(s -> ((r & t) -> p)))))
+(((p & p) v ~q) v ((q -> (r -> s)) v ~p)) v (t & ~q)
+p -> (q -> (q -> ((((p v ~((r v q) -> q)) & s) & t) -> s)))
+p -> (((q v (((r & s) -> q) & (q & (~t v r)))) & t) -> p)
+p -> (q -> (r v ((p & ((s v ~((p -> t) -> p)) -> r)) -> q)))
+p -> ((q -> p) v ((~r -> ((s -> t) -> s)) & (s v (t -> s))))
+p -> ((q -> (((r v s) & (~((t & s) -> r) & t)) & s)) v q)
+(p v ~q) v ((~(r v (s -> (q v p))) -> p) v (~q & t))
+p v ((p -> ((((q -> r) -> ~q) & p) & (p & r))) v (s v t))
+(((~p v (q & r)) v s) -> ~((~p & p) -> t)) -> (t -> t)
+p v ((q -> (r v (~r -> s))) v (((q v r) v (t & t)) v s))
+((((((p -> (p -> ~(q & r))) v s) -> s) & t) & t) -> s) v r
+p v ((q -> ((((r & (s -> s)) & r) -> (p v s)) v t)) v ~p)
+(p -> (q v p)) v (((r v ~s) & q) v ((t & (p & s)) & r))
+p -> ((q -> (r & ((p & s) & ~(p v (q v t))))) v (p -> p))
+~~((p & ~~(q v r)) v ((r & s) v t)) -> (~p v p)
+~p -> (~~(p -> (q & (r & s))) -> (p -> (t & (p & p))))
+p v (q -> (r v (~~(~s & p) -> (r & ((t & p) v r)))))
+p v (~((q v ((r & ((q v r) -> ~~s)) -> t)) & p) v t)
+(p -> ((q v (((~(r -> q) & q) -> (s & t)) -> r)) -> q)) v p
+(p -> ((p v q) v r)) v (s -> ((r & (~r & t)) v (r & p)))
+~((p & ((q v (r v s)) v r)) v (t -> ((q & p) -> t))) -> r
+p -> (((q -> r) v (~((r & s) -> t) & (t -> t))) v ~~p)
+((p -> (~q v (r -> (s v (p -> (~p -> ~t)))))) v s) v s
+(~(p & q) v r) -> ((s -> s) v (((t -> r) & (q v r)) -> q))
+(~(p -> (q -> (r & ((p -> s) v t)))) -> p) v ((t -> p) v r)
+(p -> q) v ((r -> q) v ((s -> (((t -> t) -> q) & ~t)) v r))
+p v (q -> (q & ((q & (((p & q) & r) v (p -> ~s))) v t)))
+(~(p & p) v (q -> ((r & s) v t))) v ((p & (r -> r)) -> q)
+(~p & q) -> (q v (((r & s) & t) & ((t & p) -> (p -> q))))
+p v (~((p & q) & (~r v ((r v (s -> t)) & r))) -> ~p)
+p v ((((q v q) & r) -> ((r & (s -> (t -> ~p))) v t)) v q)
+(p v ((q -> (r -> s)) v q)) v (r v (~p v ((t v s) & t)))
+p -> (~(p & p) v (~((q & r) -> q) -> ~((s & p) v t)))
+p -> ((~(q v r) v ((s v (t v t)) & ((s v r) & s))) -> p)
+p -> (p & ((q v (~r v ~(p & ~(p & s)))) v (t v r)))
+(~((p & ((p v q) v (r v (q & p)))) v s) & t) -> (p -> p)
+(((~p & (q v (r & s))) v ~(~~~p -> t)) v p) v t
+p -> (q -> ~~(r -> ((((~q & s) v s) & (t & q)) v p)))
+(p -> ((~(q v r) v (r v (r -> (s -> t)))) v p)) v (r v q)
+(p -> (q -> q)) v (r v (p -> (((s v s) -> (r -> ~r)) -> t)))
+(p v ~p) v (q v (((~~(r -> p) & r) v s) -> (t & p)))
+p -> ((~p -> ((q v (r & (q & p))) v (s -> (t -> r)))) v p)
+((((~(((p & p) & q) v p) -> r) -> (q & s)) -> t) & p) -> p
+(~p -> ~(q v r)) v ((p -> ((s -> t) & t)) -> (p -> ~p))
+(~((p v (~q & ~((r v r) v s))) & s) v (t v q)) v s
+(p v (q v (p v (p v (((r & s) & ~q) -> t))))) v (q -> s)
+(~(((~(p -> q) -> ~~r) v (q v s)) -> t) -> p) v ~p
+((((~p -> (~q v q)) v (~r & s)) -> t) v (t -> r)) v p
+(p v ~p) & ((((q & ((r -> r) -> (r & s))) -> q) v t) v q)
+((p v ~((q & ~r) -> (s -> (~t -> (t v s))))) & q) -> q
+(p & (q v ~r)) -> (((((s v t) -> q) v (s v t)) -> q) -> p)
+(p v (~(q -> (r v (s & t))) & r)) v ((r -> (t -> s)) v r)
+((~p & (((q v q) -> (r v q)) -> (s & q))) & s) -> (q v t)
+p v ((~q -> r) v (s -> ((~(p v (t & r)) -> p) -> ~r)))
+((((p & ((q v r) v s)) & q) v (p & (r v q))) & ~p) -> t
+(((p & q) -> (~(r -> (s & ~s)) v (s -> t))) v s) v ~q
+(((p v (~q -> r)) v ~p) & (s & r)) -> (s v (~t -> q))
+(p v ((q & ((q & ((p v r) -> q)) & q)) -> ~s)) v (s v t)
+p -> (q v ((r & q) -> (((s & p) & ~r) & (q v (t -> q)))))
+((p & (((p & q) v r) & s)) & ~(s -> ((q v s) v t))) -> r
+p -> ((~~(q -> r) v ((p & s) -> (q v (t -> q)))) v ~p)
+(p & (((((q & r) -> s) & p) -> s) -> ~p)) -> ((s -> t) v r)
+(((p v ((q -> r) & q)) & (~q & ~q)) -> ~(q & s)) v t
+(p & (((p -> (p & q)) -> q) -> r)) -> (~(p -> r) -> (s & t))
+(p & (((~(q v (~r & (p & ~s))) v q) & r) & t)) -> r
+(p -> (p v (q v r))) v ((s v q) v ((t & (s -> s)) & ~t))
+p -> (((((~~q & (~r & s)) v (t v r)) -> r) -> p) v q)
+(~(~(p v q) -> r) -> (q v s)) -> (t -> ((r & ~p) -> r))
+(p -> ((~(((p v p) & q) & p) v (r v p)) v (r -> s))) v t
+((p -> ((q & ~r) & ((s -> ((p v s) -> q)) -> t))) & s) -> s
+(p v (p v ~(p & q))) v ((r v (p & s)) v ((p -> t) & p))
+((p v ~q) v (q -> (p -> (r & (s v t))))) v ~~(r & t)
+(p -> (p & (q -> (~(p & r) v (s & p))))) v ((r v t) & q)
+((p & p) v ((q -> ((r -> r) v p)) v ~s)) v ((p -> r) v t)
+~~((p & q) v (r v ((r -> ((q & (r & s)) v ~r)) v t)))
+(((p -> ~(((q v q) & (r -> s)) -> r)) & (s v r)) & t) -> t
+p -> (((p -> q) v r) -> ((((s v s) & t) -> ~(t -> t)) v t))
+~~(p v (q v (r -> ((~((s -> t) & t) v t) v (r & q)))))
+((~p v q) -> p) -> (q -> (r v ((((s -> r) -> q) -> r) -> t)))
+(~p v (q v (((r & ~((r v p) & ~s)) & s) -> t))) v p
+p v (((q -> ((~r & ~q) & ((p & ~p) v s))) & t) -> t)
+(~~(p -> q) -> ((r v ~((~p v r) & s)) v ~t)) v t
+((p -> q) v (r v ((((s -> s) & t) -> (p v q)) v r))) v ~s
+((((p v ((q v r) & r)) v (q v ~s)) v (q v r)) v t) v s
+(((p -> (~p -> (q v q))) v ~r) v s) v (t & ~(p & r))
+((p v ((q v ((r v s) & p)) -> ~(t -> r))) -> p) v (q -> t)
+((p & (((p v q) -> r) & ((r & s) v q))) v t) -> (~p v p)
+~((p & q) v r) -> (r -> ~((p -> s) & ((q & q) & ~t)))
+(((~p -> ((p & ~q) & ~(r & s))) & q) -> t) v (q v q)
+((~p & ~q) v r) -> ((q -> s) v (((t & s) v ~q) -> t))
+(p v (((((p -> ~(q v r)) -> s) v r) v q) v t)) v (q -> q)
+((p v (((q & (r & q)) v s) -> (q -> r))) v (p v ~t)) v s
+~(p v q) -> ((p -> ~r) v ((s v ((s v ~t) & s)) & q))
+(~(((p -> (q v r)) & q) & (s -> p)) & t) v (s -> (r v s))
+(p v ((q v q) -> (r -> ((p -> r) v r)))) v ((s & ~t) -> r)
+~p v (~q v ((r & (~((q & r) -> s) -> (t v p))) -> p))
+p v (~(p -> ~(~q & r)) -> (((~r -> ~s) v t) -> t))
+(p & ((q & r) -> q)) v (~(~(s -> p) & (p -> t)) -> ~s)
+(p v ~q) v ((r -> q) v (((s -> r) & (t v s)) & (q & r)))
+(p & ~(q v (r -> (((p -> (s & t)) & r) v s)))) -> ~~r
+(p v q) v (r v (p v ((s -> ((~t & r) -> p)) -> (r -> t))))
+(p & ((p -> ~(q -> ((q & p) -> r))) v s)) -> ((q & t) -> t)
+(p -> ((q -> r) v ((s -> (((~r -> t) -> t) & q)) -> t))) v q
+((p & ((p v q) v ~(r v q))) & p) v (~(s -> t) -> ~t)
+((~p v q) & q) -> (r -> (s v (r v ((s -> (t & q)) -> p))))
+(p -> (q v (r -> (~s & (q v t))))) v (((p & p) v p) v q)
+p v (~(p -> (q -> ((q -> (r v s)) & ~(~q -> t)))) -> q)
+(p v (((q v r) & (s & (q & (p v r)))) -> s)) v (t v ~p)
+~(p v (((q -> r) v (p -> r)) v (s -> ((r -> t) v r)))) -> p
+p -> ((~(q v ((~(r v ~s) -> t) v q)) & (p -> q)) -> t)
+p -> (((q -> (((q & (~p -> r)) & s) v t)) & s) v (p v q))
+((~p v (q v (r v s))) & ((q -> t) & ~r)) -> ~(r & s)
+~(p v ((p -> ((p & q) v p)) v ((r -> (s v t)) & s))) -> s
+~((p & ((q & q) -> ((r v s) v r))) -> ~(s & ~s)) -> t
+~(p & ~q) -> (((r -> s) -> p) v (s v ((p -> t) v ~r)))
+((p -> (q -> r)) -> ~p) v (s v (((t -> s) & ~~r) -> r))
+(p -> p) v (~((q v (r v (s & t))) v (r -> s)) & (q -> q))
+(p -> ~q) v (~r v ((((r v s) & ~s) -> (r & t)) v r))
+p -> ((q v (p v (~~(p v (~r & s)) v r))) -> (t v p))
+~p v (((q & r) & (~s v (s & ~(p v t)))) -> (p & q))
+((p -> (p -> (q v r))) -> (s -> ~~(q -> (p & ~t)))) v s
+~(p v ~(p & p)) -> ((((q v r) -> ~(r v s)) -> p) & t)
+~(p v ~p) -> (q v ((~r & ((p v s) & s)) -> (p v t)))
+((((p v (q & r)) & ~(q & s)) & (t & s)) & ~t) -> ~q
+(p & ~((q & (q & r)) -> ((((s & p) & s) -> t) -> s))) -> p
+((((p v (p & ~p)) -> q) v (r v s)) v p) v (p v (t v t))
+p -> (((q -> (~(p -> r) -> r)) & (~s & s)) -> ~(t v t))
+(~(p & q) v ((r v (s & r)) -> ((s v (r & q)) -> p))) v t
+((p v ~(q v ((r v ~q) -> p))) -> (~(s -> p) -> t)) v s
+(p & (~(q & ~((((r v s) -> t) -> p) -> q)) & ~t)) -> p
+(p v p) -> (((q v ~r) -> (p v (r v (s v (t v s))))) -> p)
+p -> (((q v (p -> (p v (p v (q v (r -> s)))))) v t) v ~t)
+(p & (q & r)) v ((~s v (((r -> s) -> s) v (t & s))) v p)
+~(p & (((q & p) v r) & s)) v (((t v t) -> (t & t)) -> p)
+((p -> ((~q & (r v s)) -> (t -> s))) -> ((q & r) & q)) -> r
+(~((~(~(p & q) v p) -> r) v p) & s) v ((q -> q) v t)
+p -> (~((q v p) v p) -> (p -> (r v ((q & s) & (s v t)))))
+p -> (((q & r) & (r v ~((q v ((s -> p) v t)) & r))) -> q)
+p -> ~((q v r) & ~(~(((p & (s & t)) v t) v t) -> p))
+(p & ((p & ((~q & q) & r)) -> s)) v ~((t & s) & ~t)
+(p -> (((q v ((p -> p) & p)) & ((r & q) -> p)) v s)) v ~t
+(((p v (p & ~q)) -> r) -> (p v s)) v ((s -> q) -> (p -> t))
+~(p -> (~q -> (((p -> ((r v s) v q)) -> s) -> t))) -> ~t
+p -> (q -> ((r -> ((s & (((t & s) -> s) & ~t)) -> r)) -> p))
+((p v q) v (q -> (r v ((q -> ((s v ~r) & p)) v q)))) v t
+((p v q) v ((p & (~(q -> r) -> s)) -> ~t)) v (~r & t)
+p v (((p v q) -> r) -> ((r -> ((~(s -> q) -> s) v r)) v t))
+~(p -> (q -> ((r & ~s) & (t & ~~(~q & p))))) -> p
+(~(p & ((q v r) & s)) v (~t -> ~(p -> (q -> r)))) v p
+(~p v (q -> p)) v (q v (r & (r -> (((q -> s) & s) v t))))
+p -> ((q -> p) -> (((r v s) -> s) v ((q & t) v (~t v t))))
+p -> ((((q -> p) & r) -> (r v s)) v (t -> ~((s -> p) & q)))
+((~p & (q & r)) -> ~s) v ((r v ~(r & t)) -> (s & s))
+p -> ((p & q) -> ((((q v ~((r -> s) -> t)) -> t) v q) v p))
+(((p & q) & (r v (~(s -> q) v ~(~p -> t)))) & s) -> q
+((p & ~((q & (r & s)) v (s v (q v (q -> t))))) -> p) v t
+((~~p v ((q v (p v r)) & (s v (p -> t)))) -> ~t) v t
+((p v q) v (((~(r v s) -> (s v q)) & s) -> (r v s))) v t
+(((p v ~(~q -> r)) -> (s & (s v t))) & r) -> (~p v r)
+p -> (q -> (q v (r v ((s -> ~p) & ((q v ~~s) & t)))))
+(p v (q -> (((r & (q v ~(s -> t))) v t) v (r v s)))) v q
+(p & (~q -> (r -> q))) -> (p -> ((~s v (~p -> p)) v t))
+(((p v q) v ((((r & s) & r) v ~t) -> (q -> s))) v r) v p
+(p v q) -> (~(q & ~(((~r v q) v s) v r)) v (t -> s))
+p v ((p & q) v ((p & (((q & (r & s)) -> t) -> ~t)) -> r))
+p v (((q & r) -> p) v (q & (((~s & t) -> p) v (r v p))))
+((p & (~q -> q)) -> r) v (s -> ((s & (r v (q & t))) v s))
+(p v (~~(q -> r) v s)) -> ((p & (~r -> (s & t))) -> p)
+(~(p v (q -> r)) v r) v ((s v (q v (r -> ~t))) -> ~r)
+((((~p -> q) -> (r v (s & p))) v ~~p) & t) -> (t v p)
+(p -> ((q v r) & (r v q))) v ((~(s v r) & r) v (t -> t))
+((((p & q) & (r & ~q)) & (s & s)) -> r) v ((s v r) & t)
+(~~p -> ~~p) v (((q & r) -> ((r v ~s) -> q)) v t)
+p v ((~~(p & ((~(q & q) -> r) & s)) v (r & t)) -> r)
+~(p & ((~q & (r & ((~s & (~t -> t)) & s))) & ~t))
+p -> (q -> (((~((q -> q) v r) & s) v q) & ((r v p) v t)))
+p -> ~(((q -> (((r -> ~s) -> t) & p)) v (p -> p)) & ~p)
+p -> (((q & (((r -> (r & s)) v (t & r)) & ~p)) -> t) v t)
+(p v ~q) v ((((r -> (q & r)) & s) & ((p & s) & t)) -> s)
+(~(p -> p) v ~(p -> ((q v ~p) v r))) v ((s & t) -> t)
+(~((p v ((q -> r) -> (p v (r & p)))) & s) & t) v (p -> p)
+((p & q) v (r v (~q -> s))) -> (s -> (t -> ((s & s) v r)))
+(p -> (~~((q v ~p) & q) v ((r & s) -> (t v r)))) v t
+((p -> q) -> ~~(~(p -> ~r) -> ((~s -> t) -> p))) v q
+(p -> (((q & r) -> ~(s v (q -> q))) v (q -> t))) v (t -> s)
+~((p & (q -> (r -> s))) & (s & t)) v ((q & (r -> p)) -> q)
+((p v q) -> (r v r)) -> (s v (r v (~(t & (s & s)) v r)))
+p v (q v ((r & s) -> ((q -> (((t v r) -> r) & ~p)) v p)))
+p -> (~(q -> r) -> ((s & (((~t v t) -> s) & ~r)) -> s))
+p v ((~~((p -> ((q & p) -> r)) -> p) -> s) v ~(s & t))
+p v (~(q v ((r & s) & ~s)) -> (p -> ~(s & (t & r))))
+~((p & (q -> (r -> r))) -> s) v (((p -> r) v (t & p)) v p)
+(~((((p v q) v ~~p) & q) v ((r v q) & s)) & q) -> t
+(~(p v q) -> (r -> r)) & ((s v (t -> (r v t))) v (r v r))
+(p & (~q -> r)) -> (s v ((t & s) -> ((s & s) -> (p & t))))
+~p -> (~(q v (r -> p)) -> (((r -> s) -> ~~~t) -> r))
+((p & (q v (~(q -> r) v s))) -> (p -> t)) v ((q -> r) v q)
+((~(p -> p) -> q) v p) & ((r v p) v ~(s & ~(p -> t)))
+(p & (q v r)) -> ((((r v (p & (q v s))) -> ~s) v s) v t)
+(p & ~((q -> q) v ((r & p) -> ((s & p) -> q)))) -> (t & r)
+~((p & q) -> (q -> (((q & r) -> (s & s)) -> (p v t)))) -> t
+~p v (p -> (p v (q -> (r -> ((q & (r v s)) -> (t -> r))))))
+(p -> ((q -> r) & s)) v (p v (~(t & (p -> s)) -> (r -> p)))
+~((p -> q) v r) -> ((r -> ((s -> s) v t)) v ~~(r & r))
+(p -> q) v ((~(~p v r) v p) v ((~(r -> s) & p) -> t))
+(p v ~(q -> (r -> ~q))) v (s -> (p -> ~(p & (q & t))))
+~p -> (~(~(q v r) & q) & (p -> (~s -> ~(t & q))))
+(p v ~q) -> (((~(r & (q -> s)) v (s & t)) v ~q) v s)
+~((((~p & ~((q & r) -> (s v t))) & t) & p) -> s) -> r
+(((~p & q) -> ((q & (r v ~s)) & (t & q))) v ~s) v s
+p v (~(q v ((r -> ~q) v (q -> (s v s)))) v (~t v t))
+(((p v ~~~(q -> r)) & s) & (p & t)) -> (s & (s v r))
+(((p v q) -> (r v s)) -> t) -> ((s v (q v (s v ~q))) v t)
+p v (((q & (r -> ~((r v ~~s) -> s))) & t) v (q -> q))
+((p -> q) -> (r v (p -> s))) v ((p v (~(t v s) -> t)) -> p)
+(((p -> ~q) v r) -> s) -> (((q & t) v ((r & t) -> s)) v p)
+(p & ((q & ((r & ((~q -> q) & r)) v s)) & t)) -> (t v p)
+(p & (q -> ~q)) -> ~((q & (~(~r & ~s) v t)) & s)
+~p -> (q v ((((~r v (p v s)) & q) & (~t & r)) -> p))
+((p -> q) v ((q -> ((r v s) v p)) v ((~p -> p) v q))) v t
+(p v (q v ((r v s) v t))) v ~(~(s -> ~s) & (s & q))
+((p -> q) v r) v (((s -> (q v ((p -> t) -> p))) -> ~q) v t)
+~(~(p & (q -> (~(r & (p -> s)) -> p))) & ~(t -> ~p))
+p v ((p & ((p v (q & r)) & s)) -> (~(r -> q) v (t v s)))
+(p -> q) v ((r -> (((~s & p) v ((p -> r) -> t)) -> r)) v p)
+((p & (((q -> r) -> (~(p & r) v s)) -> t)) & s) -> (s v r)
+p v (q v ((~q v (((r v (r v s)) -> t) & p)) & (p -> r)))
+(p v ~((((q -> (p v r)) & s) & r) -> s)) -> ((t v q) v p)
+~~(p -> ~(((q & r) -> ~s) v s)) -> (~(t & r) v r)
+(~((p v ((q v r) -> q)) & (s & t)) v (p -> (r & s))) v s
+p -> ((q & ~(r v (((p -> (s -> t)) v p) & r))) v (r v p))
+(((p v q) & (r -> q)) & ~(p -> (q -> s))) -> (q v (t -> q))
+p -> (((q v ((r -> s) v (t & (~t -> s)))) v q) v (t v p))
+(p v (p -> ((p & q) & ((r v s) v q)))) v (t -> (~s -> q))
+((p & q) & (r & ~s)) -> ~(r -> (~(r & r) & (t -> p)))
+(p v (q -> (r v s))) v ((p v (s v q)) -> ~(t & (p & p)))
+(p -> ((((q & (r v ~s)) -> r) -> p) v s)) v (t & (s v q))
+(~(p -> (((((q & r) v s) v (r & p)) v t) v s)) & t) -> r
+~~(p v (q v ((r v (p -> ~~((s v ~q) v t))) v t)))
+~~((((~p -> q) & p) -> (r & s)) v ((q -> t) v (q v p)))
+~(p & (q v q)) v (q v (p v ((r & s) -> ((q -> r) v t))))
+(((p & (((q v r) & q) v (~s v t))) v ~q) -> ~q) v p
+~(p v (q v ((((r -> ~~(s & t)) -> p) -> r) v r))) -> t
+(~((p & q) -> r) & s) -> ((~t -> ((q & ~s) v p)) & p)
+(p v (((q & (r v ~s)) & ((s -> s) -> t)) v (p -> p))) v r
+p -> (((~q & ~(p v r)) -> s) v ((s v ~t) & (s v s)))
+(p -> (((q -> (~r -> ((q & r) & q))) -> s) -> (t v p))) v r
+(p v ~(q & r)) v (((((s -> t) -> q) -> s) -> (s & r)) -> r)
+((p -> p) -> q) -> (r v ((~q v (s & q)) -> (t -> (s v r))))
+(((~p -> (((q & p) & (r & q)) -> q)) -> s) & (q & t)) -> s
+~((p -> q) v (r v ((q v ~(s -> (t -> q))) v p))) -> ~s
+p v (q -> ((r & s) v ((t -> t) v ((q -> ~(t -> q)) -> q))))
+((((p -> (q v r)) & s) v t) v ~s) -> ((s v s) v (t -> t))
+((((p & (q & (r -> r))) -> (q v s)) v q) -> ~p) v (t -> p)
+((~p v p) & (q -> q)) & (r -> (~r -> (s & ~(t & q))))
+((p v ((q v (~((p & r) & p) & p)) -> s)) v r) v (s -> t)
+p -> ((p & ((p -> q) v (r v p))) v ~(s & ((t v t) v t)))
+p -> (q -> (~~(((r -> ~((s v t) -> s)) v p) & s) v q))
+(p & q) -> (p -> ((((q v r) & s) -> (q & ~q)) v (t -> t)))
+~(p -> ((q -> p) -> (p -> r))) v ((((p & s) & r) & t) -> s)
+~((~((p -> q) -> p) & p) & r) -> ((~s & s) -> (p -> t))
+((p -> q) -> r) v ((s -> (~p -> s)) -> ((p & t) -> (t v t)))
+~((~(~~~p & q) v r) -> (s v q)) -> (s -> (p -> t))
+(p -> ~(q & (p v r))) v ((((q -> q) & (p -> s)) -> q) v t)
+(~(p v p) v (((~p -> q) v r) & (s & ~(t & p)))) v p
+((p & q) & ~p) -> (~(r -> (~(q -> r) -> s)) v ~~t)
+p v (~(q -> r) -> ~(p & ((s v (t v (~r -> p))) -> s)))
+p -> ((q v (~(r & s) -> ((t v r) v ((t v r) -> r)))) -> p)
+~p -> ((p v ((p -> p) -> ~(q & r))) v ((s & ~r) -> t))
+~p v ((p v ~q) & (~((((r -> s) & r) -> r) v s) -> t))
+(p & (q & (r v ~(~(s -> q) & ~((q -> t) -> q))))) -> p
+p -> (p & ((q -> ((p & ((r & s) v (r & t))) -> ~s)) v p))
+p v ((p & (~q -> (p v (((r -> (s v q)) & r) -> r)))) -> t)
+(~p -> ~q) -> (((q & ~q) & r) -> ((s v p) -> (t -> q)))
+((p v (q & (r & (s v p)))) -> ((t -> t) -> (~s -> t))) v p
+~(~~(~p v ~(q & q)) & r) v ((s v r) v (t -> s))
+(((p v ~((q -> r) -> ((p v r) & s))) v s) v t) v (t -> q)
+(p v (q v r)) v ~((r & q) & ((((r v s) & q) v p) v t))
+p -> ((q -> ~r) v (s v ((s v ((p & s) -> p)) -> (t -> t))))
+p -> (((q -> r) -> (s v ((~s -> r) & (~t v ~r)))) -> p)
+p -> (((q & ~(r & p)) & ((p & (s -> q)) -> (t v t))) -> t)
+(p -> q) v ((p & p) & (((~(r & r) -> (r & s)) & t) -> t))
+p -> ((q & ((r -> ((r -> (s & r)) v ~r)) & r)) -> (t -> t))
+p v (~q v (~(p -> ((r -> p) v r)) -> (s & ~(r & t))))
+p v ~(((q & r) -> (r v ~s)) -> ~((t v r) v (t -> s)))
+((p & q) & (~(r & q) & s)) -> (q v (t & ~(p -> ~r)))
+~p v (q -> (((((r -> s) & s) -> s) & (q -> (s v t))) -> p))
+p v ((q -> (((r & ((q & s) & (r -> ~t))) & q) -> q)) v p)
+((p v ((q & (q v (r & s))) -> (t & ~~s))) -> ~s) v s
+(p -> p) & ((q v (r -> s)) -> ((~t -> (r v q)) v (t -> p)))
+~p -> ((p & q) -> ~(q & ((((r v q) v ~s) & t) v p)))
+(((p & (~~q & r)) v ((s -> ~t) v p)) & q) -> (s v q)
+~~p -> ((q -> p) v ((~(q v p) v r) v ((s v t) v t)))
+((~~(p & ~(p & q)) & r) v p) -> ((q v s) v (t -> t))
+(p v ((~(q & ~q) & (r v (s v t))) -> (~p v s))) v q
+(p & ~((p v q) v (r & (r v (((s & p) & t) -> p))))) -> t
+((p -> (p v p)) v (~(q -> (((r v s) v q) & p)) v t)) v s
+p v ((~(~(q -> q) -> ((~r v p) v q)) -> (s v t)) v t)
+~p -> (q -> ((p & ((((r & s) -> t) v r) & (p & s))) -> q))
+((p & q) v r) v ((r & s) -> (((t & (~r v s)) v r) & t))
+~(p -> q) -> ((p v (r v ((s & p) v ~t))) v (~t v t))
+p v ((p -> q) v ((r -> s) -> (((s & r) & ~r) & (t & t))))
+~(p & q) v (((r v q) -> (s & (t & ~~(s -> q)))) v p)
+(p & ~q) v ~((r -> ~(r & ((s -> r) v s))) & (t & r))
+p v (((~q & p) & ((r -> p) & ((s & q) v (t -> p)))) -> q)
+p v (q -> (((r & s) -> r) v ((r v (~r v t)) v (t -> p))))
+(p & q) -> ((p -> (((((r -> s) & r) v s) & q) -> ~t)) -> q)
+p -> ((q -> q) v (~~(r v ((~s -> ~t) v ~q)) v s))
+(p v ((q & r) -> s)) v (q & ((s & ~p) -> (t v (t & p))))
+(p v (((q -> r) v ((s -> p) v t)) v ~t)) v (q -> (r v q))
+(p & ~((q -> ~q) v r)) -> (~r v (s v ((r & t) -> s)))
+p v (((p -> ((~q -> r) -> ((p -> (s v r)) -> t))) v q) v q)
+p -> (~~~q -> ((((r v q) & p) v p) -> (q -> (s & t))))
+p v ((~((q v q) -> (r v s)) v p) -> ((p -> (t v s)) v s))
+(p & (q v (r v ~s))) -> ((t -> ~t) -> (p -> (~s v s)))
+(p -> ((q v r) v p)) v ((r -> (q v ((s -> ~p) -> t))) -> t)
+p -> ((p v ~q) & ((((q v (r v (r v s))) & t) v q) -> p))
+~~(((((p & q) & p) -> r) v r) v (((s & r) & t) -> ~r))
+~(p & q) v ((((r v ~s) v ~r) v s) v (t & (t & q)))
+p -> (q -> ((r v (s & ~((p & (t & t)) -> s))) -> (p -> q)))
+(p -> ((q -> ~~r) -> (r & s))) -> ((t v ~(p & q)) v q)
+p -> ((p v q) v (q -> ((r v (~r v (p -> (s -> q)))) & t)))
+p v (q v (r v ((~(~s & ~(s & p)) -> t) -> (q -> s))))
+(p v p) v (~q v (~r v ((~s v s) & (t -> (q v t)))))
+(p v ((~((q & p) & (r & ~s)) -> t) v ~t)) -> (q -> q)
+p -> (q v ~(((~p v r) & q) & (s -> ~(q v (p & t)))))
+(((p v q) -> ~(((r & s) -> t) -> t)) v (r -> (t v p))) v s
+(((p v ((q -> r) v (~p v r))) v q) & ((s & t) -> p)) v t
+((((p v ~(q & ~r)) & q) & ~s) & (t & (p -> t))) -> q
+(p v ((p & q) -> (q & (r & (s -> t))))) v ((q -> p) -> ~r)
+p -> (((q v (p -> (r v (s -> (~(s -> p) -> q))))) v p) v t)
+((~p v (q -> ((r & s) -> t))) v t) v (p & (s v ~~r))
+(~(((p -> q) -> p) v r) & ((((s v p) -> q) -> r) & p)) -> t
+~(p -> q) -> (~((p -> (r & ~(q v (q -> p)))) & s) v t)
+(p & ((q v ((r & s) -> (~(q & t) -> s))) & (q & s))) -> q
+(((p -> ((q -> r) -> q)) v r) v (r v ~s)) v (t -> (r -> s))
+~~(~((~(p -> q) -> (((~r v r) & s) -> s)) v t) -> p)
+(p -> q) -> (((r & s) -> ((r -> (s v (~t v p))) -> r)) v r)
+~(~((p v ~q) -> r) -> ((p & r) -> s)) -> ~~(t v q)
+((p v (q & r)) v ~((r v ((p v (s -> r)) v s)) & p)) v t
+p -> (q -> (((p v r) v (r & ((~q -> s) -> q))) v (s v t)))
+p -> (~(q -> (r v p)) -> ((((s -> t) -> s) & s) -> ~~r))
+~p -> ((p v q) -> ~(p & (p & (r v ~(s & (q & t))))))
+p v ((q & ~r) -> (p -> (r v (r v (((s v p) v q) -> t)))))
+p -> (p v (~q & ~(~(~(p v (r v s)) & r) & ~t)))
+~(((p & (q & r)) & ~(s -> q)) & (~(q & (t -> t)) & t))
+((p v ~q) v ((((q -> r) & s) -> (q v t)) v t)) v (s & r)
+(~p -> q) v ((q v r) v (((s v p) -> ((s -> q) -> r)) v t))
+(~~p -> ((p -> (~q & r)) -> ((~~s & p) -> s))) v t
+((p & (q -> ~r)) -> q) v ((s & r) -> (~(t & ~p) -> s))
+p v ((~(q & q) v (q v (~r v ((s v ~q) v s)))) v t)
+~p -> (((q & (r v r)) & ~r) -> ~(~s & ~(p -> t)))
+(~p -> (q -> (r & ((q v (((s & t) -> r) -> s)) v r)))) v q
+(p -> ((q -> p) -> (((r & (s & p)) & r) -> ~r))) v (t v r)
+(p v (q v (~(r v r) & s))) v ((t & (s -> r)) v (t -> r))
+~p v (~q -> ((r -> ((s & (r -> r)) -> r)) v (s -> ~t)))
+((p v (~(p v ((q v (r -> ~p)) v ~s)) & t)) -> p) v t
+((p v p) & q) -> (r -> (~r -> (s v ((q v r) & (t & t)))))
+(p v ((q v p) -> (r v (q v ~(((s v t) -> p) -> p))))) v r
+(~p v ((q v (r v s)) v ~~(t -> (q v t)))) v (t -> r)
+(((p -> q) & ~p) v (q v (q -> ((r & (r -> s)) & r)))) v t
+(~((p -> (q & (~r -> s))) & (s -> (~s & t))) -> p) v s
+p -> (((q -> r) & (r -> (r v s))) -> ((p -> (r v t)) v ~r))
+(p -> ((q v (r -> ~(((p & s) -> t) v t))) -> s)) v (q -> p)
+(((p & (q v r)) & s) & ~(p v (p & t))) -> ((q & p) -> t)
+((~(p v (q v p)) & p) & r) -> (q -> (r v (s v (p -> t))))
+~p -> (~((p & q) v (r -> ((r -> s) -> r))) -> (~t & p))
+(p -> ((q -> r) & s)) v ((q -> p) v (~~~(t & q) v t))
+(p -> ((~q v (r & s)) -> (~(~s v ~s) v ~q))) v t
+p v (~((((q v r) -> ((q -> s) & q)) v (r & p)) & t) v t)
+p -> (q -> (((r v q) & (r v q)) & ((s v t) v ~(s v t))))
+p -> (q v (((r & ~s) & q) -> (t -> ((s v r) v (r v r)))))
+(((~((p -> q) v (r v s)) & t) v q) -> ((s -> q) v s)) v s
+(p v q) v (~((r v (p & q)) & p) & (s v (s -> (t v s))))
+~((((p & q) v r) & ~(s v (~p v t))) & s) v (s v q)
+p v ((~q v (r v (~((p v r) -> s) v ~t))) -> (s -> s))
+(p -> (p & ~q)) v ((r -> (q & (s -> (q & t)))) v (p v q))
+p v (~(q & r) v (s -> ((p & (q & s)) -> ((t -> p) & p))))
+p v (q -> (r v (~p & ~(((~(s v t) & t) & p) & s))))
+~~(p -> ((q & r) -> ((r v s) -> (r v (s v ~(t v q))))))
+(p -> (q v ((~r -> r) v p))) v ((s -> t) & (t & (q v t)))
+p v (q -> (((r -> ((r & s) v r)) v ((r -> ~r) & p)) v t))
+p v (q -> (p v ((p -> r) & ~(p & ~(~(q -> s) v t)))))
+(p -> (q v (~(q & (r & (s v t))) -> p))) v ((q -> p) -> s)
+~(~p & p) v ((q -> ((r & (s v s)) v ~(q & t))) & r)
+((~(p & (q v r)) v p) v q) v (r v (p & ((s & t) v t)))
+p -> ((q -> ((r v s) v (p v s))) & (((t -> ~t) -> r) v p))
+(p -> ((((q v r) v (q -> (r -> q))) v (s v ~t)) v p)) v t
+((p & (q -> ((r v (s v ~s)) v t))) & (t & t)) -> (p v s)
+(p & p) -> ((p v (((p -> p) & q) -> ((r & ~s) -> p))) v t)
+(p v ((q v ~r) v r)) v ((((s & q) & t) -> q) v (p & p))
+p v (((~q & r) -> r) v (r & ~((p v s) v ~(p & t))))
+p v ((~(q v r) -> ~~s) -> (~p v ~((q -> t) -> q)))
+~(p v q) v (~r v (~(r v ((p -> s) v q)) -> (s v t)))
+((~~(~~p v (q & r)) -> r) & s) -> (~r -> (t -> s))
+((p & (p & (~q & (q v r)))) & s) v (p -> (r v (r -> t)))
+((p & ~q) & r) -> (~(~s -> t) -> (r -> (t -> (s & q))))
+p v ((q & (q & ((r v ~s) v (t & t)))) v (t -> (q -> r)))
+(p v ((q -> (r v (s -> (((r v p) -> q) & t)))) v s)) v ~t
+(((~(p v q) -> (q -> r)) v s) & (p -> s)) -> (p v (p -> t))
+(~(p & (q & ~(r v ~s))) v (t -> ((s v p) v p))) v s
+(~p -> ((p & q) -> (q & (r -> s)))) v ((t v t) & (r v q))
+p -> (p -> (q v (r v ((q & ((s -> t) -> ~t)) -> ~~s))))
+((((p & q) & r) -> (((q v q) -> (~s & r)) -> r)) v s) v t
+(p -> (p v (~q -> (r -> s)))) v (t -> ((r & r) & (s v q)))
+p -> (~~((q -> r) v q) v ((~q -> (q v (s & p))) v t))
+p -> (q -> ((r -> (q -> ((~((q & s) v p) & q) v r))) v t))
+p -> ((p v (((q v ~~r) & q) & ((s & ~t) & p))) v s)
+p v (~q -> (~p v ((r & (s -> ~(q & (t & q)))) -> p)))
+p -> ((((p -> ((~p -> (q & r)) & s)) & q) & t) -> (s & t))
+((p v (((p v (q -> r)) v s) v ~r)) -> t) -> (t v (t v p))
+(((p v q) -> (~~r -> r)) -> ~((s & t) & p)) v (t & t)
+~(p v ~p) -> (~((q & ((r & (r -> p)) & s)) & t) v s)
+(p v (q v ((r v s) v ((((r v p) -> p) -> r) -> r)))) v ~t
+(((((p v q) v r) -> ~s) -> (q v ~p)) v ~r) v (t -> p)
+(~((((p -> q) v ~r) & ~s) v q) & (q & (s -> t))) -> t
+((((~((p -> q) v r) & r) v (s -> s)) & t) & p) -> (q -> q)
+(p v q) v (~((((r v s) & r) & t) v ~~s) -> (p -> r))
+(p -> p) v (((q v q) v (~p & (r v ((s -> t) v t)))) -> p)
+(((p & (p v ~q)) -> ~(q -> ~r)) v (s v t)) v (t -> q)
+p -> (((q -> r) & r) v (~((~r & q) -> s) v (~t v p)))
+(p -> q) v ((~(~((~r v s) & s) -> (t -> q)) -> s) -> p)
+p v (~q -> (q -> ((r v (p v (s v s))) v (s v (r -> t)))))
+p -> (q v ((~(r v ((r -> s) v t)) & (q v t)) -> (r -> s)))
+p v (~(q v r) -> ~((s & r) v (((p -> t) v ~s) & p)))
+((p & (q -> r)) v ~(((p v p) & ((q & s) v t)) -> r)) -> p
+~(((((~p v q) -> q) & r) -> s) & t) -> ((~s v q) v s)
+(p & (q -> p)) -> (~((q & r) -> (((s v t) & p) v q)) -> q)
+((((p v q) -> r) -> (s v (t -> (r -> ~(r -> s))))) v q) v p
+(p v ~(q -> (~r -> q))) v (((s & p) -> (t v ~s)) v p)
+p v (p -> (((q & ~(r & (s & (p v s)))) -> (q v s)) & t))
+((~p & q) -> (q v p)) v (r v (s & (t & (q -> (q -> r)))))
+(~~p v (p v (q v r))) -> ((s v ~s) v ((q -> t) v s))
+((p & ((q v r) -> (p -> (((s & p) & s) & s)))) & ~p) -> t
+(p v ((((p & p) -> (~q v r)) v s) & (s -> (s v t)))) v t
+(((p -> p) -> (q v ((r v s) & q))) v (t & (t -> p))) v ~q
+((p -> (p & (q & p))) v ((r v s) -> p)) v ((r & t) & ~s)
+(p & ((q -> r) & ((s -> (p v t)) & ~q))) v (r -> (r v r))
+((((p -> ~(q v (q & (r & (s & q))))) & r) v t) & r) -> r
+(((~p & q) -> p) v ((r -> s) -> s)) v (q v (q & (q v t)))
+((~p v q) & (r v (p -> (((r -> s) & (q & t)) v t)))) v p
+p v (~(q -> q) -> (r & (((s -> (q & t)) & q) -> ~~r)))
+(((((p v q) -> (r v p)) v (s -> ~s)) v t) v (s v q)) v p
+(p & (p -> p)) -> (((q v (~r v (s v t))) -> q) v ~~p)
+~p -> (p -> (((q -> ~r) -> ~~(~(r -> p) -> s)) -> t))
+~(p v (~~(q & r) & (s -> ((t -> p) & q)))) -> (p -> q)
+(p v ((q -> (((r -> (p -> s)) -> p) -> (q v ~p))) v r)) v t
+((p -> ((q v (~p v (r v s))) v t)) v (p v q)) & (p -> p)
+((((p & q) -> r) -> r) -> ~(r & s)) v ((t -> s) v (q -> t))
+p -> (~q -> (((p -> r) -> s) v ((((p -> r) & p) v r) v t)))
+p v (q v ((p & r) -> ((((s & ~r) & (r v p)) & p) v t)))
+(((p & (q v r)) & ((q -> s) v (p -> p))) v p) v (p -> ~t)
+p -> (p v ~(q -> (~(~(~q & r) & (~s -> t)) & r)))
+(~(p -> q) -> (q -> ((r -> r) v ~(p v ~(r -> s))))) v t
+p -> ((~q & r) v ((r v s) v ((t -> (r -> (q v t))) v t)))
+(p -> p) v ((((~(q -> p) & r) & s) & t) v (t & (r v r)))
+((((~p -> q) v ~p) v (r & s)) & r) -> (r v (~r v t))
+(p -> (~q v (~q v (r -> (~(s -> t) & t))))) -> (p -> p)
+(p & q) -> ((r v ((s -> ~(((r & q) v p) -> s)) -> p)) v t)
+(((p & q) v r) v ~(s & r)) v (((t & p) & (q v p)) v p)
+~((p v (p -> p)) v q) -> ((r v (q & (s v (t -> t)))) v p)
+p -> ~~(q -> ((p & (r v s)) -> (((r -> q) -> ~t) -> p)))
+~(p v (q v ((r -> s) v q))) -> ((r -> ((p & r) -> q)) v t)
+((((~p -> q) -> r) & s) -> (((t & ~q) v q) v ~t)) v r
+(~(((p v ((q -> (r v s)) v q)) -> s) v s) v t) v (q v s)
+(~p & q) -> (((r v (s v s)) v s) v ((s v (s -> t)) v p))
+(p -> (q v ((r v s) -> p))) v ((q -> ~(~p & ~r)) v t)
+(p -> (~q v ((((r -> q) & p) & p) & q))) & ((s & t) -> s)
+((p v ((p v ((~q v (r -> q)) v q)) v q)) v (s -> q)) v t
+(((p v p) & (~(q v r) & p)) v q) v (s v (q -> (t -> q)))
+((p & ~((q v (r & (s & t))) & (t & r))) -> (p v p)) v r
+p -> ((~((q & r) -> (q -> s)) v ~~((q & q) -> q)) v t)
+((p -> ((p -> (q & ((r v s) -> s))) & r)) v r) v ~(r & t)
+p v ((q v r) v ((s -> (~t & (~t & (~r & t)))) v s))
+p v (p -> (((q -> ~p) v (r v q)) v ((s & (p v s)) & t)))
+(p & q) v ((p -> r) v (~~((s v (t & s)) v ~q) -> p))
+~(p -> q) -> ((r & ~(s -> t)) v ((q -> (t -> q)) v ~q))
+(((p v ~q) & r) -> s) -> (t -> (((s v (p -> p)) & r) -> r))
+(p v q) -> (((r -> ((s v (q -> t)) v ~t)) v q) v (q & q))
+(p v q) v (((((q -> (p & r)) v r) v s) & (r & t)) -> ~q)
+((p v (~q v r)) v ((~s -> q) -> ((r & ~r) v t))) v q
+p v (((p -> p) v q) v ~(((q & r) v (s -> q)) & (t v s)))
+(p -> (q v ((r & q) -> (p & q)))) v (~(p v q) & (s & t))
+((p & (q -> ((~q v r) -> ~((s & ~t) v r)))) -> p) v p
+p -> (((((~q & (r & (s v s))) & q) -> p) -> (p v t)) -> p)
+(p & p) -> ((q v ~(r & (r & s))) v (~~t v (s v p)))
+~~((p v ((q v (~~(p & ~p) & r)) -> s)) -> (t -> t))
+(~p v (p -> (p -> (p v ((q v (r -> s)) v r))))) v (t & r)
+p -> ~((~(q & r) & (p & (r & q))) & (~s & (t -> s)))
+p -> (((q -> r) & r) v (((r v p) -> (p v (~s & t))) -> p))
+~p v (q -> ((~(r v (p v ~(q v q))) -> s) v ~~t))
+(p -> ((q & (r v s)) v p)) v (p -> (s v ~(t & (s & p))))
+~((p & ((~(q -> q) & ~(p & p)) & ((r -> s) v t))) & p)
+p -> ((((q -> (r -> q)) v s) v (((q v q) & ~p) -> t)) v r)
+(((((~(p v q) & (q v r)) v q) -> s) & (t & r)) -> t) v t
+~(((p -> q) & ((((p v r) & s) v q) -> (p v s))) & t) v t
+((((p -> (q -> ~r)) & ~~r) -> s) v t) v (r v ~~t)
+((p & (((q -> ~((r -> ~s) -> t)) & ~r) -> r)) & t) -> t
+~p -> ~~(((~((p -> q) v r) & s) -> (p & ~t)) v p)
+(~~(p v p) & q) v ((r v s) v (p -> ((r & t) -> ~q)))
+(((p v q) & ((r -> s) & (q & (r -> s)))) -> q) v (t & ~t)
+(((p & (~q -> p)) & r) -> (s -> s)) -> (((t & r) & q) -> r)
+(p & ((q -> r) & (r -> (~(s & t) & ~t)))) -> (~p v p)
+~p v (q v ((~((~q -> r) & s) v ((r v t) & p)) v p))
+((p -> (~p -> q)) v ((r -> s) v ~(q v s))) v (t -> ~t)
+p -> ((((q & r) -> s) & q) v (t v ((p & s) -> ~(q & s))))
+~(p v (q v (~r & ~(s & (((t v q) -> t) & q))))) -> r
+((p -> q) v p) v ~((q v r) -> ((q v q) -> ((s -> t) -> t)))
+~((p v q) & ((r & ((((s -> p) & t) -> r) v p)) & t)) v r
+(((p & (~q v ((r -> (s & t)) & (q & r)))) & q) -> p) v p
+(p & q) v ((((r -> ~s) & ~~q) -> ((p v t) -> t)) v p)
+(p -> (q -> (r & (p v s)))) v ((q v (p v ~(q -> s))) v t)
+(p v ((p & (q & (((~r -> s) v r) -> (t v s)))) -> p)) v r
+((~p -> p) -> ((q -> ~r) & (s v (t v s)))) v (~p -> t)
+(p -> ((q & q) -> p)) v ((~(r -> s) & (p v p)) -> (s -> t))
+(p v ((p -> p) v (~q v ((r & r) -> ~s)))) v (~t -> q)
+p v (q v ((((r & r) & p) & ~(s v q)) -> ((s v t) & q)))
+p -> (q -> (r v (((r v s) v ~s) -> (((q -> r) -> r) v t))))
+((p -> ~q) & (r & ~(((p -> (r v ~s)) & r) -> r))) -> t
+(p & q) -> (((r & (q & r)) v (~(r -> s) & (t -> s))) -> r)
+~p v (q v ((((r & ~q) -> s) & ~r) v (s -> (t v s))))
+p v ((q v r) -> ((q -> s) -> ((~(q & r) -> (t & s)) -> s)))
+p v (p -> (p -> ((q & ((r -> r) -> (s & q))) & (~t & r))))
+p v (q -> ((q v (((r & (q -> (~s v r))) -> r) v t)) v q))
+((p & ((~p -> q) & (q v (((r -> s) -> q) & s)))) & t) -> q
+(p v p) v (~((q -> (~r -> q)) v p) v (p -> (s -> ~t)))
+((p & q) -> r) v ((~p -> (s -> ~((t & q) v ~r))) -> p)
+((((p v (q -> ~r)) & (s -> s)) v t) v r) v ((p & t) -> p)
+(p & q) -> ((r & s) -> ((~~r v ~t) & (~q -> ~s)))
+((~(((p -> (q v (q & r))) v (q v s)) v t) & r) -> q) v p
+((p v q) v r) v ((s v ~r) v (((r v (t v t)) -> t) -> q))
+(p v q) -> (~((((r v r) v s) v r) -> (t v (s v r))) -> r)
+(p -> (~q & (~r -> (~(s -> r) v t)))) -> (q -> (p -> r))
+~p v (((q -> (r & (~~r & p))) & p) v (q v (s v t)))
+(p & q) -> ((q -> p) v (~q v ~((r & ~s) -> (r -> t))))
+(~~((p & (~q -> r)) v s) v t) v ((t & (s -> t)) -> r)
+p v (q v (r -> ((((p -> (q v s)) v q) & p) -> (r -> ~t))))
+p -> ((q v ((r & (((p -> ~q) v s) -> (s & s))) -> p)) v t)
+(~~(((p -> q) -> p) -> r) v (s -> (p -> s))) v (~s -> t)
+((p v q) & ~(((((r -> q) -> s) & t) & t) -> (t v t))) -> r
+(p -> (~~(q v (~(~q v (~r & s)) v t)) v p)) v s
+(p v ((q -> ((r & (s -> (t -> q))) v q)) v q)) v ~(t & s)
+(p & ((q v (p -> r)) & ((((~s -> s) & q) v t) & s))) -> p
+(p & q) -> (r v (p & ((~(p v s) v r) -> (~t & ~s))))
+((p & ((q & r) & s)) v ((~p -> (q & ~~t)) -> t)) v p
+(p v ((q -> (r -> (q -> ~~s))) v s)) v (r v (~t -> p))
+p -> ((q v ((~(q -> r) v (s v q)) -> r)) v (s v (t & t)))
+(p v ~~((q -> ~r) v ((p -> s) v ((q -> t) -> q)))) v r
+p -> (p v ((q & r) -> (q -> (q & ((~s v (t -> t)) -> p)))))
+p v ~(~q & (((q & r) v q) & (((s v t) & r) -> ~p)))
+(p & ((q v ((r v q) -> (~s -> (p v (r v t))))) -> s)) -> p
+(p -> (~(~q v p) v r)) v ~((s & r) & ((q & r) & t))
+~(p v (q v (r v s))) v (p -> ((((q -> t) v t) v q) v s))
+(p & (q -> q)) -> ((r & ((~s -> p) & (t v (r v p)))) -> p)
+(((~p -> q) & r) -> (s & r)) v (~((t -> ~r) -> s) v r)
+(p & q) -> (((((q & r) -> (s v t)) & (t & ~t)) v s) -> q)
+p -> (q v ((((r -> s) & t) -> (p & ~r)) v ((s & s) & t)))
+((~p -> (((q v r) & s) -> r)) -> s) -> (((t & q) & t) -> q)
+p -> (q -> ((r & (~q & r)) -> (((s & p) v q) v (t -> p))))
+~~(~(p -> ((q & (r -> (s -> (~~s v t)))) -> p)) -> p)
+(p -> q) v (r -> ((r -> ((((~r & s) & s) & q) -> r)) v t))
+(~((p & q) -> ((~(~r & s) -> t) -> (t & s))) & t) -> q
+(~p & q) v ((~((p -> r) -> p) -> (s & (p v t))) v ~p)
+(p v (q & r)) v ~((s v p) & (((q & s) & (t v t)) & r))
+(p v (p & (q -> ((~((r v p) v p) & s) -> (t v p))))) -> p
+(~((p & (p v q)) -> ((p -> (r & s)) -> p)) & q) -> (p v t)
+~((p & ~((q & r) -> (p & (q v (s -> t))))) & ~r) v t
+(p & q) -> (r v ((s -> ((t & q) v s)) v ((q v ~r) -> s)))
+((p v ((q & p) -> ~r)) v s) v (p & ((t -> (s v r)) -> p))
+~p -> ((q & (((r -> ~p) v ~r) -> s)) -> ((t -> t) -> s))
+p -> (~q v (r -> (s -> (~(p -> (t -> s)) -> ~(s & r)))))
+(~((~((p & q) & r) & (~s & t)) v (s -> s)) -> t) v p
+~(p v ((q -> ~r) v ~((q -> s) v q))) -> (t v (r v p))
+(p -> (q -> ((~r v (r v s)) & ((p v (s -> t)) -> p)))) v t
+(((p -> p) v (~q -> r)) -> ((s -> (t -> (r v q))) & p)) -> p
+~(p & ((q & r) & ~(((q -> s) -> p) v ((s -> p) v ~t))))
+p v (q v (q -> ((r v (s -> p)) v (s & (t & (~t -> t))))))
+(p & (((((q -> ~((r -> s) & t)) v t) -> s) -> q) v p)) -> p
+(p & q) -> (r v (~~((~p v s) -> (q & (s & t))) -> p))
+((((p -> q) -> r) & ~(((r v q) v s) -> q)) -> (p v r)) v t
+(p & q) -> ((~r -> (~(q -> ~(r v s)) -> t)) v (r v s))
+(p & (q -> ((~r & s) & q))) -> (p v (((t v r) -> p) & s))
+(((p -> q) v r) -> (~s & (t & (t & (r & (r & s)))))) -> p
+((~p -> p) v (q & r)) v (s v (s -> (t v ((s & s) & s))))
+(p & ~((q & q) v ((((r & (s v r)) v s) & s) & t))) -> p
+((((~p -> (q & r)) -> ~p) & ~((s v t) -> t)) & t) -> q
+p v ~(((p & q) -> (r & s)) -> (t & ((p v (q -> p)) & q)))
+p v ((p -> (q & ~(r & (p -> (s v t))))) v (t & (r & p)))
+~(p v ((q v ~((~((r -> s) v t) & r) & q)) v s)) -> s
+((p v q) -> r) -> (s -> (s & (((t -> r) -> s) v (~s & r))))
+(p -> ((q -> (((p -> r) -> (p & (s v r))) v r)) v s)) v ~t
+p v (q v ~~(p -> ((r & ~((s & q) & p)) & (s v t))))
+~p -> (q -> (((r & (s & s)) v ((t v t) v t)) v (p -> p)))
+(p & ((q & p) v (p & (r v s)))) -> (~((p -> t) -> t) -> p)
+~~~p v (~q v ((r -> (q -> (~(s -> t) -> s))) v s))
+((p v q) -> (((p -> p) -> r) v ~s)) v (((s v p) v q) v t)
+((p v (q -> r)) v s) -> ((~t v (t -> (p & (q -> t)))) v t)
+(((p v ((q & ~r) & p)) & s) v q) v (q -> (r -> (p -> t)))
+((p & (q & ((r & s) -> (s -> q)))) & (t & ~(r & s))) -> q
+(~(p -> q) & q) -> (((r v (s & t)) & (s & s)) & (q & p))
+(((~p & q) -> q) -> ((p -> (r v s)) -> ((q & t) & p))) -> p
+((p & q) & (q -> (((q -> p) -> r) -> s))) v (~t -> (q -> q))
+(((p & (q -> r)) & q) & q) -> (((p -> s) & ~r) v (t v r))
+(p v (q & (r v (q -> ~s)))) -> ((p & ((t -> q) & r)) -> p)
+((~p & p) -> ((p -> ((q & (r -> s)) v (r & q))) & t)) v p
+(p v ((~~~(q -> r) v s) -> t)) v (p -> (r -> (r v s)))
+p v (((q -> ((r & s) -> ((p v (t v ~p)) v t))) & p) -> q)
+(~(p -> q) v q) -> (r -> (s -> ((~r & t) -> ~~~r)))
+p v ((((((q v q) v (~(r v s) -> s)) v t) v p) & s) -> s)
+(p v q) v ~(p & (~(r & s) v (t -> (r & (s & ~q)))))
+p v ((p -> q) v ~(((r v s) v s) & (((r v q) v t) & p)))
+~~p v ((q v ~r) v (((~(s & q) v ~s) v q) v t))
+(p -> (q -> q)) v (r v ~(q v (s v ((t & ~~q) v t))))
+(~p & (q -> (q v r))) -> (r v (r -> (r -> (s & (q -> t)))))
+p v (((q v r) v s) -> (t -> (r v ((s & (~t -> q)) v q))))
+((p -> p) v (((q v r) & q) v ((s -> ~t) v (t & q)))) v s
+p -> (((q -> r) v (s v ~r)) v ((t & q) v (t v (p v t))))
+(~p -> (~p v (q v p))) v ((r -> s) -> (~t & (r -> p)))
+((((~(p v ((q v r) & q)) -> p) & s) & r) -> r) v (r -> t)
+~(p -> p) -> ((q v ~r) & ((s & ((s & t) -> ~t)) & p))
+p v ((~q -> q) -> (((r -> s) v (s -> (~p -> t))) v ~r))
+~((~(p & q) & r) -> (((s & q) v r) -> t)) v (~s v s)
+(p v q) v ((((~r v (r -> s)) -> ~q) -> (t & ~s)) -> t)
+(p v (~~(p & q) -> (r v (~(s v (t v p)) v t)))) v q
+(p v ~p) v ((p -> q) & (((r -> (r & (s v t))) & q) -> q))
+(~p & (q & (r v (s -> ((t & p) v (r & p)))))) -> (t -> q)
+p v (((((~q v q) v (p -> q)) v r) -> r) v (p -> (s v t)))
+((p & q) & ~(((q v ~(r -> s)) & (s -> ~t)) v q)) -> p
+(p -> ((p & (q -> r)) v s)) v (r -> (((t & s) -> t) -> ~q))
+~(p v q) v (((r -> s) v (((q -> p) & q) -> (t -> t))) v q)
+(p & (~(q -> (r v (~s -> ~q))) v t)) -> ((p v s) v s)
+((p v q) v r) v (((s v ~~~(s -> q)) & r) v (q -> t))
+(p -> ((((q -> ~(r & (s v r))) & t) v t) -> (r -> t))) v t
+(p -> ((q v q) v (p & r))) v (s -> (t -> (s v ~(q v t))))
+p v (q v ((((r v s) -> s) -> s) -> ((~q v (t -> t)) v s)))
+p v ((q -> r) v (s -> ((~(~r v (~t & p)) v q) v t)))
+p -> (~q v (r v ((s & s) v (((~~t -> t) v t) v r))))
+p -> ((p v ((q & (~r v s)) v ((q -> t) v (r v r)))) & p)
+((p -> ~((q -> r) & ~s)) -> (t -> ~(p & p))) v (r -> r)
+(((((~p -> (q -> q)) & ~(r & s)) & q) v p) v ~t) v t
+(((p v q) v (r -> (~~s -> q))) v ~~(t v ~p)) v s
+p -> ((((q v r) v (((s v s) v t) & p)) -> ~s) v (p v q))
+p -> (~(((q -> ~r) v s) & p) -> ((s & t) v ~(r & s)))
+(p v (q & ((r & r) & ~(s & s)))) v ((q & p) -> (r & t))
+p -> (~(q v q) -> (q v ((~(r -> q) -> s) v (~t v r))))
+p -> (((((p v (q v q)) & (r -> q)) v s) v (~r -> t)) v q)
+p v ((q & ~(~(r v s) -> (q v (s -> p)))) v ~(t & p))
+((((~((p -> q) v ~(r & r)) -> s) v ~t) & s) -> s) v q
+((p -> q) -> ~(r & (~(s -> q) & r))) v (t -> (r & ~q))
+(p -> ((q -> (((r -> s) & ((s -> r) & t)) & q)) v q)) v ~p
+((p & p) -> (q v r)) v ((p -> p) & (~r v (s -> (t -> t))))
+(~((p -> (q & ~~(r & p))) -> s) v t) -> (r -> (q -> r))
+((p & q) & r) v ((s -> (t v p)) v ((~r v s) -> (t -> p)))
+p v ~(p & ((q -> ((((q & r) & (s & r)) & s) -> t)) -> r))
+~(p v (q v ((((r v q) & s) & t) -> t))) -> ((r & q) v s)
+((p -> q) v (p -> (p & ((~r & s) -> t)))) v (s v (q v t))
+((((p v q) v r) & s) v ~s) v (q -> (s & ((p -> p) v t)))
+p -> (p v ~(((~~q v (p v r)) -> ~(p & ~s)) & t))
+(((~p & p) & (p & (q v (r -> q)))) -> s) v (t -> (p -> t))
+(((p & ~(q v r)) -> r) -> p) v ((s -> (p & t)) -> (s -> t))
+~((p v (((q v q) & p) & (r -> s))) & (~p & (s -> ~t)))
+(((p v (q -> r)) v r) v q) v ((r -> ((~s -> t) -> r)) -> q)
+p v (q v (r v ((r & s) v ((t -> ((t & ~s) -> t)) v s))))
+(p & p) v (((q -> ((r v s) v ((s v t) v ~s))) v q) v q)
+p v ((q v ~r) v (((q -> r) v s) -> (((r v t) -> p) -> q)))
+p -> ((q & r) -> ((r & r) v (s -> (t v (r -> (p & ~t))))))
+(p v (q & (((r & q) -> (p v r)) v ~s))) v (r -> (p -> t))
+((~p & q) & ~((p v (r & (q v s))) v (t v r))) -> ~t
+(p v (q -> r)) v (((s -> ~(((p -> q) v t) -> p)) -> s) -> q)
+~~(~(p -> p) v (q -> ((r v (s v ~t)) -> (~p -> q))))
+(p -> ~((p v q) -> (((r & s) & ((t & p) & q)) & p))) v p
+((~(((p -> q) & r) & r) & r) & ~~s) v (r -> (t -> t))
+(~(((p v q) v q) v ((r & s) -> (r v t))) & (s -> t)) -> s
+(((p & (~(q -> r) & r)) v ((s -> s) v p)) v (p & q)) v t
+(((p & q) -> (r -> (s v ~((t -> (r & r)) v r)))) v r) v q
+(~(p & ((q -> r) & q)) v (r & p)) v (s v ~~(r & t))
+(p -> p) v (q v (q -> (q -> ~((~r -> (~s v t)) v p))))

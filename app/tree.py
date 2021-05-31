@@ -34,7 +34,7 @@ class ProofElement(object):
         self.sentence = sentence
         self.branch = branch
         self.closed = None
-        self.history = History() if history is None else history
+        self.history = History() if history is None else history.copy()
         self.editable = True
         self.layer = layer
 
@@ -75,7 +75,6 @@ class ProofElement(object):
 class ProofNode(ProofElement, NodeMixin):
     """Reprezentacja pojedynczego zdania w drzewie"""
     namegen = random.Random()
-    colors = getcolors()
 
     def __init__(self, sentence: Sentence, branch_name: str, layer: int = 0, history: History = None, parent: ProofNode = None, children: tp.Iterable[ProofNode] = []):
         """Reprezentacja pojedynczego zdania w drzewie
@@ -101,7 +100,7 @@ class ProofNode(ProofElement, NodeMixin):
     def gen_name(self, am=2) -> tuple[str]:
         """Zwraca `am` nazw dla gałęzi z czego jedną jest nazwa aktualnej"""
         branch_names = self.getbranchnames()
-        possible = [i for i in self.colors if not i in branch_names]
+        possible = [i for i in getcolors() if not i in branch_names]
         if len(possible)<am-1:
             if len(self.leaves) == 1000:
                 raise ProofNodeError("No names exist")
@@ -117,9 +116,9 @@ class ProofNode(ProofElement, NodeMixin):
         return [i.branch for i in self.getleaves()]
 
 
-    def getbranch(self) -> tuple[list[Sentence], Close]:
+    def getbranch_sentences(self) -> tuple[list[Sentence], Close]:
         """Zwraca gałąź dowodu z informacjami o jej zamknięciu"""
-        assert self.is_leaf, "Gałąź nie jest kompletna, gdyż węzeł nie jest drzewem"
+        assert self.is_leaf, "Gałąź nie jest kompletna, gdyż węzeł nie jest liściem"
         return [i.sentence for i in self.path], self.closed
 
 

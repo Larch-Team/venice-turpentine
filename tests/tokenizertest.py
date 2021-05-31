@@ -9,7 +9,6 @@ import basic
 basic.TESTING = True
 
 class TestTokenize(test.TestCase):
-    # TODO: Rozbudować
 
     def test_word(self):
         self.assertEqual(basic.tokenize("p or q", ['or']), ["or_or"])
@@ -49,3 +48,4 @@ class TestTokenize(test.TestCase):
 
 if __name__ == "__main__":
     test.main()
+
