@@ -5,7 +5,7 @@ import json, random
 from collections import namedtuple, OrderedDict
 from math import inf as INFINITY
 from anytree import NodeMixin, util, LevelOrderIter
-from tree_helpers import *
+from history import *
 from close import *
 
 Sentence = tp.NewType("Sentence", list[str])

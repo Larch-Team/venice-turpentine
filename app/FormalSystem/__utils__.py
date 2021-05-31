@@ -1,7 +1,7 @@
 from collections import namedtuple
 import typing as tp
 import close
-from tree_helpers import History
+from history import History
 from sentence import Sentence
 
 Rule = namedtuple('Rule', ('symbolic', 'docs', 'func', 'context', 'reusable'))
