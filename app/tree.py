@@ -196,12 +196,12 @@ class ProofNode(ProofElement, NodeMixin):
 
     def pop(self, layer: int):
         """
-        Usuwa z dowodu wszystkie węzły o danej, lub wyższej warstwie, stosować na korzeniu
+        Usuwa z dowodu wszystkie węzły o danej, lub wyższej warstwie
 
         :param layer: Warstwa (najwyższą można uzyskać przez sprawdzenie wartości w stosie użytych reguł)
         :type layer: int
         """
-        assert self.is_root, "This is not the root"
-        self.children = [i for i in self.children if i.layer>=layer]
-        for i in self.children:
+        node = self.root
+        node.children = [i for i in self.children if i.layer>=layer]
+        for i in node.children:
             i.pop(layer)

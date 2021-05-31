@@ -9,6 +9,7 @@ import pop_engine as pop
 from sentence import Sentence
 from tree import ProofNode
 from close import Close
+from usedrule import *
 
 Module = pop.Module
 
@@ -219,12 +220,16 @@ class Session(object):
             
             self.proof = ProofNode(tokenized, 'Green')
             self.branch = 'Green'
+            self.metadata = dict(
+                usedrules = []
+            )
 
 
     @EngineLog
     def reset_proof(self) -> None:
         self.proof = None
         self.branch = ''
+        self.metadata = None
 
 
     @EngineLog
@@ -312,11 +317,26 @@ class Session(object):
             return None
 
         old = self._get_node()
-        self._get_node().append(out)
+        layer = self._get_node().append(out)
         children = old.children
         for j, s in zip(children, used_extention):
             j.History(*s)
+
+        self.metadata['usedrules'].append(UsedRule(layer, self.branch, rule, context))
         return tuple(i.branch for i in children)
+
+
+    @EngineLog
+    def undo(self, actions_amount: int) -> tuple[str]:
+        if not self.proof:
+            raise EngineError(
+                "There is no proof started")
+
+        rules = [self.metadata['usedrules'].pop() for _ in range(actions_amount)]
+        min_layer = min((r.layer for r in rules))
+        self.proof.pop(min_layer)
+
+        return rules
 
 
     @DealWithPOP

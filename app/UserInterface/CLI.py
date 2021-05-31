@@ -302,6 +302,12 @@ def do_use(session: engine.Session, command) -> str:
     return "\n".join(out)
 
 
+def do_undo(session: engine.Session, amount: int):
+    """Undos last [arg] actions"""
+    rules = session.undo(amount)
+    return "\n".join(f'Undid rule: {i.rule}' for i in rules)
+
+
 def do_contra(session, branch: str):
     """Detects contradictions and handles them by closing their branches"""
     cont = session.deal_closure(branch)
@@ -367,6 +373,7 @@ command_dict = OrderedDict({
     # Czy zrobić oddzielne save i write? save serializowałoby tylko do wczytania, a write drukowałoby input
     'write': {'comm': do_write, 'args': [str]},
     'use': {'comm': do_use, 'args': 'multiple_strings'},
+    'undo': {'comm': do_undo, 'args': [int]},
     'leave': {'comm': do_leave, 'args': []},
     'prove': {'comm': do_prove, 'args': 'multiple_strings'},
     'auto': {'comm': do_auto, 'args': []},
