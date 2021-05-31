@@ -183,11 +183,25 @@ class ProofNode(ProofElement, NodeMixin):
 
     # Modyfikacja
 
-    def append(self, sentences: tp.Iterable[tuple[Sentence]]):
-        """Dodaje zdania do drzewa"""
+    def append(self, sentences: tp.Iterable[tuple[Sentence]]) -> int:
+        """Dodaje zdania do drzewa, zwraca warstwę"""
         names = self.gen_name(am=len(sentences))
         layer = max((i.layer for i in self.getleaves()))+1
         for i, branch in enumerate(sentences):
             par = self
             for sen in branch:
                 par = ProofNode(sen, names[i], layer, self.history, parent=par)
+        return layer
+
+
+    def pop(self, layer: int):
+        """
+        Usuwa z dowodu wszystkie węzły o danej, lub wyższej warstwie, stosować na korzeniu
+
+        :param layer: Warstwa (najwyższą można uzyskać przez sprawdzenie wartości w stosie użytych reguł)
+        :type layer: int
+        """
+        assert self.is_root, "This is not the root"
+        self.children = [i for i in self.children if i.layer>=layer]
+        for i in self.children:
+            i.pop(layer)
