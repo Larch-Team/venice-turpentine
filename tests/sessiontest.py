@@ -4,6 +4,7 @@ import os
 import sys
 import anytree
 from pprint import pprint
+from multiprocessing import Pool
 sys.path.append('../app')
 from UserInterface import CLI as c
 
@@ -16,41 +17,45 @@ rules = runner.session.getrules()
 
 def collect_branch(runner, name):
     runner(f'jump {name}')
-    a = runner.session._get_node().getbranch_sentences()[0]
     return runner.session._get_node().getbranch_sentences()[0]
 
-for num, formula in enumerate(TAUTOLOGIES):
+def prove_formula(counter):
+    num=counter[0]
+    formula=counter[1]
     runner(f'prove {formula}')
     last_branches = None
     branches = {tuple(collect_branch(runner, name)) for name in runner.session.getbranches()}
     turn = 0
-    print(f'{num=}, {formula=}')
     while branches != last_branches and not runner.session.proof_finished()[0]:
         turn += 1
-        print(f'\t{turn=}')
+        #print(f'\t{turn=}')
         for branch_name in runner.session.getbranches():
-            print(f'\t\t{branch_name=}')
+            #print(f'\t\t{branch_name=}')
             for i, f in enumerate(collect_branch(runner, branch_name)):
                 jumpout = False
-                print(f'\t\t\t{i+1=}')
+                #print(f'\t\t\t{i+1=}')
                 for rule in rules:
                     out = runner(f'use {rule} {i+1}')
                     # print(out)
                     if out not in ("Rule couldn't be used", 'This sentence was already used in a non-reusable rule'):
                         oneline = "/".join(out.split('\n'))
-                        print(f'\t\t\t\t{rule=} {oneline}')
+                        #print(f'\t\t\t\t{rule=} {oneline}')
                         jumpout = True
                         break
                 if jumpout:
                     break
         last_branches = branches.copy()
         branches = {tuple(collect_branch(runner, name)) for name in runner.session.getbranches()}
-    print(runner.session.proof_finished())
+    print(f'{num=}, {formula=}', '\n',runner.session.proof_finished())
     if not sum(runner.session.proof_finished())==2:
         for i in branches:
             print()
             for j in i:
                 print(str(j))
-        break
+        return
 
+if __name__ == '__main__':
+    counter_list = list(enumerate(TAUTOLOGIES))
+    pool=Pool()
+    pool.map(prove_formula, counter_list)
     runner(f'leave')
