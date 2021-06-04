@@ -13,6 +13,7 @@ token_type = NewType('Token', str)
 
 LexerRule = namedtuple('LexerRule', ('constraints', 'type_', 'lexems'))
 
+
 class LrchLexerError(Exception):
     pass
 
@@ -24,16 +25,18 @@ def join_items(tuples):
             d[k].extend(v)
         else:
             d[k] = list(v)
-    return {k:tuple(v) for k,v in d.items()}
+    return {k: tuple(v) for k, v in d.items()}
+
 
 def sep_items(tuples):
     d = []
     for k, v in tuples.items():
         if isinstance(v, (tuple, list)):
-            d.extend([(k,i) for i in v])
+            d.extend([(k, i) for i in v])
         else:
-            d.append((k,v))
+            d.append((k, v))
     return tuple(d)
+
 
 class Lexicon(object):
     STACK = []
@@ -60,15 +63,18 @@ class BuiltLexer(object):
         self.needs_casing = lex.needs_casing
         self.LITERALS = lex.LITERALS
         self.find_new = self._get_find_new(lex)
-        
-        lex_re = ( (i, j) for i, j, _ in self._filter_constraints(lex, kwargs) )
-        gen_re = ( (i, j) for i, j, for_generation in lex_re if for_generation)
 
-        self.lexer_regexes = {key:self._regex_from_list(val) for key, val in self._join_rules(lex_re).items()}
-        self.generator_regexes = {key:self._regex_from_list(val) for key, val in self._join_rules(gen_re).items()}
-        
-        if set(self.lexer_regexes).issubset(self.generator_regexes): 
-            raise LrchLexerError("Zbiór leksemów nie pozwala na generowanie nowych zmiennych")
+        lex_re = ((i, j) for i, j, _ in self._filter_constraints(lex, kwargs))
+        gen_re = ((i, j) for i, j, for_generation in lex_re if for_generation)
+
+        self.lexer_regexes = {key: self._regex_from_list(
+            val) for key, val in self._join_rules(lex_re).items()}
+        self.generator_regexes = {key: self._regex_from_list(
+            val) for key, val in self._join_rules(gen_re).items()}
+
+        if set(self.lexer_regexes).issubset(self.generator_regexes):
+            raise LrchLexerError(
+                "Zbiór leksemów nie pozwala na generowanie nowych zmiennych")
 
         class _Lex:
             _master_re = re
@@ -84,10 +90,10 @@ class BuiltLexer(object):
                 raise LrchLexerError(f'{t} is not tokenizable')
 
             def build(self, **kwargs):
-                self.lexer = plex.lex(object=self,**kwargs)
+                self.lexer = plex.lex(object=self, **kwargs)
 
             def tokenize(self, s: str):
-                self.lexer.input(s)    
+                self.lexer.input(s)
                 while (i := self.lexer.token()):
                     if i.value in self.literals:
                         yield i.value
@@ -126,7 +132,7 @@ class BuiltLexer(object):
         :rtype: dict[str, tuple[str]]
         """
         d = join_items(rules)
-        return {k:sorted(i, reverse=True) for k,i in d.items()}
+        return {k: sorted(i, reverse=True) for k, i in d.items()}
 
     def tokenize(self, formula: str) -> list[token_type]:
         """
@@ -140,7 +146,7 @@ class BuiltLexer(object):
         """
         if not self.needs_casing:
             formula = formula.lower()
-        
+
         try:
             sentence = list(self.lexer.tokenize(formula))
         except LexError as e:
@@ -165,20 +171,22 @@ class BuiltLexer(object):
             used_lexems = sentence.getLexems()
 
             try:
-                while (new_lex := next(new_lexems)) not in used_lexems: pass
+                while (new_lex := next(new_lexems)) not in used_lexems:
+                    pass
             except StopIteration:
                 return None
             else:
                 return f"{type_}_{new_lex}"
 
         else:
-            counted = Counter((l for t, l in sentence.getItems() if l == type_)).items()
+            counted = Counter(
+                (l for t, l in sentence.getItems() if l == type_)).items()
             try:
                 new_lex = max(counted, key=lambda x: x[1])[0]
             except ValueError:
                 return getone(self.generator_regexes[type_])
             else:
-                return f"{type_}_{new_lex}"          
+                return f"{type_}_{new_lex}"
 
 
 class RuleConstraint(ABC):
@@ -186,13 +194,11 @@ class RuleConstraint(ABC):
     @abstractmethod
     def __init__(self, tag: Any) -> None:
         super().__init__()
-        self.tag=tag
-
+        self.tag = tag
 
     def __enter__(self) -> None:
         Lexicon.STACK.append((type(self).__name__, self.tag))
         return
-
 
     def __exit__(self, *args) -> None:
         Lexicon.STACK.pop()
