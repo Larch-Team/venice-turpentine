@@ -48,7 +48,7 @@ class Sentence(list):
         return ret
 
     def getPrecedence(self) -> dict[str, int]:
-        return self.S.acc('FormalSystem').get_operator_precedence()
+        return self.S.acc('FormalUser').get_operator_precedence()
 
     # Manipulacja zdaniem
 
@@ -118,9 +118,9 @@ class Sentence(list):
         :return: Indeksy spójników oraz siła wiązania - im wyższa wartość, tym mocniej wiąże
         :rtype: dict[str, float]
         """
-        if self.precedenceBaked and self._pluggedFS == self.S.config['chosen_plugins']['FormalSystem']:
+        if self.precedenceBaked and self._pluggedFS == self.S.config['chosen_plugins']['FormalUser']:
             return self.precedenceBaked
-        self._pluggedFS = self.S.config['chosen_plugins']['FormalSystem']
+        self._pluggedFS = self.S.config['chosen_plugins']['FormalUser']
 
         self.precedenceBaked = {}
         precedence = self.getPrecedence()

@@ -5,7 +5,7 @@ import sys
 
 sys.path.append('../app')
 from sentence import Sentence
-from FormalSystem import zeroth_order_logic as zol
+from FormalUser import zeroth_order_logic as zol
 
 def join_to_string(sentence) -> str:
     """Writes the sentence as a string, where tokens are written as `<[token type]_[lexem]>`"""
@@ -19,7 +19,7 @@ def join_to_string(sentence) -> str:
 
 
 class _SessionDummy(object):
-    config = {'chosen_plugins':{'FormalSystem':zol}}
+    config = {'chosen_plugins':{'FormalUser':zol}}
     
     def acc(self, arg):
         return zol

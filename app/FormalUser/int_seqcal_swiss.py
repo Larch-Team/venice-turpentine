@@ -8,9 +8,9 @@ Implementacja opisana w:
 https://github.com/PogromcaPapai/Larch/blob/24e1391c183d08842aa0cf7df971eeb01a1a9885/media/int_seqcal%20-%20implementacja.pdf
 """
 import typing as tp
-import FormalSystem.__utils__ as utils
+import FormalUser.__utils__ as utils
 
-SOCKET = 'FormalSystem'
+SOCKET = 'FormalUser'
 VERSION = '0.0.1'
 
 
@@ -343,13 +343,13 @@ def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, conte
     Używa określonej reguły na podanej gałęzi.
     Więcej: https://www.notion.so/szymanski/Gniazda-w-Larchu-637a500c36304ee28d3abe11297bfdb2#98e96d34d3c54077834bc0384020ff38
 
-    :param name: Nazwa używanej reguły, listę można uzyskać z pomocą FormalSystem.get_rules()
+    :param name: Nazwa używanej reguły, listę można uzyskać z pomocą FormalUser.get_rules()
     :type name: str
     :param branch: Lista zdań w gałęzi, na której została użyta reguła
     :type branch: list[utils.Sentence]
     :param used: Obiekt historii przechowujący informacje o już rozłożonych zdaniach
     :type used: utils.History
-    :param context: kontekst wymagany do zastosowania reguły, listę można uzyskać z pomocą FormalSystem.get_needed_context(rule)
+    :param context: kontekst wymagany do zastosowania reguły, listę można uzyskać z pomocą FormalUser.get_needed_context(rule)
         Kontekst reguł: https://www.notion.so/szymanski/Zarz-dzanie-kontekstem-regu-2a5abea2a1bc492e8fa3f8b1c046ad3a
     :type context: dict[str, tp.Any]
     :param auto: , defaults to False
@@ -366,13 +366,13 @@ def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, conte
 
     # Check sequent number
     if context.get('partID', -1) > sum(i.startswith('sep') for i in start_left)+1:
-        raise utils.FormalSystemError("Sequent number is too big")
+        raise utils.FormalUserError("Sequent number is too big")
 
     # Loop detection
     history = None
     if name == "left imp":
         if tuple(start_right) in used:
-            raise utils.FormalSystemError("Operation prohibited by loop detection algorithm")
+            raise utils.FormalUserError("Operation prohibited by loop detection algorithm")
         else:
             history = [[start_right], [0]]
     elif name == 'left or':

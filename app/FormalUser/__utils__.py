@@ -10,7 +10,7 @@ ContextDef = namedtuple(
     'ContextDef', ('variable', 'official', 'docs', 'type_'))
 
 
-class FormalSystemError(Exception):
+class FormalUserError(Exception):
     pass
 
 

@@ -190,7 +190,7 @@ def tokenize(statement: str, used_tokens: tp.Iterable[str], defined: dict[str, s
 
     :param statement: The statement to tokenize
     :type statement: str
-    :param used_tokens: List of tokens used in this formal system (`FormalSystem.get_used_types`)
+    :param used_tokens: List of tokens used in this formal system (`FormalUser.get_used_types`)
     :type used_tokens: tp.Iterable[str]
     :param defined: Variables defined by the user, defaults to dict()
     :type defined: dict[str, str], optional
