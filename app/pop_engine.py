@@ -7,6 +7,7 @@ import sys
 import shutil
 import typing as tp
 from collections import OrderedDict
+from exceptions import *
 
 Module = type(tp)
 
@@ -246,7 +247,7 @@ class Socket(object):
         if not set_names.issubset(set_plugin):
             raise LackOfFunctionsError(
                 self, plugin.__name__, set_names-set_plugin)
-        members = dict(inspect.getmembers(plugin, callable))
+        members = dict(inspect.getmembers(plugin, tp.Callable))
         for i in set_names:
             self._functionfit(members[i])
         return True
@@ -310,7 +311,7 @@ class Socket(object):
 
         # Template reading
         funcs = {}
-        for i in inspect.getmembers(template, callable):
+        for i in inspect.getmembers(template, tp.Callable):
             if i[0].endswith('Error'):
                 continue
             sig = inspect.signature(i[1])
@@ -336,43 +337,3 @@ class DummySocket(Socket):
     def plug(self, plugin_name: str) -> None:
         self.plugin = plugin_name
         logger.warning(f"{plugin_name} connected to {self.name} (dummy)")
-
-####
-# Exceptions
-####
-
-
-class PluginError(Exception):
-    """Mother of exceptions used to deal with plugin problems"""
-
-    def __init__(self, msg):
-        logger.error(msg)
-        super().__init__(msg)
-
-
-class LackOfFunctionsError(PluginError):
-    """Raised if module lacks important functions"""
-
-    def __init__(self, socket: Socket, module_name: str, functions: list[str]):
-        info = f"{module_name} can't be connected to {socket.name}, because it lacks {len(functions)} function{'s'*(len(functions)>1)}"
-        self.lacking = [
-            f"{i}: {', '.join(str(socket.functions[i][0]))} -> {str(socket.functions[i][1])}" for i in functions]
-        super().__init__(info)
-
-
-class FunctionInterfaceError(PluginError):
-    """Raised if function has a bad interface"""
-
-    def __init__(self, argument_problem: bool, socket: Socket, func: tp.Callable, what_is: tp.Any):
-        if argument_problem:
-            info = f"{func.__name__} can't be connected to {socket.name}; " + \
-                f"Arguments are: {str(what_is)}, should be: {str(socket.functions[func.__name__][0])}"
-        else:
-            info = f"{func.__name__} can't be connected to {socket.name}; " + \
-                f"Return is: {str(what_is)}, should be: {str(socket.functions[func.__name__][1])}"
-        super().__init__(info)
-
-
-class VersionError(PluginError):
-    """Raised if plugin has an incompatible version"""
-    pass

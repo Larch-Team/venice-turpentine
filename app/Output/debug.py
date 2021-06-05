@@ -8,13 +8,13 @@ Autorzy:
 """
 import typing as tp
 import Output.__utils__ as utils
-from anytree import Node
+from anytree import Node, RenderTree
 
 SOCKET = 'Output'
 VERSION = '0.0.1'
 
 
-def get_readable(sentence: utils.Sentence, lexem_parser: callable) -> str:
+def get_readable(sentence: utils.Sentence, lexem_parser: tp.Callable) -> str:
     """Konwertuje tokeny do formy <typ_leksem>
 
     :param sentence: Zdanie do transformacji
@@ -27,7 +27,7 @@ def get_readable(sentence: utils.Sentence, lexem_parser: callable) -> str:
     assert isinstance(sentence, utils.Sentence)
     return "<"+"> <".join(sentence)+">"
 
-def write_tree(tree: utils.PrintedTree, lexem_parser: callable) -> list[str]:
+def write_tree(tree: utils.PrintedTree, lexem_parser: tp.Callable) -> list[str]:
     """
     Zwraca drzewiastą reprezentację dowodu
 
@@ -46,7 +46,7 @@ def write_tree(tree: utils.PrintedTree, lexem_parser: callable) -> list[str]:
     ]
 
 
-def get_nodes(sentences: list[str], lexem_parser: callable, children: list[utils.PrintedTree]) -> list[Node]: 
+def get_nodes(sentences: list[str], lexem_parser: tp.Callable, children: list[utils.PrintedTree]) -> list[Node]: 
     """Zwraca listę dzieci do dodania do drzewa.
     Jeżeli istnieją jeszcze zdania w sentences, to mają one pierwszeństwo. W innym przypadku wyliczane są dzieci.
 

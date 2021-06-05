@@ -19,7 +19,7 @@ TEX_DICTIONARY = {
     ")"         :   ")",
 }
 
-def get_readable(sentence: utils.Sentence, lexem_parser: callable) -> str:
+def get_readable(sentence: utils.Sentence, lexem_parser: tp.Callable) -> str:
     """Zwraca zdanie w czytelnej formie
 
     :param sentence: Zdanie do transformacji
@@ -38,7 +38,7 @@ def get_readable(sentence: utils.Sentence, lexem_parser: callable) -> str:
             readable.append(lexem)
     return "".join(readable).replace("  ", " ")
 
-def write_tree(tree: utils.PrintedTree, lexem_parser: callable) -> list[str]:
+def write_tree(tree: utils.PrintedTree, lexem_parser: tp.Callable) -> list[str]:
     """
     Zwraca drzewiastą reprezentację dowodu
 
@@ -52,7 +52,7 @@ def write_tree(tree: utils.PrintedTree, lexem_parser: callable) -> list[str]:
     return [_write_tree(tree.sentences, tree.children, lexem_parser)]
 
 
-def _translate(s: utils.Sentence, lexem_parser: callable):
+def _translate(s: utils.Sentence, lexem_parser: tp.Callable):
     readable = []
     for i in s:
         for typ in TEX_DICTIONARY.keys():
@@ -64,7 +64,7 @@ def _translate(s: utils.Sentence, lexem_parser: callable):
     return " ".join(readable)
 
 
-def _write_tree(sentences, children, lexem_parser: callable) -> str:
+def _write_tree(sentences, children, lexem_parser: tp.Callable) -> str:
     if len(sentences)>0:
         return _gen_infer(_translate(sentences[0], lexem_parser), _write_tree(sentences[1:], children, lexem_parser))
     elif children is not None:

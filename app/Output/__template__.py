@@ -8,7 +8,7 @@ SOCKET = 'Output'
 VERSION = '0.0.1'
 
 
-def get_readable(sentence: utils.Sentence, lexem_parser: callable) -> str:
+def get_readable(sentence: utils.Sentence, lexem_parser: tp.Callable) -> str:
     """Returns a readable version of the sentence
 
     :param sentence: Transcribed sentence
@@ -20,7 +20,7 @@ def get_readable(sentence: utils.Sentence, lexem_parser: callable) -> str:
     """
     pass
 
-def write_tree(tree: utils.PrintedTree, lexem_parser: callable) -> list[str]:
+def write_tree(tree: utils.PrintedTree, lexem_parser: tp.Callable) -> list[str]:
     """
     Returns a tree/table representation of the whole proof
     """

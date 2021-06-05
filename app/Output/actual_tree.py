@@ -5,6 +5,7 @@ Autorzy:
     Michał Gajdziszewski - autor skryptu wzorcowego
     Jakub Dakowski (@PogromcaPapai) - autor implementacji
 """
+from typing import Callable
 import Output.__utils__ as utils
 from anytree import Node, RenderTree
 
@@ -12,7 +13,7 @@ SOCKET = 'Output'
 VERSION = '0.0.1'
 
 
-def get_readable(sentence: utils.Sentence, lexem_parser: callable) -> str:
+def get_readable(sentence: utils.Sentence, lexem_parser: Callable) -> str:
     """Zwraca zdanie w czytelnej formie
 
     :param sentence: Zdanie do transformacji
@@ -32,7 +33,7 @@ def get_readable(sentence: utils.Sentence, lexem_parser: callable) -> str:
     return "".join(readable).replace("  ", " ")
 
 
-def write_tree(tree: utils.PrintedTree, lexem_parser: callable) -> list[str]:
+def write_tree(tree: utils.PrintedTree, lexem_parser: Callable) -> list[str]:
     """
     Zwraca drzewiastą reprezentację dowodu
 
@@ -51,7 +52,7 @@ def write_tree(tree: utils.PrintedTree, lexem_parser: callable) -> list[str]:
     ]
 
 
-def get_nodes(sentence: list[str], lexem_parser: callable, children: list[utils.PrintedTree]) -> list[Node]: 
+def get_nodes(sentence: list[str], lexem_parser: Callable, children: list[utils.PrintedTree]) -> list[Node]: 
     """Zwraca listę dzieci do dodania do drzewa.
     Jeżeli istnieją jeszcze zdania w sentence, to mają one pierwszeństwo. W innym przypadku wyliczane są dzieci.
 

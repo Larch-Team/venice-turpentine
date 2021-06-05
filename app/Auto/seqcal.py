@@ -54,7 +54,7 @@ def find_rule(sen: utils.Sentence) -> tp.Union[list[str], None]:
 
 # __template__.py
 
-def solve(delegate: callable, branch: list[utils.Sentence]) -> tuple[tp.Union[str, None], tp.Union[tuple[str], None]]:
+def solve(delegate: tp.Callable, branch: list[utils.Sentence]) -> tuple[tp.Union[str, None], tp.Union[tuple[str], None]]:
     found_rules = find_rule(branch[-1])
     
     if found_rules is None:

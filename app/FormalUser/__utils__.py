@@ -9,6 +9,8 @@ Rule = namedtuple('Rule', ('symbolic', 'docs', 'func', 'context', 'reusable'))
 ContextDef = namedtuple(
     'ContextDef', ('variable', 'official', 'docs', 'type_'))
 
+SentenceTupleStructure = tp.NewType('TupleStructure', tuple[tuple[Sentence]])
+HistoryTupleStructure = tp.NewType('TupleStructure', tuple[tuple[tp.Union[Sentence, int, tp.Callable]]])
 
 class FormalUserError(Exception):
     pass
@@ -136,7 +138,7 @@ def merge_tupstruct(left: tuple[tuple[str]], right: tuple[tuple[str]], glue: str
             raise AssertionError((l_correct*"left")+(l_correct*r_correct *' and ')+(r_correct*"right") + "tuple is messed up")
 
 
-def select(tuple_structure: tuple[tuple[Sentence]], selection: tuple[tuple[bool]], func: callable) -> tuple[tuple[Sentence]]:
+def select(tuple_structure: tuple[tuple[Sentence]], selection: tuple[tuple[bool]], func: tp.Callable) -> tuple[tuple[Sentence]]:
     """Selektywne wykonywanie funkcji na elementach struktury krotek
 
     Przykłady:
@@ -181,7 +183,7 @@ def select(tuple_structure: tuple[tuple[Sentence]], selection: tuple[tuple[bool]
     return _select(tuple_structure, selection, func)
 
 
-def _select(filtered, selection, func: callable) -> tuple[tuple[Sentence]]:
+def _select(filtered, selection, func: tp.Callable) -> tuple[tuple[Sentence]]:
     """Recursion used in `select`; DO NOT USE"""
     after = []
 
@@ -284,7 +286,7 @@ def add_prefix(sentence: Sentence, prefix: str, lexem: str) -> Sentence:
 
 
 @Modifier
-def on_part(sentence: Sentence, split_type: str, sent_num: int, func: callable):
+def on_part(sentence: Sentence, split_type: str, sent_num: int, func: tp.Callable):
     """Wykonuje funkcję na pewnej części zdania (części oddzielone są `split_type`)
     Ex.:
               onpart(s, sep*, 1, f)
