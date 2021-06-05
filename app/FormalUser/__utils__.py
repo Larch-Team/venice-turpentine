@@ -3,6 +3,7 @@ import typing as tp
 import close
 from history import History
 from sentence import Sentence
+from exceptions import FormalUserError
 
 Rule = namedtuple('Rule', ('symbolic', 'docs', 'func', 'context', 'reusable'))
 
@@ -11,9 +12,6 @@ ContextDef = namedtuple(
 
 SentenceTupleStructure = tp.NewType('TupleStructure', tuple[tuple[Sentence]])
 HistoryTupleStructure = tp.NewType('TupleStructure', tuple[tuple[tp.Union[Sentence, int, tp.Callable]]])
-
-class FormalUserError(Exception):
-    pass
 
 
 # Rule decorators

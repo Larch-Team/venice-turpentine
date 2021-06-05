@@ -4,7 +4,7 @@ from close import Close
 from pop_engine import Socket
 from sentence import Sentence
 from tree import ProofNode
-from exceptions import EngineError
+from exceptions import EngineError, FormalUserError
 from usedrule import UsedRule
 
 class Proof(object):
@@ -27,10 +27,6 @@ class Proof(object):
         leaf.append(sentences, self.namegen)
 
 
-    def __getattribute__(self, name: str) -> Any:
-        return getattr(self.nodes, name)
-
-
     # Proof manipulation
 
     def deal_closure(self, FormalSystem: Socket, branch_name: str) -> tuple[Close, str]:
@@ -50,8 +46,8 @@ class Proof(object):
 
         if out:
             closure, info = out
-            self.proof.getleaves(branch_name)[0].close(closure)
-            return f"{branch_name}: {info}"
+            self.nodes.getleaf(branch_name).close(closure)
+            return closure, f"{branch_name}: {info}"
         else:
             return None, None
 
@@ -83,14 +79,14 @@ class Proof(object):
         # Rule execution
         try:
             out, used_extention, decisions = FormalSystem.use_rule(rule, branch, used, context, decisions)
-        except self.acc('FormalUser').utils.FormalUserError as e:
+        except FormalUserError as e:
             raise EngineError(str(e))
 
         # Adding to used rules and returning
         if out is None:
             return None
 
-        layer = old.append(out)
+        layer = old.append(out, self.namegen)
         children = old.children
         assert len(children) == len(used_extention), "Liczba gałęzi i list komend powinna być taka sama"
         for j, s in zip(children, used_extention):
@@ -104,7 +100,7 @@ class Proof(object):
 
 class BranchCentric(Proof):
 
-    def __init__(self, sentence: Sentence, config: dict, name_seed: int) -> None:
+    def __init__(self, sentence: Sentence, config: dict, name_seed: int = None) -> None:
         super().__init__(sentence, config, name_seed=name_seed)
         self.branch = 'Green'
 
@@ -130,7 +126,7 @@ class BranchCentric(Proof):
             else:
                 self.branch = changed.branch
         else:
-            changed = self.proof.get_leaf(new.capitalize())
+            changed = self.nodes.getleaf(new.capitalize())
             if not changed:
                 raise EngineError(
                     f"Branch '{new.lower()}' doesn't exist in this proof")

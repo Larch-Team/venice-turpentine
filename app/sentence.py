@@ -1,4 +1,4 @@
-from typing import Any, Union, NewType
+from typing import Callable, Union, NewType
 
 _Sentence = NewType('Sentence', list[str])
 Session = NewType('Session', object)
@@ -7,7 +7,7 @@ Session = NewType('Session', object)
 class SentenceError(Exception):
     pass
 
-def _operate_on_keys(dictionary: dict, op: callable) -> dict:
+def _operate_on_keys(dictionary: dict, op: Callable) -> dict:
     return {op(i):j for i, j in dictionary.items()}
 
 def _split_keys(dictionary: dict, key: int) -> dict:

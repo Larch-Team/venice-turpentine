@@ -56,12 +56,12 @@ class ProofElement(object):
         return self.history.copy()
 
 
-    def History(self, *commands: tuple[tp.Union[Sentence, int, callable]]) -> None:
+    def History(self, *commands: tuple[tp.Union[Sentence, int, Callable]]) -> None:
         """ Używane do manipulacji historią
 
             Możliwe argumenty:
                 - `Sentence`    - dodaje formułę do historii 
-                - `callable`    - wykonuje operacje `callable(history)` na obiekcie historii, a wynik nadpisuje jako nową historię; traktuj ją jako `set`
+                - `Callable`    - wykonuje operacje `callable(history)` na obiekcie historii, a wynik nadpisuje jako nową historię; traktuj ją jako `set`
                 - `int`         - wykonuje jedną z predefiniowanych operacji:
                     - 0 - operacja pusta
                     - 1 - reset historii
@@ -74,7 +74,6 @@ class ProofElement(object):
 
 class ProofNode(ProofElement, NodeMixin):
     """Reprezentacja pojedynczego zdania w drzewie"""
-    namegen = random.Random()
 
     def __init__(self, sentence: Sentence, branch_name: str, layer: int = 0, history: History = None, parent: ProofNode = None, children: tp.Iterable[ProofNode] = []):
         """Reprezentacja pojedynczego zdania w drzewie
@@ -97,15 +96,15 @@ class ProofNode(ProofElement, NodeMixin):
         self.children = children
     
 
-    def gen_name(self, am=2) -> tuple[str]:
+    def gen_name(self, namegen: random.Random, am=2) -> tuple[str]:
         """Zwraca `am` nazw dla gałęzi z czego jedną jest nazwa aktualnej"""
         branch_names = self.getbranchnames()
         possible = [i for i in getcolors() if not i in branch_names]
         if len(possible)<am-1:
             if len(self.leaves) == 1000:
                 raise ProofNodeError("No names exist")
-            return self.branch, *[str(self.namegen.randint(0, 1000)) for i in range(am-1)]
-        return self.branch, *random.choices(possible, k=am-1)
+            return self.branch, *[str(namegen.randint(0, 1000)) for i in range(am-1)]
+        return self.branch, *namegen.choices(possible, k=am-1)
     
 
     # Nawigacja
@@ -144,6 +143,12 @@ class ProofNode(ProofElement, NodeMixin):
         else:
             return self.root.leaves
 
+    def getleaf(self, name: str) -> ProofNode:
+        branches = self.getleaves(name)
+        if branches:
+            return branches[0]
+        else:
+            return None
 
     def getopen(self) -> list[ProofNode]:
         """Zwraca listę *otwartych* liści całego drzewa"""
@@ -182,9 +187,9 @@ class ProofNode(ProofElement, NodeMixin):
 
     # Modyfikacja
 
-    def append(self, sentences: tp.Iterable[tuple[Sentence]]) -> int:
+    def append(self, sentences: tp.Iterable[tuple[Sentence]], namegen: random.Random) -> int:
         """Dodaje zdania do drzewa, zwraca warstwę"""
-        names = self.gen_name(am=len(sentences))
+        names = self.gen_name(namegen, am=len(sentences))
         layer = max((i.layer for i in self.getleaves()))+1
         for i, branch in enumerate(sentences):
             par = self

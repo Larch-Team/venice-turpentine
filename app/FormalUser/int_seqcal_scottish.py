@@ -75,9 +75,9 @@ def stoup_add(tree: tuple[tuple[utils.Sentence]], rule_name: str, new: bool = Fa
 
 
 def stoupManager(func):
-    def wrapped(auto: bool, left, right, num, *args):
-        if not auto:
-            return func(left, right, num, *args)
+    def wrapped(left, right, num, *args):
+        # if not auto:
+        #     return func(left, right, num, *args)
         if (priority := stoup_find(left)) is not None:
             if priority == num-1:
                 res_left, res_right = func([i for i in left if i != "^"], right, num, *args)
@@ -161,11 +161,13 @@ def rule_left_or(left: utils.Sentence, right: utils.Sentence, num: int):
 
 @stoupBlock
 def rule_right_or(left: utils.Sentence, right: utils.Sentence, side: str, used: list[tuple[str]]):
+    # sourcery skip: merge-duplicate-blocks
     """ ... => (A,B)[side]
         ______________
         ... => AvB
     """
-    if not right or side not in ('l', 'r','find'):
+    # Usunięto find bo trochę przesadne chwilowo
+    if not right or side not in ('l', 'r'):
         return (None, None)
 
     split = utils.strip_around(right, 'or', False, PRECEDENCE)
@@ -173,19 +175,18 @@ def rule_right_or(left: utils.Sentence, right: utils.Sentence, side: str, used: 
         return (None, None)
     left_split, right_split = split[0]
 
-
     if side=='l':
-        ret = left_split
+            return ((left,),), ((left_split,),)
     elif side=='r':
-        ret = right_split
+        return ((left,),), ((right_split,),)
     else:
         if is_sequent(left, left_split):
-            ret = left_split
+            return ((left,),), ((left_split,),)
         elif is_sequent(left, right_split):
-            ret = right_split
+            return ((left,),), ((right_split,),)
         else:
             # Default case
-            ret = max(split[0], key=len)
+            return ((left,),), ((max(split[0], key=len),),)
 
     if ret in used:
         raise utils.FormalUserError("Operation prohibited by loop detection algorithm")
@@ -298,7 +299,7 @@ RULES = {
         utils.ContextDef(
             variable='conn_side',
             official='Side of the or operation',
-            docs='l/r/find; `find` option searches for the best possible fit',
+            docs='l/r',
             type_=str
         )]
     ),
@@ -414,7 +415,7 @@ def get_used_types() -> tuple[str]:
     return USED_TYPES
 
 
-def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, context: dict[str, tp.Any], auto: bool) -> tuple[tp.Union[tuple[tuple[utils.Sentence]], None], tp.Union[tuple[tuple[tp.Union[int, callable, utils.Sentence]]], None]]:
+def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, context: dict[str, tp.Any], decisions: dict[str, tp.Any]) -> tuple[utils.SentenceTupleStructure, utils.HistoryTupleStructure, dict[str, tp.Any]]:
     """
     Używa określonej reguły na podanej gałęzi.
     Więcej: https://www.notion.so/szymanski/Gniazda-w-Larchu-637a500c36304ee28d3abe11297bfdb2#98e96d34d3c54077834bc0384020ff38
@@ -433,7 +434,7 @@ def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, conte
     :return: Struktura krotek, reprezentująca wynik reguły oraz strukturę reprezentującą operacje do wykonania na zbiorze zamknięcia.
         Struktury krotek: https://www.notion.so/szymanski/Reprezentacja-dowod-w-w-Larchu-cd36457b437e456a87b4e0c2c2e38bd5#014dccf44246407380c4e30b2ea598a9
         Zamykanie gałęzi: https://www.notion.so/szymanski/Zamykanie-ga-zi-53249279f1884ab4b6f58bbd6346ec8d
-    :rtype: tuple[tp.Union[tuple[tuple[utils.Sentence]], None], tp.Union[tuple[tuple[tp.Union[int, callable, utils.Sentence]]], None]]
+    :rtype: tuple[tp.Union[tuple[tuple[utils.Sentence]], None], tp.Union[tuple[tuple[tp.Union[int, Callable, utils.Sentence]]], None]]
     """
     rule = RULES[name]
 
@@ -466,7 +467,7 @@ def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, conte
 
     elif name == 'right imp':
         if (stripped := utils.strip_around(start_right, "imp", False, PRECEDENCE)) is None:
-            return None, None
+            return None, None, None
         l, r = stripped[0]
         if is_sequent(start_left, l):
             if tuple(r) not in used:
@@ -488,9 +489,9 @@ def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, conte
         context['used'] = used
 
     # Rule usage
-    usage = rule.func(auto, start_left[:], start_right[:], *context.values())
+    usage = rule.func(start_left[:], start_right[:], *context.values())
     if not usage:
-        return None, None
+        return None, None, None
     left, right = usage
 
 
@@ -499,9 +500,9 @@ def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, conte
         # History length multiplication
         if not history:
             history = [[0]]*len(left)
-        return utils.merge_tupstruct(left, right, "turnstile_=>"), history
+        return utils.merge_tupstruct(left, right, "turnstile_=>"), history, None
     else:
-        return None, None
+        return None, None, None
 
 def get_operator_precedence() -> dict[str, int]:
     """Zwraca siłę wiązania danych spójników, im wyższa, tym mocniej wiąże (negacja ma najwyższą przykładowo)"""

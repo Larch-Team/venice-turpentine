@@ -97,15 +97,17 @@ def rule_left_or(left: utils.Sentence, right: utils.Sentence, num: int):
 
 
 def rule_right_or(left: utils.Sentence, right: utils.Sentence, side: str):
+    # sourcery skip: merge-duplicate-blocks
+    
     """ ... => (A,B)[side]
         ______________
         ... => AvB
     """
-    if not right or side not in ('l', 'r','find'):
+    # Usunięto find bo trochę przesadne chwilowo
+    if not right or side not in ('l', 'r'):
         return (None, None)
     
-    subsent = utils.pop_part(right, 'sep', 0)
-    split = utils.strip_around(subsent, 'or', False, PRECEDENCE)
+    split = utils.strip_around(right, 'or', False, PRECEDENCE)
     if split is None or split[0] is None:
         return (None, None)
     left_split, right_split = split[0]
@@ -223,7 +225,7 @@ RULES = {
         utils.ContextDef(
             variable='conn_side',
             official='Side of the or operation',
-            docs='l/r/find; `find` option searches for the best possible fit',
+            docs='l/r',
             type_=str
         )]
     ),
@@ -338,7 +340,7 @@ def get_used_types() -> tuple[str]:
     return USED_TYPES
 
 
-def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, context: dict[str, tp.Any], auto: bool) -> tuple[tp.Union[tuple[tuple[utils.Sentence]], None], tp.Union[tuple[tuple[tp.Union[int, callable, utils.Sentence]]], None]]:
+def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, context: dict[str, tp.Any], decisions: dict[str, tp.Any]) -> tuple[utils.SentenceTupleStructure, utils.HistoryTupleStructure, dict[str, tp.Any]]:
     """
     Używa określonej reguły na podanej gałęzi.
     Więcej: https://www.notion.so/szymanski/Gniazda-w-Larchu-637a500c36304ee28d3abe11297bfdb2#98e96d34d3c54077834bc0384020ff38
@@ -352,12 +354,12 @@ def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, conte
     :param context: kontekst wymagany do zastosowania reguły, listę można uzyskać z pomocą FormalUser.get_needed_context(rule)
         Kontekst reguł: https://www.notion.so/szymanski/Zarz-dzanie-kontekstem-regu-2a5abea2a1bc492e8fa3f8b1c046ad3a
     :type context: dict[str, tp.Any]
-    :param auto: , defaults to False
-    :type auto: bool, optional
+    :param decisions: Decyzje podjęte samodzielnie przez algorytm, pozwalają na odtworzenie dowoduz zapisanego pliku.
+    :type context: dict[str, tp.Any]
     :return: Struktura krotek, reprezentująca wynik reguły oraz strukturę reprezentującą operacje do wykonania na zbiorze zamknięcia.
         Struktury krotek: https://www.notion.so/szymanski/Reprezentacja-dowod-w-w-Larchu-cd36457b437e456a87b4e0c2c2e38bd5#014dccf44246407380c4e30b2ea598a9
         Zamykanie gałęzi: https://www.notion.so/szymanski/Zamykanie-ga-zi-53249279f1884ab4b6f58bbd6346ec8d
-    :rtype: tuple[tp.Union[tuple[tuple[utils.Sentence]], None], tp.Union[tuple[tuple[tp.Union[int, callable, utils.Sentence]]], None]]
+    :rtype: tuple[tp.Union[tuple[tuple[utils.Sentence]], None], tp.Union[tuple[tuple[tp.Union[int, Callable, utils.Sentence]]], None]]
     """
     rule = RULES[name]
 
@@ -380,7 +382,7 @@ def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, conte
     elif name == 'right imp':
         l = utils.strip_around(start_right, "imp", False, PRECEDENCE)
         if l is None:
-            return None, None
+            return None, None, None
         elif is_sequent(start_left, l[0][0]):
             history = [[0]]
         else:
@@ -394,9 +396,9 @@ def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, conte
         # History length multiplication
         if not history:
             history = [[0]]*len(left)
-        return utils.merge_tupstruct(left, right, "turnstile_=>"), history
+        return utils.merge_tupstruct(left, right, "turnstile_=>"), history, None
     else:
-        return None, None
+        return None, None, None
 
 def get_operator_precedence() -> dict[str, int]:
     """Zwraca siłę wiązania danych spójników, im wyższa, tym mocniej wiąże (negacja ma najwyższą przykładowo)"""

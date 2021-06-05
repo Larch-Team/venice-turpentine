@@ -491,7 +491,7 @@ def run() -> int:
     session = engine.Session('main', 'config.json')
     ptk.print_formatted_text(ptk.HTML(
         '<b>Logika -> Psychika</b>\nType ? to get command list; type [command]? to get help'))
-    console = ptk.PromptSession(message=lambda: f"{session.branch+bool(session.branch)*' '}# ", rprompt=lambda: get_rprompt(
+    console = ptk.PromptSession(message=lambda: f"{session.get_current_branch()+bool(session.get_current_branch())*' '}# ", rprompt=lambda: get_rprompt(
         session, getcolors()), complete_in_thread=True, complete_while_typing=True, completer=Autocomplete(session))
     while True:
         command = console.prompt().strip()

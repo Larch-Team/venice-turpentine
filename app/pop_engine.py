@@ -247,7 +247,7 @@ class Socket(object):
         if not set_names.issubset(set_plugin):
             raise LackOfFunctionsError(
                 self, plugin.__name__, set_names-set_plugin)
-        members = dict(inspect.getmembers(plugin, tp.Callable))
+        members = dict(inspect.getmembers(plugin, callable))
         for i in set_names:
             self._functionfit(members[i])
         return True
@@ -311,7 +311,7 @@ class Socket(object):
 
         # Template reading
         funcs = {}
-        for i in inspect.getmembers(template, tp.Callable):
+        for i in inspect.getmembers(template, callable):
             if i[0].endswith('Error'):
                 continue
             sig = inspect.signature(i[1])

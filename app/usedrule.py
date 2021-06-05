@@ -6,6 +6,7 @@ class UsedRule(object):
     branch: str
     rule: str
     context: dict = field(default_factory=dict)
+    decisions: dict = field(default_factory=dict)
 
     def to_dict(self):
         return asdict(self)

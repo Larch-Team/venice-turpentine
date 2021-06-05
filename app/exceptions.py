@@ -48,3 +48,8 @@ class FunctionInterfaceError(PluginError):
 class VersionError(PluginError):
     """Raised if plugin has an incompatible version"""
     pass
+
+# FormalUser
+
+class FormalUserError(Exception):
+    pass
