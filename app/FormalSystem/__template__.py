@@ -7,6 +7,8 @@ import FormalSystem.__utils__ as utils
 SOCKET = 'FormalSystem'
 VERSION = '0.0.1'
 
+def get_tags() -> tuple[str]:
+    pass
 
 def get_operator_precedence() -> dict[str, int]:
     """Zwraca siłę wiązania danych spójników, im wyższa, tym mocniej wiąże (negacja ma najwyższą przykładowo)"""
@@ -35,10 +37,6 @@ def get_rules() -> dict[str, str]:
 
 def get_needed_context(rule_name: str) -> tuple[utils.ContextDef]:
     """Zwraca informacje o wymaganym przez daną regułę kontekście w formie obiektów ContextDef"""
-    pass
-
-
-def get_used_types() -> tuple[str]:
     pass
 
 

@@ -10,7 +10,9 @@ VERSION = '0.0.1'
 
 # Rule definition
 
-USED_TYPES = ('and', 'or', 'imp', 'not', 'sentvar')
+def get_tags() -> tuple[str]:
+    return 'propositional', 'uses negation'
+
 PRECEDENCE = {
     'and':3,
     'or':3,
@@ -124,10 +126,6 @@ def get_rules() -> dict[str, str]:
         name: "\n".join((rule.symbolic, rule.docs))
         for name, rule in RULES.items()
     }
-
-
-def get_used_types() -> tuple[str]:
-    return USED_TYPES
 
 
 def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, context: dict[str, tp.Any], auto: bool = False) -> tuple[tp.Union[tuple[tuple[utils.Sentence]], None], tp.Union[tuple[tuple[tp.Union[int, callable, utils.Sentence]]], None]]:

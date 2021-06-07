@@ -272,38 +272,6 @@ class Test_double_neg(test.TestCase):
             self.rule('<not_~><not_~><sentvar_p>'), (('<sentvar_p>',),))
 
 
-# TODO: Ta funkcja kompletnie nie działa xDD
-# class Test_check_closure(test.TestCase):
-
-#     def setUp(self):
-#         self.func = new_notation(zol.check_closure)
-
-#     def test_true_basic(self):
-#         self.assertIs(self.func(
-#             '<not_~><sentvar_p>', '<sentvar_p>'), True)
-
-#     def test_false_basic(self):
-#         self.assertIs(self.func(
-#             '<sentvar_p>', '<sentvar_p>'), False)
-
-#     def test_double_neg(self):
-#         self.assertIs(self.func(
-#             '<not_~><not_~><sentvar_p>', '<sentvar_p>'), False)
-
-#     def test_true_notation_change(self):
-#         self.assertIs(self.func(
-#             '<not_not><sentvar_p>', '<sentvar_p>'), True)
-
-#     def test_true_long(self):
-#         self.assertIs(self.func('<not_~>((<sentvar_p><and_^><sentvar_q>)<and_^><sentvar_r>)',
-#                                            '(<sentvar_p><and_^><sentvar_q>)<and_^><sentvar_r>'), True)
-
-#     def test_true_reversed(self):
-#         self.assertIs(self.func(
-#             '<sentvar_p>', '<not_~><sentvar_p>'), True)
-
-
-
 class Test_bracket_reduction(test.TestCase):
 
     def setUp(self):
