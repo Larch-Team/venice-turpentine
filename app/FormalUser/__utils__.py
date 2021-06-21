@@ -276,6 +276,7 @@ def add_prefix(sentence: Sentence, prefix: str, lexem: str) -> Sentence:
     :return: Zmieniony prefiks
     :rtype: Sentence
     """
+    #TODO: dodawać znak negacji według zawartości zdania
     if len(sentence) == 1:
         return Sentence([f"{prefix}_{lexem}", *sentence], sentence.S)
     new_record = {0:sentence.calcPrecedenceVal(prefix)}
