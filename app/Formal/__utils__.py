@@ -10,8 +10,8 @@ Rule = namedtuple('Rule', ('symbolic', 'docs', 'func', 'context', 'reusable'))
 ContextDef = namedtuple(
     'ContextDef', ('variable', 'official', 'docs', 'type_'))
 
-SentenceTupleStructure = tp.NewType('TupleStructure', tuple[tuple[Sentence]])
-HistoryTupleStructure = tp.NewType('TupleStructure', tuple[tuple[tp.Union[Sentence, int, tp.Callable]]])
+SentenceTupleStructure = tp.NewType('SentenceTupleStructure', tuple[tuple[Sentence]])
+HistoryTupleStructure = tp.NewType('HistoryTupleStructure', tuple[tuple[tp.Union[Sentence, int, tp.Callable]]])
 
 
 # Rule decorators
@@ -235,6 +235,44 @@ def strip_around(sentence: Sentence, border_type: str, split: bool, precedence: 
         return ((left, right),)
 
 
+# Smullyan representation
+
+class Smullyan(object):
+    CONJUNCTIVE = {
+        'true and':     [True,  True,   True],
+        'false or':     [False, False,  False],
+        'false imp':    [True,  False,  False],
+        'false revimp': [False, True,   False],
+        'false nand':   [True,  True,   False],
+        'true nor':     [False, False,  True],
+    }
+
+    DISJUNCTIVE = {
+        'false and':     [False, False,  False],
+        'true or':       [True,  True,   True],
+        'true imp':      [False, True,   False],
+        'false revimp':  [True,  False,  False],
+        'true nand':     [False, False,  True],
+        'false nor':     [True,  True,   False],
+    }
+
+    TABLE = CONJUNCTIVE | DISJUNCTIVE
+
+    def __init__(self, rule) -> None:
+        """Generuje regułę według tabel Smullyanowskich"""
+        super().__init__()
+        assert rule in self.TABLE, "Reguła nie została zdefiniowana"
+
+        self.comp1, self.comp2, self.whole = self.TABLE[rule]
+        self.split = rule in self.DISJUNCTIVE
+
+
+    def __call__(self, sentence: Sentence) -> tp.Union[None, SentenceTupleStructure]:
+        """Służy do wywoływania reguły, zwraca strukturę krotek"""
+        
+        if not self.whole:
+            return add_prefix()
+
 # Modifiers
 
 
@@ -264,7 +302,7 @@ def reduce_prefix(sentence: Sentence, prefix_type: str, precedence: dict[str, in
 
 
 @Modifier
-def add_prefix(sentence: Sentence, prefix: str, lexem: str) -> Sentence:
+def add_prefix(sentence: Sentence, prefix: str, lexem: str = None) -> Sentence:
     """Dodaje prefiks do zdania
 
     :param sentence: Zdanie do modyfikacji
@@ -276,7 +314,8 @@ def add_prefix(sentence: Sentence, prefix: str, lexem: str) -> Sentence:
     :return: Zmieniony prefiks
     :rtype: Sentence
     """
-    #TODO: dodawać znak negacji według zawartości zdania
+    if not lexem:
+        lexem = sentence.S.
     if len(sentence) == 1:
         return Sentence([f"{prefix}_{lexem}", *sentence], sentence.S)
     new_record = {0:sentence.calcPrecedenceVal(prefix)}

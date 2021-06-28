@@ -5,7 +5,7 @@ import typing as tp
 import Formal.__utils__ as utils
 
 SOCKET = 'Formal'
-VERSION = '0.0.1'
+VERSION = '0.2.0'
 
 PRECEDENCE = {
     'and':3,
