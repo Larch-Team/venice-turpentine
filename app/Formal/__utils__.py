@@ -3,7 +3,7 @@ import typing as tp
 import close
 from history import History
 from sentence import Sentence
-from exceptions import FormalUserError
+from exceptions import FormalError
 
 Rule = namedtuple('Rule', ('symbolic', 'docs', 'func', 'context', 'reusable'))
 

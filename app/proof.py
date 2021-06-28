@@ -4,7 +4,7 @@ from close import Close
 from pop_engine import Socket
 from sentence import Sentence
 from tree import ProofNode
-from exceptions import EngineError, FormalUserError
+from exceptions import EngineError, FormalError
 from usedrule import UsedRule
 
 class Proof(object):
@@ -79,7 +79,7 @@ class Proof(object):
         # Rule execution
         try:
             out, used_extention, decisions = FormalSystem.use_rule(rule, branch, used, context, decisions)
-        except FormalUserError as e:
+        except FormalError as e:
             raise EngineError(str(e))
 
         # Adding to used rules and returning

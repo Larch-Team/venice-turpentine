@@ -49,7 +49,7 @@ class VersionError(PluginError):
     """Raised if plugin has an incompatible version"""
     pass
 
-# FormalUser
+# Formal
 
-class FormalUserError(Exception):
+class FormalError(Exception):
     pass

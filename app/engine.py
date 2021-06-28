@@ -69,7 +69,7 @@ class Session(object):
     Wszystkie wyjątki określane jako `EngineError` mają wbudowany string w formie "dostępnej dla użytkownika"
     """
     ENGINE_VERSION = '0.0.1'
-    SOCKETS = ('Application', 'FormalSolver', 'FormalUser', 'Lexicon', 'Output')
+    SOCKETS = ('Application', 'Assistant', 'Formal', 'Lexicon', 'Output')
     SOCKETS_NOT_IN_CONFIG = ('Application')
 
     def __init__(self, session_ID: str, config_file: str):
@@ -204,16 +204,16 @@ class Session(object):
         """
         try:
             tokenized = self.acc('Lexicon').tokenize(
-                statement, self.acc('FormalUser').get_used_types(), self.defined)
+                statement, self.acc('Formal').get_used_types(), self.defined)
         except self.acc('Lexicon').utils.CompilerError as e:
             raise EngineError(str(e))
         tokenized = Sentence(tokenized, self)
-        problem = self.acc('FormalUser').check_syntax(tokenized)
+        problem = self.acc('Formal').check_syntax(tokenized)
         if problem:
             logger.warning(f"{statement} is not a valid statement \n{problem}")
             raise EngineError(problem)
         else:
-            tokenized = self.acc('FormalUser').prepare_for_proving(tokenized)
+            tokenized = self.acc('Formal').prepare_for_proving(tokenized)
             
             self.proof = BranchCentric(tokenized, self.config)
 
@@ -232,7 +232,7 @@ class Session(object):
             raise EngineError("There is no proof started")
         
         # Branch checking
-        closure, info = self.proof.deal_closure(self.acc('FormalUser'), branch_name)
+        closure, info = self.proof.deal_closure(self.acc('Formal'), branch_name)
         if closure:
             EngineLog(f"Closing {branch_name}: {str(closure)}, {info=}")
             return f"{branch_name}: {info}"
@@ -250,17 +250,17 @@ class Session(object):
         docs        - Dokumentacja dla zmiennej wyświetlalna dla użytkownika
         type_       - Typ zmiennej, albo jest to dosłownie typ, albo string wyrażony w `TYPE_LEXICON`
         """
-        return self.acc('FormalUser').get_needed_context(rule)
+        return self.acc('Formal').get_needed_context(rule)
 
 
     @EngineLog
     @DealWithPOP
     def use_rule(self, rule: str, context: dict[str, tp.Any]) -> tp.Union[None, tuple[str]]:
         """Uses a rule of the given name on the current branch of the proof.
-        Context allows to give the FormalUser additional arguments 
-        Use `self.acc('FormalUser').get_needed_context(rule)` to check for needed context
+        Context allows to give the Formal additional arguments 
+        Use `self.acc('Formal').get_needed_context(rule)` to check for needed context
 
-        :param rule: Rule name (from `FormalUser` plugin)
+        :param rule: Rule name (from `Formal` plugin)
         :type rule: str
         :param context: Arguments for rule usage
         :type context: dict[str, tp.Any]
@@ -271,15 +271,15 @@ class Session(object):
         if not self.proof:
             raise EngineError(
                 "There is no proof started")
-        if rule not in self.acc('FormalUser').get_rules().keys():
+        if rule not in self.acc('Formal').get_rules().keys():
             raise EngineError("No such rule")
 
         # Context checking
-        context_info = self.acc('FormalUser').get_needed_context(rule)
+        context_info = self.acc('Formal').get_needed_context(rule)
         if {i.variable for i in context_info} != set(context.keys()):
             raise EngineError("Wrong context")
 
-        return self.proof.use_rule(self.acc('FormalUser'), rule, context, None)
+        return self.proof.use_rule(self.acc('Formal'), rule, context, None)
 
 
     @EngineLog
@@ -327,7 +327,7 @@ class Session(object):
     @DealWithPOP
     def getrules(self) -> dict[str, str]:
         """Zwraca nazwy reguł wraz z dokumentacją"""
-        return self.acc('FormalUser').get_rules()
+        return self.acc('Formal').get_rules()
 
 
     @DealWithPOP
