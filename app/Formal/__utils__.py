@@ -237,6 +237,7 @@ def strip_around(sentence: Sentence, border_type: str, split: bool, precedence: 
 
 # Smullyan representation
 
+
 class Smullyan(object):
     CONJUNCTIVE = {
         'true and':     [True,  True,   True],
@@ -265,13 +266,29 @@ class Smullyan(object):
 
         self.comp1, self.comp2, self.whole = self.TABLE[rule]
         self.split = rule in self.DISJUNCTIVE
+        self.name = rule.split(' ')[1]
 
 
-    def __call__(self, sentence: Sentence) -> tp.Union[None, SentenceTupleStructure]:
+    def __call__(self, sentence: Sentence, precedence: dict[str, int]) -> tp.Union[None, SentenceTupleStructure]:
         """Służy do wywoływania reguły, zwraca strukturę krotek"""
         
-        if not self.whole:
-            return add_prefix()
+        stripped = sentence if self.whole else reduce_prefix(sentence, 'neg', '~')
+
+        if self.comp1 and self.comp2:
+            return strip_around(stripped, self.name, self.split, precedence)
+        if self.split:
+            branch1, branch2 = strip_around(stripped, self.name, self.split, precedence)
+            return (
+                (add_prefix(branch1[0], 'neg', '~') if self.comp1 else sentence,),
+                (add_prefix(branch2[0], 'neg', '~') if self.comp2 else sentence,)
+            )
+        else:
+            branch = strip_around(stripped, self.name, self.split, precedence)[0]
+            return ((
+                add_prefix(branch[0], 'neg', '~') if self.comp1 else sentence,
+                add_prefix(branch[1], 'neg', '~') if self.comp2 else sentence
+            ),)
+
 
 # Modifiers
 
@@ -315,7 +332,7 @@ def add_prefix(sentence: Sentence, prefix: str, lexem: str = None) -> Sentence:
     :rtype: Sentence
     """
     if not lexem:
-        lexem = sentence.S.
+        lexem = sentence.S.lexe.generate(sentence, prefix)
     if len(sentence) == 1:
         return Sentence([f"{prefix}_{lexem}", *sentence], sentence.S)
     new_record = {0:sentence.calcPrecedenceVal(prefix)}
