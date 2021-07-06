@@ -388,14 +388,14 @@ class Smullyan(Rule):
         if self.split:
             branch1, branch2 = strip_around(stripped, self.name, self.split)
             return (
-                (add_prefix(branch1[0], 'neg', '~') if self.comp1 else sentence,),
-                (add_prefix(branch2[0], 'neg', '~') if self.comp2 else sentence,)
+                (add_prefix(branch1[0], 'neg', '~') if self.comp1 else branch1[0],),
+                (add_prefix(branch2[0], 'neg', '~') if self.comp2 else branch2[0],)
             )
         else:
             branch = strip_around(stripped, self.name, self.split)[0]
             return ((
-                add_prefix(branch[0], 'neg', '~') if self.comp1 else sentence,
-                add_prefix(branch[1], 'neg', '~') if self.comp2 else sentence
+                add_prefix(branch[0], 'neg', '~') if self.comp1 else branch[0],
+                add_prefix(branch[1], 'neg', '~') if self.comp2 else branch[1]
             ),)
             
     def _naive(self, branch: list[Sentence], context: dict[str, tp.Any]) -> tp.Union[None, SentenceTupleStructure]:
@@ -416,12 +416,12 @@ class Smullyan(Rule):
         if self.split:
             branch1, branch2 = stripped.splitByIndex(tokenID)
             return (
-                (add_prefix(branch1, 'neg', '~') if self.comp1 else sentence,),
-                (add_prefix(branch2, 'neg', '~') if self.comp2 else sentence,)
+                (add_prefix(branch1[0], 'neg', '~') if self.comp1 else branch1[0],),
+                (add_prefix(branch2[0], 'neg', '~') if self.comp2 else branch2[0],)
             )
         else:
             branch = stripped.splitByIndex(tokenID)
             return ((
-                add_prefix(branch[0], 'neg', '~') if self.comp1 else sentence,
-                add_prefix(branch[1], 'neg', '~') if self.comp2 else sentence
+                add_prefix(branch[0], 'neg', '~') if self.comp1 else branch[0],
+                add_prefix(branch[1], 'neg', '~') if self.comp2 else branch[1]
             ),)
