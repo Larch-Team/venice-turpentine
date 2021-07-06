@@ -9,9 +9,10 @@ from usedrule import UsedRule
 
 class Proof(object):
 
-    def __init__(self, sentence: Sentence, config: dict, name_seed: int = None) -> None:
+    def __init__(self, sentence: Sentence, name_seed: int = None) -> None:
         super().__init__()
-        self.config = config
+        self.S = sentence.S # Session
+        self.config = self.S.get_config()
         self.nodes = ProofNode(sentence, 'Green')
         self.metadata = dict(
             usedrules = [],
@@ -94,7 +95,7 @@ class Proof(object):
             for k in j.descendants:
                 k.History(*s)
 
-        self.metadata['usedrules'].append(UsedRule(layer, self.branch, rule, context, decisions))
+        self.metadata['usedrules'].append(UsedRule(layer, self.branch, rule, self, context, decisions))
         return tuple(i.branch for i in children)
 
 

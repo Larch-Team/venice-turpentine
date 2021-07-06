@@ -1,8 +1,12 @@
 """
 Tutaj umieść dokumentację swojego pluginu
 """
+from collections import namedtuple
 import typing as tp
 import Formal.__utils__ as utils
+from rule import Rule
+from sentence import Sentence
+from usedrule import UsedRule
 
 SOCKET = 'Formal'
 VERSION = '0.2.0'
@@ -110,7 +114,66 @@ def check_syntax(sentence: utils.Sentence) -> tp.Union[str, None]:
     raise Exception('Zdanie nie jest poprawne')
 
 
-### TEMPLATE CIĄG DALSZY
+### RULES
+
+
+### Usage check
+
+def check_use(rule: UsedRule, conclusion: Sentence) -> bool:
+    # sourcery skip: merge-duplicate-blocks
+    premiss = rule.get_premisses()[0]
+    connective, use_result = premiss.getMainConnective()
+    if connective.startswith('neg'):
+        # zastosowanie reguły dla prawdziwości na zanegowanej formule
+        if rule.rule.startswith('true'):
+            return False
+        connective, use_result = use_result[0].getMainConnective()
+    # zastosowanie reguły dla fałszywości na niezanegowanej formule
+    elif rule.rule.startswith('false'):
+        return False
+
+    # Zastosowanie reguły dla złego spójnika
+    if not connective.startswith(rule.rule.split()[1]):
+        return False
+    # Sprawdzenie, czy reguły zastosowano na poprawnej instancji spójnika
+    else:
+        return conclusion.getNonNegated() in {i.getNonNegated() for i in use_result}
+
+
+RULES = {
+    'true and': Rule(
+        symbolic="A and B / A; B",
+        docs="Rozkładanie prawdziwej koniunkcji. Wymaga wskazania zdania w gałęzi.",
+        func=),
+    'false and': Rule(
+        symbolic="~(A and B) / ~A | ~B",
+        docs="Rozkładanie fałszywej koniunkcji. Wymaga wskazania zdania w gałęzi.",
+        func=lambda x: utils.add_prefix(utils.strip_around(
+            red_neg(x), 'and', True, PRECEDENCE), 'not', '~')),
+    'false or': Rule(
+        symbolic="~(A or B) / ~A; ~B",
+        docs="Rozkładanie fałszywej alternatywy. Wymaga wskazania zdania w gałęzi.",
+        func=lambda x: utils.add_prefix(utils.strip_around(
+            red_neg(x), 'or', False, PRECEDENCE), 'not', '~')),
+    'true or': Rule(
+        symbolic="(A or B) / A | B",
+        docs="Rozkładanie prawdziwej alternatywy. Wymaga wskazania zdania w gałęzi.",
+        func=lambda x: utils.strip_around(x, 'or', True, PRECEDENCE)),
+    'false imp': Rule(
+        symbolic="~(A -> B) / A; ~B",
+        docs="Rozkładanie fałszywej implikacji. Wymaga wskazania zdania w gałęzi.",
+        func=lambda x: utils.select(utils.strip_around(red_neg(x),'imp', False, PRECEDENCE), ((False, True),), lambda y: utils.add_prefix(y, 'not', '~'))),
+    'true imp': Rule(
+        symbolic="(A -> B) / ~A | B",
+        docs="Rozkładanie prawdziwej implikacji. Wymaga wskazania zdania w gałęzi.",
+        func=lambda x: utils.select(utils.strip_around(x, 'imp', True, PRECEDENCE), ((True,), (False,)), lambda y: utils.add_prefix(y, 'not', '~'))),
+    'double not': Rule(
+        symbolic="~~A / A",
+        docs="Usuwanie podwójnej negacji. Wymaga wskazania zdania w gałęzi.",
+        func=lambda x: utils.reduce_prefix(
+            utils.reduce_prefix(utils.empty_creator(x), 'not', PRECEDENCE), 'not', PRECEDENCE))
+}
+
 
 def get_rules() -> dict[str, str]:
     """Zwraca reguły rachunku z opisem"""
@@ -129,7 +192,7 @@ def get_needed_context(rule_name: str) -> tuple[utils.ContextDef]:
             variable='tokenID', 
             official='Token Number', 
             docs='The index of a token in a sentence', 
-            type_=int)
+            type_='tokenID')
     ]
 
 

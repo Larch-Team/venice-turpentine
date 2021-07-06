@@ -4,6 +4,7 @@ import close
 from history import History
 from sentence import Sentence
 from exceptions import FormalError
+from rule import Rule
 
 Rule = namedtuple('Rule', ('symbolic', 'docs', 'func', 'context', 'reusable'))
 
@@ -207,7 +208,7 @@ def empty_creator(sentence: Sentence):
 
 @cleaned
 @Creator
-def strip_around(sentence: Sentence, border_type: str, split: bool, precedence: dict[str, int]) -> tuple[tuple[Sentence]]:
+def strip_around(sentence: Sentence, border_type: str, split: bool) -> tuple[tuple[Sentence]]:
     """Dzieli zdanie wokół głównego spójnika, jeśli spójnikiem jest `border_type`
 
     :param sentence: zdanie do podziału
@@ -216,15 +217,13 @@ def strip_around(sentence: Sentence, border_type: str, split: bool, precedence: 
     :type border_type: str
     :param split: Czy tworzyć nowe gałęzie?
     :type split: bool
-    :param precedence: Kolejność wykonywania działań
-    :type precedence: dict[str, int]
     :return: Struktura krotek
     :rtype: tuple[tuple[Sentence]]
     """
     if not sentence or len(sentence)==1:
         return None
 
-    middle, subsents = sentence.getMainConnective(precedence)
+    middle, subsents = sentence.getMainConnective()
     if middle is None or middle.split('_')[0] != border_type:
         return None
     
@@ -235,67 +234,12 @@ def strip_around(sentence: Sentence, border_type: str, split: bool, precedence: 
         return ((left, right),)
 
 
-# Smullyan representation
-
-
-class Smullyan(object):
-    CONJUNCTIVE = {
-        'true and':     [True,  True,   True],
-        'false or':     [False, False,  False],
-        'false imp':    [True,  False,  False],
-        'false revimp': [False, True,   False],
-        'false nand':   [True,  True,   False],
-        'true nor':     [False, False,  True],
-    }
-
-    DISJUNCTIVE = {
-        'false and':     [False, False,  False],
-        'true or':       [True,  True,   True],
-        'true imp':      [False, True,   False],
-        'false revimp':  [True,  False,  False],
-        'true nand':     [False, False,  True],
-        'false nor':     [True,  True,   False],
-    }
-
-    TABLE = CONJUNCTIVE | DISJUNCTIVE
-
-    def __init__(self, rule) -> None:
-        """Generuje regułę według tabel Smullyanowskich"""
-        super().__init__()
-        assert rule in self.TABLE, "Reguła nie została zdefiniowana"
-
-        self.comp1, self.comp2, self.whole = self.TABLE[rule]
-        self.split = rule in self.DISJUNCTIVE
-        self.name = rule.split(' ')[1]
-
-
-    def __call__(self, sentence: Sentence, precedence: dict[str, int]) -> tp.Union[None, SentenceTupleStructure]:
-        """Służy do wywoływania reguły, zwraca strukturę krotek"""
-        
-        stripped = sentence if self.whole else reduce_prefix(sentence, 'neg', '~')
-
-        if self.comp1 and self.comp2:
-            return strip_around(stripped, self.name, self.split, precedence)
-        if self.split:
-            branch1, branch2 = strip_around(stripped, self.name, self.split, precedence)
-            return (
-                (add_prefix(branch1[0], 'neg', '~') if self.comp1 else sentence,),
-                (add_prefix(branch2[0], 'neg', '~') if self.comp2 else sentence,)
-            )
-        else:
-            branch = strip_around(stripped, self.name, self.split, precedence)[0]
-            return ((
-                add_prefix(branch[0], 'neg', '~') if self.comp1 else sentence,
-                add_prefix(branch[1], 'neg', '~') if self.comp2 else sentence
-            ),)
-
-
 # Modifiers
 
 
 @cleaned
 @Modifier
-def reduce_prefix(sentence: Sentence, prefix_type: str, precedence: dict[str, int]) -> Sentence:
+def reduce_prefix(sentence: Sentence, prefix_type: str) -> Sentence:
     """Usuwa prefiksy ze zdań
 
     :param sentence: zdanie do modyfikacji
@@ -310,7 +254,7 @@ def reduce_prefix(sentence: Sentence, prefix_type: str, precedence: dict[str, in
     if not sentence or len(sentence)==1:
         return None
 
-    middle, subsents = sentence.getMainConnective(precedence)
+    middle, subsents = sentence.getMainConnective()
     if middle is None or middle.split('_')[0] != prefix_type:
         return None
     
@@ -396,3 +340,88 @@ def on_part(sentence: Sentence, split_type: str, sent_num: int, func: tp.Callabl
         return tuple(l)
     else:
         return None
+    
+
+# Smullyan representation
+
+
+class Smullyan(Rule):
+    CONJUNCTIVE = {
+        'true and':     [True,  True,   True],
+        'false or':     [False, False,  False],
+        'false imp':    [True,  False,  False],
+        'false revimp': [False, True,   False],
+        'false nand':   [True,  True,   False],
+        'true nor':     [False, False,  True],
+    }
+
+    DISJUNCTIVE = {
+        'false and':     [False, False,  False],
+        'true or':       [True,  True,   True],
+        'true imp':      [False, True,   False],
+        'false revimp':  [True,  False,  False],
+        'true nand':     [False, False,  True],
+        'false nor':     [True,  True,   False],
+    }
+
+    TABLE = CONJUNCTIVE | DISJUNCTIVE
+
+    def __init__(self, name: str, symbolic: str, docs: str, context: tp.Iterable[ContextDef], parent: Rule, children: tp.Iterable[Rule]) -> None:
+        """Generuje regułę według tabel Smullyanowskich"""
+        assert name in self.TABLE, "Reguła nie została zdefiniowana"
+        super().__init__(name, symbolic, docs, context, parent=parent, children=children)
+
+        self.comp1, self.comp2, self.whole = self.TABLE[name]
+        self.split = name in self.DISJUNCTIVE
+        self.name = name.split(' ')[1]
+        self.strict = self._strict
+        self.naive = self._naive
+
+
+    def _strict(self, sentence: Sentence) -> tp.Union[None, SentenceTupleStructure]:
+        """Służy do wywoływania reguły, zwraca strukturę krotek"""
+        
+        stripped = sentence if self.whole else reduce_prefix(sentence, 'neg', '~')
+
+        if self.comp1 and self.comp2:
+            return strip_around(stripped, self.name, self.split)
+        if self.split:
+            branch1, branch2 = strip_around(stripped, self.name, self.split)
+            return (
+                (add_prefix(branch1[0], 'neg', '~') if self.comp1 else sentence,),
+                (add_prefix(branch2[0], 'neg', '~') if self.comp2 else sentence,)
+            )
+        else:
+            branch = strip_around(stripped, self.name, self.split)[0]
+            return ((
+                add_prefix(branch[0], 'neg', '~') if self.comp1 else sentence,
+                add_prefix(branch[1], 'neg', '~') if self.comp2 else sentence
+            ),)
+            
+    def _naive(self, branch: list[Sentence], context: dict[str, tp.Any]) -> tp.Union[None, SentenceTupleStructure]:
+        
+        # Sentence getting
+        tokenID = context['tokenID']
+        sentence = branch[context['sentenceID']] 
+        if sentence[tokenID].startswith('sentvar'):
+            raise FormalError("You can't divide a sentence by a variable")
+        
+        # Sentence negating
+        stripped = sentence if self.whole else reduce_prefix(sentence, 'neg', '~')
+        if stripped is None:
+            raise FormalError("You can't reduce a negation if it doesn't exist")
+        tokenID = tokenID - int(not self.whole)
+        
+        # Sentence splitting
+        if self.split:
+            branch1, branch2 = stripped.splitByIndex(tokenID)
+            return (
+                (add_prefix(branch1, 'neg', '~') if self.comp1 else sentence,),
+                (add_prefix(branch2, 'neg', '~') if self.comp2 else sentence,)
+            )
+        else:
+            branch = stripped.splitByIndex(tokenID)
+            return ((
+                add_prefix(branch[0], 'neg', '~') if self.comp1 else sentence,
+                add_prefix(branch[1], 'neg', '~') if self.comp2 else sentence
+            ),)

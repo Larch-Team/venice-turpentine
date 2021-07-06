@@ -24,7 +24,7 @@ class ProofNodeError(Exception):
         super().__init__(msg, *args, **kwargs)
 
 
-class ProofElement(object):
+class ProofBase(object):
     """Klasa macierzysta dla ProofNode implementująca wszystkie czysto dowodowe elementy"""
 
 
@@ -72,7 +72,7 @@ class ProofElement(object):
 
 
 
-class ProofNode(ProofElement, NodeMixin):
+class ProofNode(ProofBase, NodeMixin):
     """Reprezentacja pojedynczego zdania w drzewie"""
 
     def __init__(self, sentence: Sentence, branch_name: str, layer: int = 0, history: History = None, parent: ProofNode = None, children: tp.Iterable[ProofNode] = []):

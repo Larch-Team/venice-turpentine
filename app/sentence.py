@@ -88,7 +88,6 @@ class Sentence(list):
         right = opened_left-opened_right-min_left
         return Sentence(-min_left*["("] + reduced + right*[")"], self.S, new_baked)
 
-
     @staticmethod
     def static_calcPrecedenceVal(connective: str, precedence: dict[str, int], lvl: int = 0, prec_div: int = None) -> float:
         if prec_div is not None:
@@ -111,19 +110,23 @@ class Sentence(list):
         return self.static_calcPrecedenceVal(connective, precedence, lvl, prec_div)
         
 
-    def readPrecedence(self) -> dict[int, float]:
+    def readPrecedence(self, precedence: dict[str, int] = None) -> dict[int, float]:
         """
         Oblicza, bądź zwraca informacje o sile spójników w danym zdaniu. *Powinno być przywołane przed dowolnym użyciem precedenceBaked*
+        W testach używać można argument opcjonalny, aby nie odwoływać się do 
 
+        :param precedence: Siła wiązania spójników (podane same typy) - im wyższa wartość, tym mocniej wiąże, optional
+        :type precedence: dict[str, int]
         :return: Indeksy spójników oraz siła wiązania - im wyższa wartość, tym mocniej wiąże
         :rtype: dict[str, float]
         """
-        if self.precedenceBaked and self._pluggedFS == self.S.config['chosen_plugins']['Formal']:
-            return self.precedenceBaked
-        self._pluggedFS = self.S.config['chosen_plugins']['Formal']
+        if precedence is None:
+            if self.precedenceBaked and self._pluggedFS == self.S.config['chosen_plugins']['Formal']:
+                return self.precedenceBaked
+            self._pluggedFS = self.S.config['chosen_plugins']['Formal']
+            precedence = self.getPrecedence()
 
         self.precedenceBaked = {}
-        precedence = self.getPrecedence()
 
         lvl = 0
         prec_div = max(precedence.values())+1
@@ -148,24 +151,40 @@ class Sentence(list):
         return left, right
 
 
-    def getMainConnective(self, precedence: dict[str, int]) -> tuple[str, tuple[_Sentence, _Sentence]]:
+    def getMainConnective(self, precedence: dict[str, int] = None) -> tuple[str, tuple[_Sentence, _Sentence]]:
         """
         Na podstawie kolejności wykonywania działań wyznacza najwyżej położony spójnik.
         Zwraca None gdy nie udało się znaleźć spójnika
 
-        :param precedence: Siła wiązania spójników (podane same typy) - im wyższa wartość, tym mocniej wiąże
+        :param precedence: Siła wiązania spójników (podane same typy) - im wyższa wartość, tym mocniej wiąże, optional
         :type precedence: dict[str, int]
         :return: Główny spójnik oraz powstałe zdania; None jeśli dane zdanie nie istnieje
         :rtype: tuple[str, tuple[_Sentence, _Sentence]]
         """
         sentence = self.reduceBrackets()
-        prec = sentence.readPrecedence()
+        prec = sentence.readPrecedence(precedence)
 
         if len(prec)==0:
             return None, None
         con_index = self.getLowest(prec)
         return sentence[con_index], sentence._split(con_index)
-                
+    
+    
+    def splitByIndex(self, index: int):
+        return self[:index].reduceBrackets(), self[index+1:].reduceBrackets()
+
+
+    def getNonNegated(self) -> _Sentence:
+        """
+        Zwracane zdanie jest konceptualnie podobne do literału, ale rozszerzone na całe zdanie. W skrócie redukowane są wszystkie negacje obejmujące całe zdanie
+        """
+        conn, new = self.getMainConnective()
+        if not conn or not conn.startswith('neg'):
+            return self
+
+        while conn.startswith('neg'):
+            conn, new = new[0].getMainConnective()
+        return new[0]
 
     # Overwriting list methods
 
