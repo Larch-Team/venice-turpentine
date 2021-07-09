@@ -49,7 +49,7 @@ def Modifier(func):
             result = func(sentence[:], *args, **kwargs)
             return transform_to_sentences(result, sentence.S)
         else:
-            raise TypeError("Modifier is not a sentence nor a tuple")
+            raise TypeError("Modifier was given nor a sentence nor a tuple")
 
     return wrapper
 
@@ -250,7 +250,7 @@ def reduce_prefix(sentence: Sentence, prefix_type: str) -> Sentence:
         return None
 
     middle, subsents = sentence.getMainConnective()
-    if middle is None or middle.split('_')[0] != prefix_type:
+    if middle is None or not middle.startswith(prefix_type):
         return None
     
     _, right = subsents
@@ -376,21 +376,21 @@ class Smullyan(Rule):
     def _strict(self, sentence: Sentence) -> tp.Union[None, SentenceTupleStructure]:
         """Służy do wywoływania reguły, zwraca strukturę krotek"""
         
-        stripped = sentence if self.whole else reduce_prefix(sentence, 'neg', '~')
+        stripped = sentence if self.whole else reduce_prefix(sentence, 'not', '~')
 
         if self.comp1 and self.comp2:
             return strip_around(stripped, self.main, self.split)
         if self.split:
             branch1, branch2 = strip_around(stripped, self.main, self.split)
             return (
-                (add_prefix(branch1[0], 'neg', '~') if self.comp1 else branch1[0],),
-                (add_prefix(branch2[0], 'neg', '~') if self.comp2 else branch2[0],)
+                (add_prefix(branch1[0], 'not', '~') if self.comp1 else branch1[0],),
+                (add_prefix(branch2[0], 'not', '~') if self.comp2 else branch2[0],)
             )
         else:
             branch = strip_around(stripped, self.main, self.split)[0]
             return ((
-                add_prefix(branch[0], 'neg', '~') if self.comp1 else branch[0],
-                add_prefix(branch[1], 'neg', '~') if self.comp2 else branch[1]
+                add_prefix(branch[0], 'not', '~') if self.comp1 else branch[0],
+                add_prefix(branch[1], 'not', '~') if self.comp2 else branch[1]
             ),)
             
     def _naive(self, branch: list[Sentence], sentenceID: SentenceID, tokenID: TokenID) -> tp.Union[None, SentenceTupleStructure]:
@@ -401,23 +401,25 @@ class Smullyan(Rule):
         sentence = branch[sentenceID] 
         if sentence[tokenID].startswith('sentvar'):
             raise FormalError("You can't divide a sentence by a variable")
+        elif sentence[tokenID] in '()':
+            raise FormalError("You can't divide a sentence by a parenthesis")
         
         # Sentence negating
-        stripped = sentence if self.whole else reduce_prefix(sentence, 'neg', '~')
+        stripped = sentence if self.whole else reduce_prefix(sentence, 'not')
         if stripped is None:
             raise FormalError("You can't reduce a negation if it doesn't exist")
-        tokenID = tokenID - int(not self.whole)
+        tokenID = tokenID - (len(sentence)+1-len(stripped))//2
         
         # Sentence splitting
         if self.split:
             branch1, branch2 = stripped.splitByIndex(tokenID)
             return (
-                (add_prefix(branch1[0], 'neg', '~') if self.comp1 else branch1[0],),
-                (add_prefix(branch2[0], 'neg', '~') if self.comp2 else branch2[0],)
+                (branch1 if self.comp1 else add_prefix(branch1, 'not', '~'),),
+                (branch2 if self.comp2 else add_prefix(branch2, 'not', '~'),)
             )
         else:
             branch = stripped.splitByIndex(tokenID)
             return ((
-                add_prefix(branch[0], 'neg', '~') if self.comp1 else branch[0],
-                add_prefix(branch[1], 'neg', '~') if self.comp2 else branch[1]
+                branch[0] if self.comp1 else add_prefix(branch[0], 'not', '~'),
+                branch[1] if self.comp2 else add_prefix(branch[1], 'not', '~')
             ),)

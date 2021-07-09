@@ -1,15 +1,15 @@
 from dataclasses import asdict, dataclass, field
-
-from proof import BranchCentric
+from typing import NewType
 from sentence import Sentence
 
+_BranchCentric = NewType('_BranchCentric', object)
 
 @dataclass(init=True, repr=True)
 class UsedRule(object):
     layer: int
     branch: str
     rule: str
-    _proof: BranchCentric
+    _proof: _BranchCentric
     context: dict = field(default_factory=dict)
     decisions: dict = field(default_factory=dict)
 

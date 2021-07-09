@@ -302,13 +302,16 @@ def do_use(session: engine.Session, command) -> str:
     return "\n".join(out)
 
 
-def do_undo(session: engine.Session, amount: int):
+def do_undo(session: engine.Session, amount: int) -> str:
     """Undos last [arg] actions"""
-    rules = session.undo(amount)
-    return "\n".join(f'Undid rule: {i.rule}' for i in rules)
+    try:
+        rules = session.undo(amount)
+        return "\n".join(f'Undid rule: {i.rule}' for i in rules)
+    except engine.EngineError as e:
+        return str(e)
 
 
-def do_contra(session: engine.Session, branch: str):
+def do_contra(session: engine.Session, branch: str) -> str:
     """Detects contradictions and handles them by closing their branches"""
     cont = session.deal_closure(branch)
     if cont:

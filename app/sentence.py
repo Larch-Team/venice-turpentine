@@ -54,6 +54,7 @@ class Sentence(list):
 
     def reduceBrackets(self) -> _Sentence:
         """Minimalizuje nawiasy w zdaniu; zakłada poprawność ich rozmieszczenia"""
+        # TODO: Redukcja nawiasów w *całości* zdania
 
         if len(self)<2:
             return self[:]
@@ -179,10 +180,10 @@ class Sentence(list):
         Zwracane zdanie jest konceptualnie podobne do literału, ale rozszerzone na całe zdanie. W skrócie redukowane są wszystkie negacje obejmujące całe zdanie
         """
         conn, new = self.getMainConnective()
-        if not conn or not conn.startswith('neg'):
+        if not conn or not conn.startswith('not'):
             return self
 
-        while conn.startswith('neg'):
+        while conn.startswith('not'):
             conn, new = new[0].getMainConnective()
         return new[0]
 

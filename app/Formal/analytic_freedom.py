@@ -13,10 +13,10 @@ SOCKET = 'Formal'
 VERSION = '0.2.0'
 
 PRECEDENCE = {
-    'and':3,
-    'or':3,
-    'imp':2,
-    'not':4
+    'and': 3,
+    'or': 3,
+    'imp': 2,
+    'not': 4
 }
 
 
@@ -30,7 +30,7 @@ def prepare_for_proving(statement: utils.Sentence) -> utils.Sentence:
     return utils.add_prefix(statement, 'not', "~")
 
 
-### SYNTAX CHECKING
+# SYNTAX CHECKING
 
 def synchk_transcribe(sentence):
     s = []
@@ -64,7 +64,8 @@ def reduce_(sentence):
     while prev_sentence != sentence:
         prev_sentence = sentence
         for to_replace in ('1s', 's2s', '(s)'):
-            sentence, indexes = special_replace(sentence, to_replace, "s", indexes)
+            sentence, indexes = special_replace(
+                sentence, to_replace, "s", indexes)
     return sentence, indexes
 
 
@@ -112,79 +113,81 @@ def check_syntax(sentence: utils.Sentence) -> tp.Union[str, None]:
     raise Exception('Zdanie nie jest poprawne')
 
 
-### RULES
+# RULES
 
-RULES = {}
-RULES |= {
+RULES = {
     'double not': utils.Rule(
         name='double not',
         symbolic="~~A / A",
         docs="Usuwanie podwójnej negacji. Wymaga wskazania zdania w gałęzi.",
-        reusable=False,
-        children=(RULES['true and'])
+        reusable=False
     ),
     'true and': utils.Smullyan(
         name='true and',
         symbolic="A and B / A; B",
-        docs="Rozkładanie prawdziwej koniunkcji. Wymaga wskazania zdania w gałęzi oraz rozkładanej koniunkcji.",
-        reusable=False,
-        children=(RULES['false or'])
+        docs="Rozkładanie prawdziwej koniunkcji. Wymaga wskazania zdania w gałęzi oraz rozkładanego spójnika.",
+        reusable=False
     ),
     'false or': utils.Smullyan(
         name='false or',
         symbolic="~(A or B) / ~A; ~B",
-        docs="Rozkładanie fałszywej alternatywy. Wymaga wskazania zdania w gałęzi.",
-        reusable=False,
-        children=(RULES['false imp'])
+        docs="Rozkładanie fałszywej alternatywy. Wymaga wskazania zdania w gałęzi oraz rozkładanego spójnika.",
+        reusable=False
     ),
     'false imp': utils.Smullyan(
         name='false imp',
         symbolic="~(A -> B) / A; ~B",
-        docs="Rozkładanie fałszywej implikacji. Wymaga wskazania zdania w gałęzi.",
-        reusable=False,
-        children=(RULES['true or'])
+        docs="Rozkładanie fałszywej implikacji. Wymaga wskazania zdania w gałęzi oraz rozkładanego spójnika.",
+        reusable=False
     ),
     'true or': utils.Smullyan(
         name='true or',
         symbolic="(A or B) / A | B",
-        docs="Rozkładanie prawdziwej alternatywy. Wymaga wskazania zdania w gałęzi.",
-        reusable=False,
-        children=(RULES['false and'])
+        docs="Rozkładanie prawdziwej alternatywy. Wymaga wskazania zdania w gałęzi oraz rozkładanego spójnika.",
+        reusable=False
     ),
     'false and': utils.Smullyan(
         name='false and',
         symbolic="~(A and B) / ~A | ~B",
-        docs="Rozkładanie fałszywej koniunkcji. Wymaga wskazania zdania w gałęzi.",
-        reusable=False,
-        children=(RULES['true imp'])
+        docs="Rozkładanie fałszywej koniunkcji. Wymaga wskazania zdania w gałęzi oraz rozkładanego spójnika.",
+        reusable=False
     ),
     'true imp': utils.Smullyan(
         name='true imp',
         symbolic="(A -> B) / ~A | B",
-        docs="Rozkładanie prawdziwej implikacji. Wymaga wskazania zdania w gałęzi.",
+        docs="Rozkładanie prawdziwej implikacji. Wymaga wskazania zdania w gałęzi oraz rozkładanego spójnika.",
         reusable=False
     )
 }
 
 double_not = RULES['double not']
 
+RULES['double not'].children = (RULES['true and'],)
+RULES['true and'].children = (RULES['false or'],)
+RULES['false or'].children = (RULES['false imp'],)
+RULES['false imp'].children = (RULES['true or'],)
+RULES['true or'].children = (RULES['false and'],)
+RULES['false and'].children = (RULES['true imp'],)
+
+
 @double_not.setStrict
 def strict_doublenot(sentence: Sentence):
-    return utils.reduce_prefix(utils.reduce_prefix(sentence, 'neg'), 'neg')
+    return utils.reduce_prefix(utils.reduce_prefix(sentence, 'not'), 'not')
+
 
 @double_not.setNaive
-def naive_doublenot(branch: list[Sentence], sentID: SentenceID):
-    return utils.reduce_prefix(utils.reduce_prefix(branch[sentID], 'neg'), 'neg')
+def naive_doublenot(branch: list[Sentence], sentenceID: SentenceID):
+    return utils.reduce_prefix(utils.reduce_prefix(utils.empty_creator(branch[sentenceID]), 'not'), 'not')
 
 
-### CHECKER
+# CHECKER
 
 
 # def checker(rule: UsedRule, conclusion: Sentence) -> bool:
 #     # sourcery skip: merge-duplicate-blocks
 #     premiss = rule.get_premisses()[0]
 #     connective, use_result = premiss.getMainConnective()
-#     if connective.startswith('neg'):
+#     if connective.startswith('not'):
 #         # zastosowanie reguły dla prawdziwości na zanegowanej formule
 #         if rule.rule.startswith('true'):
 #             return False
@@ -206,19 +209,19 @@ def checker(rule: UsedRule, conclusion: Sentence) -> bool:
     Na podstawie informacji o użytych regułach i podanym wyniku zwraca wartość prawda/fałsz informującą o wyprowadzalności wniosku z reguły.
     Konceptualnie przypomina zbiory Hintikki bez reguły o niesprzeczności.
     """
-    premiss = rule.get_premisses()[0] # Istnieje tylko jedna
+    premiss = rule.get_premisses()[0]  # Istnieje tylko jedna
     entailed = RULES[rule.rule].strict(premiss)
     return conclusion in sum(entailed, [])
 
 
-### SOLVER
+# SOLVER
 
 
 def solver(proof: Proof) -> list[str]:
     pass
 
 
-### INNE
+# INNE
 
 
 def check_closure(branch: list[utils.Sentence], used: set[tuple[str]]) -> tp.Union[None, tuple[utils.close.Close, str]]:
@@ -232,8 +235,8 @@ def check_closure(branch: list[utils.Sentence], used: set[tuple[str]]) -> tp.Uni
             else:
                 continue
 
-            if utils.reduce_prefix(negated, 'not', PRECEDENCE) == statement:
-                return utils.close.Contradiction(sentenceID1 = num1+1, sentenceID2 = num2+1), "Sentences contradict. The branch was closed."
+            if utils.reduce_prefix(negated, 'not') == statement:
+                return utils.close.Contradiction(sentenceID1=num1+1, sentenceID2=num2+1), "Sentences contradict. The branch was closed."
 
     return None
 
@@ -244,7 +247,7 @@ def get_used_types() -> tuple[str]:
 
 def get_rules_docs() -> dict[str, str]:
     """Zwraca reguły rachunku z opisem"""
-    return {rule.name:rule.__doc__ for rule in RULES.values()}
+    return {rule.name: rule.__doc__ for rule in RULES.values()}
 
 
 def get_needed_context(rule_name: str) -> tuple[utils.ContextDef]:
@@ -252,7 +255,7 @@ def get_needed_context(rule_name: str) -> tuple[utils.ContextDef]:
     return RULES[rule_name].context
 
 
-def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, context: dict[str, tp.Any], decisions: dict[str, tp.Any]) -> tuple[utils.SentenceTupleStructure, utils.HistoryTupleStructure, dict[str, tp.Any]]:  
+def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, context: dict[str, tp.Any], decisions: dict[str, tp.Any]) -> tuple[utils.SentenceTupleStructure, utils.HistoryTupleStructure, dict[str, tp.Any]]:
     """
     Używa określonej reguły na podanej gałęzi.
     Więcej: https://www.notion.so/szymanski/Gniazda-w-Larchu-637a500c36304ee28d3abe11297bfdb2#98e96d34d3c54077834bc0384020ff38
@@ -280,11 +283,13 @@ def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, conte
         raise utils.FormalError("No such sentence")
     sentence = branch[sentenceID]
 
-    if not rule.reusable and sentence in used: # Used sentence filtering
-        raise utils.FormalError("This sentence was already used in a non-reusable rule")
+    if not rule.reusable and sentence in used:  # Used sentence filtering
+        raise utils.FormalError(
+            "This sentence was already used in a non-reusable rule")
 
     # Rule usage
-    important_context = {i:j for i,j in context.items() if i in {i.variable for i in rule.context}}
+    important_context = {i: j for i, j in context.items() if i in {
+        i.variable for i in rule.context}}
     fin = rule.naive(branch, **important_context)
     if fin:
         return fin, len(fin)*([[0]] if rule.reusable else [[sentence]]), None

@@ -8,12 +8,13 @@ from exceptions import EngineError, FormalError
 from usedrule import UsedRule
 
 class Proof(object):
+    START_BRANCH = 'Green'
 
-    def __init__(self, sentence: Sentence, name_seed: int = None) -> None:
+    def __init__(self, sentence: Sentence, config: dict = None, name_seed: int = None) -> None:
         super().__init__()
         self.S = sentence.S # Session
-        self.config = self.S.get_config()
-        self.nodes = ProofNode(sentence, 'Green')
+        self.config = config or self.S.get_config()
+        self.nodes = ProofNode(sentence, self.START_BRANCH)
         self.metadata = dict(
             usedrules = [],
             decision_points = []
@@ -103,7 +104,7 @@ class BranchCentric(Proof):
 
     def __init__(self, sentence: Sentence, config: dict, name_seed: int = None) -> None:
         super().__init__(sentence, config, name_seed=name_seed)
-        self.branch = 'Green'
+        self.branch = self.START_BRANCH
 
     def append(self, sentences: Iterable[tuple[Sentence]]) -> int:
         return super().append(sentences, self.branch)

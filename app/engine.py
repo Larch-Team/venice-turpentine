@@ -9,10 +9,8 @@ from anytree import node
 
 import pop_engine as pop
 from proof import BranchCentric, Proof
-from context_definition import ContextDef
+from rule import ContextDef
 from sentence import Sentence
-from tree import ProofNode
-from close import Close
 from usedrule import *
 from exceptions import EngineError
 
@@ -57,10 +55,10 @@ TYPE_LEXICON = {
 }
 
 def contextdef_translate(contextdef: ContextDef):
-    if isinstance(type_, str):
-        return TYPE_LEXICON[type_]
+    if isinstance(contextdef, str):
+        return TYPE_LEXICON[contextdef]
     else:
-        return type_
+        return contextdef
 
 # Session
 
@@ -71,8 +69,11 @@ class Session(object):
     Wszystkie wyjątki określane jako `EngineError` mają wbudowany string w formie "dostępnej dla użytkownika"
     """
     ENGINE_VERSION = '0.0.1'
-    SOCKETS = ('Application', 'Assistant', 'Formal', 'Lexicon', 'Output')
-    SOCKETS_NOT_IN_CONFIG = ('Application')
+    SOCKETS = {'Assistant': '0.0.1', 
+               'Formal': '0.2.0', 
+               'Lexicon': '0.0.1',
+               'Output': '0.0.1'}
+    SOCKETS_NOT_IN_CONFIG = ()
 
     def __init__(self, session_ID: str, config_file: str):
         """Obekty sesji stanowią pojedyncze instancje działającego silnika.
@@ -85,10 +86,10 @@ class Session(object):
         self.id = session_ID
         self.config_name = config_file
         self.read_config()
-        self.sockets = {name: pop.Socket(name, os.path.abspath(name), self.ENGINE_VERSION, '__template__.py',
-                                         self.config['chosen_plugins'].get(name, None)) for name in self.SOCKETS}
+        self.sockets = {name: pop.Socket(name, os.path.abspath(name), version, '__template__.py',
+                                         self.config['chosen_plugins'].get(name, None)) for name, version in self.SOCKETS.items()}
         self.sockets["UserInterface"] = pop.DummySocket("UserInterface", os.path.abspath(
-            "UserInterface"), self.ENGINE_VERSION, '__template__.py')
+            "UserInterface"), '0.0.1', '__template__.py')
 
         self.defined = {}
         self.proof = None
@@ -289,11 +290,19 @@ class Session(object):
         if not self.proof:
             raise EngineError(
                 "There is no proof started")
+        if len(self.proof.metadata['usedrules'])<2:
+            raise EngineError("Nothing to undo")
 
-        rules = [self.metadata['usedrules'].pop() for _ in range(actions_amount)]
+        rules = [self.proof.metadata['usedrules'].pop() for _ in range(actions_amount)]
         min_layer = min((r.layer for r in rules))
         self.proof.nodes.pop(min_layer)
-
+        
+        # Poprawianie gałęzi
+        if self.proof.metadata['usedrules']:
+            self.proof.branch = self.proof.metadata['usedrules'][-1].branch
+        else:
+            self.proof.branch = self.proof.START_BRANCH
+        
         return rules
 
 
@@ -308,7 +317,7 @@ class Session(object):
         except KeyError:
             raise EngineError(
                 f"Branch '{self.branch}' doesn't exist in this proof")
-        except AttributeError:
+        except AttributeError as e:
             raise EngineError("There is no proof started")
         reader = lambda x: self.acc('Output').get_readable(x, self.acc('Lexicon').get_lexem)
         if closed:

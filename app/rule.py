@@ -56,7 +56,7 @@ class RuleBase(object):
             self.context = []
             params = signature(func).parameters
             for i in params.values():
-                if hasattr(i.annotation, 'name_official'):
+                if hasattr(i.annotation, 'official'):
                     self.context.append(ContextDef(
                         variable = i.annotation.__name__,
                         official = i.annotation.official,
@@ -80,4 +80,4 @@ class Rule(RuleBase, NodeMixin):
     def __init__(self, name: str, symbolic: str, docs: str, reusable: bool, context: Iterable[ContextDef] = None, parent: _Rule = None, children: Iterable[_Rule] = []) -> None:
         super().__init__(name, symbolic, docs, reusable, context)
         self.parent = parent
-        self.children = children
+        self.children = children or []
