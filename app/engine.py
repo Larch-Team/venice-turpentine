@@ -9,6 +9,7 @@ from anytree import node
 
 import pop_engine as pop
 from proof import BranchCentric, Proof
+from context_definition import ContextDef
 from sentence import Sentence
 from tree import ProofNode
 from close import Close
@@ -51,10 +52,11 @@ def DealWithPOP(func):
 # Input type handling
 
 TYPE_LEXICON = {
-    'sentenceID':int
+    'sentenceID':int,
+    'tokenID':int
 }
 
-def type_translator(type_):
+def contextdef_translate(contextdef: ContextDef):
     if isinstance(type_, str):
         return TYPE_LEXICON[type_]
     else:
@@ -271,7 +273,7 @@ class Session(object):
         if not self.proof:
             raise EngineError(
                 "There is no proof started")
-        if rule not in self.acc('Formal').get_rules().keys():
+        if rule not in self.acc('Formal').get_rules_docs().keys():
             raise EngineError("No such rule")
 
         # Context checking
@@ -327,7 +329,7 @@ class Session(object):
     @DealWithPOP
     def getrules(self) -> dict[str, str]:
         """Zwraca nazwy reguł wraz z dokumentacją"""
-        return self.acc('Formal').get_rules()
+        return self.acc('Formal').get_rules_docs()
 
 
     @DealWithPOP

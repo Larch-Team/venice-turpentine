@@ -266,7 +266,7 @@ def do_use(session: engine.Session, command) -> str:
         if i == len(c_values):
             return "More arguments needed: {}".format(", ".join((i.official for i in context_info[i:])))
 
-        vartype = engine.type_translator(c.type_)
+        vartype = engine.contextdef_translate(c.type_)
         try:
             new = vartype(c_values[i])
         except ValueError:
@@ -349,7 +349,7 @@ def do_next(session: engine.Session):
         return str(e)
 
 
-def do_get_rules(session):
+def do_get_rules_docs(session):
     """Returns all of the rules that can be used in this proof system"""
     try:
         return "\n\n".join(("\n---\n".join(i) for i in session.getrules().items()))
@@ -370,7 +370,7 @@ def do_debug_get_methods(session: engine.Session) -> str:
 command_dict = OrderedDict({
     # Navigation
     'exit': {'comm': do_exit, 'args': []},
-    'get rules': {'comm': do_get_rules, 'args': []},
+    'get rules': {'comm': do_get_rules_docs, 'args': []},
     'get tree': {'comm': do_get_tree, 'args': []},
     'jump': {'comm': do_jump, 'args': [str]},
     'next': {'comm': do_next, 'args': []},

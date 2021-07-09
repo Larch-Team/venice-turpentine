@@ -4,12 +4,7 @@ import close
 from history import History
 from sentence import Sentence
 from exceptions import FormalError
-from rule import Rule
-
-Rule = namedtuple('Rule', ('symbolic', 'docs', 'func', 'context', 'reusable'))
-
-ContextDef = namedtuple(
-    'ContextDef', ('variable', 'official', 'docs', 'type_'))
+from rule import Rule, ParameterContext, SentenceID, TokenID, ContextDef
 
 SentenceTupleStructure = tp.NewType('SentenceTupleStructure', tuple[tuple[Sentence]])
 HistoryTupleStructure = tp.NewType('HistoryTupleStructure', tuple[tuple[tp.Union[Sentence, int, tp.Callable]]])
@@ -366,16 +361,16 @@ class Smullyan(Rule):
 
     TABLE = CONJUNCTIVE | DISJUNCTIVE
 
-    def __init__(self, name: str, symbolic: str, docs: str, context: tp.Iterable[ContextDef], parent: Rule, children: tp.Iterable[Rule]) -> None:
+    def __init__(self, name: str, symbolic: str, docs: str, reusable: bool, context: tp.Iterable[ContextDef] = None, parent: Rule = None, children: tp.Iterable[Rule] = None) -> None:
         """Generuje regułę według tabel Smullyanowskich"""
         assert name in self.TABLE, "Reguła nie została zdefiniowana"
-        super().__init__(name, symbolic, docs, context, parent=parent, children=children)
+        super().__init__(name, symbolic, docs, reusable, context, parent=parent, children=children)
 
         self.comp1, self.comp2, self.whole = self.TABLE[name]
         self.split = name in self.DISJUNCTIVE
-        self.name = name.split(' ')[1]
-        self.strict = self._strict
-        self.naive = self._naive
+        self.main = name.split(' ')[1]
+        self.setStrict(self._strict)
+        self.setNaive(self._naive)
 
 
     def _strict(self, sentence: Sentence) -> tp.Union[None, SentenceTupleStructure]:
@@ -384,25 +379,26 @@ class Smullyan(Rule):
         stripped = sentence if self.whole else reduce_prefix(sentence, 'neg', '~')
 
         if self.comp1 and self.comp2:
-            return strip_around(stripped, self.name, self.split)
+            return strip_around(stripped, self.main, self.split)
         if self.split:
-            branch1, branch2 = strip_around(stripped, self.name, self.split)
+            branch1, branch2 = strip_around(stripped, self.main, self.split)
             return (
                 (add_prefix(branch1[0], 'neg', '~') if self.comp1 else branch1[0],),
                 (add_prefix(branch2[0], 'neg', '~') if self.comp2 else branch2[0],)
             )
         else:
-            branch = strip_around(stripped, self.name, self.split)[0]
+            branch = strip_around(stripped, self.main, self.split)[0]
             return ((
                 add_prefix(branch[0], 'neg', '~') if self.comp1 else branch[0],
                 add_prefix(branch[1], 'neg', '~') if self.comp2 else branch[1]
             ),)
             
-    def _naive(self, branch: list[Sentence], context: dict[str, tp.Any]) -> tp.Union[None, SentenceTupleStructure]:
+    def _naive(self, branch: list[Sentence], sentenceID: SentenceID, tokenID: TokenID) -> tp.Union[None, SentenceTupleStructure]:
         
         # Sentence getting
-        tokenID = context['tokenID']
-        sentence = branch[context['sentenceID']] 
+        if sentenceID < 0 or sentenceID >= len(branch):
+            raise FormalError("No such sentence")
+        sentence = branch[sentenceID] 
         if sentence[tokenID].startswith('sentvar'):
             raise FormalError("You can't divide a sentence by a variable")
         

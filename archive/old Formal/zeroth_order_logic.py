@@ -184,7 +184,7 @@ def check_syntax(sentence: utils.Sentence) -> tp.Union[str, None]:
             return f'Spójnik dwuargumentowy na pozycji {indexes[er]+1} nie ma lewego argumentu'
     raise Exception('Zdanie nie jest poprawne')
 
-def get_rules() -> dict[str, str]:
+def get_rules_docs() -> dict[str, str]:
     """Zwraca reguły rachunku z opisem"""
     return {
         name: "\n".join((rule.symbolic, rule.docs))
@@ -201,7 +201,7 @@ def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, conte
     Używa określonej reguły na podanej gałęzi.
     Więcej: https://www.notion.so/szymanski/Gniazda-w-Larchu-637a500c36304ee28d3abe11297bfdb2#98e96d34d3c54077834bc0384020ff38
 
-    :param name: Nazwa używanej reguły, listę można uzyskać z pomocą Formal.get_rules()
+    :param name: Nazwa używanej reguły, listę można uzyskać z pomocą Formal.get_rules_docs()
     :type name: str
     :param branch: Lista zdań w gałęzi, na której została użyta reguła
     :type branch: list[utils.Sentence]
@@ -231,7 +231,7 @@ def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, conte
         raise utils.FormalError("This sentence was already used in a non-reusable rule")
 
     # Rule usage
-    fin = rule.func(tokenized_statement)
+    fin = rule.naive(tokenized_statement, **context)
     if fin:
         # 
         return fin, len(fin)*([[0]] if rule.reusable else [[tokenized_statement]]), None
