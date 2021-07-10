@@ -1,9 +1,5 @@
-import unittest as test
-from importlib import import_module
-import os
 import sys
-import anytree
-from pprint import pprint
+
 from multiprocessing import Pool
 sys.path.append('../app')
 from UserInterface import CLI as c

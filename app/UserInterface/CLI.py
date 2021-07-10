@@ -227,18 +227,6 @@ def do_prove(session: engine.Session, sentence: str) -> str:
     else:
         return "Sentence tokenized successfully \nProof initialized"
 
-
-def do_auto(session: engine.Session):
-    """Not reliable, do not use yet"""
-    try:
-        out = session.auto()
-    except engine.EngineError as e:
-        return str(e)
-    if out:
-        return "\n".join(out)
-    else:
-        return "Nothing more can be done"
-
 def do_use(session: engine.Session, command) -> str:
     """Uses a rule in the proof
 
@@ -374,7 +362,6 @@ command_dict = OrderedDict({
     'use': {'comm': do_use, 'args': 'multiple_strings'},
     'leave': {'comm': do_leave, 'args': []},
     'prove': {'comm': do_prove, 'args': 'multiple_strings'},
-    'auto': {'comm': do_auto, 'args': []},
     # Program interaction
     'plugin switch': {'comm': do_plug_switch, 'args': [str, str]},
     'plugin list all': {'comm': do_plug_list_all, 'args': []},
