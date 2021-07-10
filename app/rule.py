@@ -1,7 +1,6 @@
 from collections import namedtuple
-from typing import NewType, Type
-from typing import Any, Callable, Iterable, NewType
 from inspect import signature
+from typing import Callable, Iterable, NewType, Type
 
 from anytree.node.nodemixin import NodeMixin
 

@@ -5,14 +5,12 @@ import logging
 import os
 import typing as tp
 
-from anytree import node
-
 import pop_engine as pop
-from proof import BranchCentric, Proof
+from exceptions import EngineError
+from proof import BranchCentric
 from rule import ContextDef
 from sentence import Sentence
 from usedrule import *
-from exceptions import EngineError
 
 Module = pop.Module
 
@@ -305,6 +303,12 @@ class Session(object):
         
         return rules
 
+
+    def check(self) -> tuple[str]:
+        if not self.is_closed():
+            return ("Nie możesz sprawdzić nieskończonego dowodu")
+
+        
 
     # Proof navigation
 

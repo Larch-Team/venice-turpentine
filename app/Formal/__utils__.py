@@ -5,9 +5,7 @@ from history import History
 from sentence import Sentence
 from exceptions import FormalError
 from rule import Rule, ParameterContext, SentenceID, TokenID, ContextDef
-
-SentenceTupleStructure = tp.NewType('SentenceTupleStructure', tuple[tuple[Sentence]])
-HistoryTupleStructure = tp.NewType('HistoryTupleStructure', tuple[tuple[tp.Union[Sentence, int, tp.Callable]]])
+from tree import HistoryTupleStructure, SentenceTupleStructure
 
 
 # Rule decorators
@@ -218,7 +216,7 @@ def strip_around(sentence: Sentence, border_type: str, split: bool) -> tuple[tup
     if not sentence or len(sentence)==1:
         return None
 
-    middle, subsents = sentence.getMainConnective()
+    middle, subsents = sentence.getComponents()
     if middle is None or middle.split('_')[0] != border_type:
         return None
     
@@ -249,7 +247,7 @@ def reduce_prefix(sentence: Sentence, prefix_type: str) -> Sentence:
     if not sentence or len(sentence)==1:
         return None
 
-    middle, subsents = sentence.getMainConnective()
+    middle, subsents = sentence.getComponents()
     if middle is None or not middle.startswith(prefix_type):
         return None
     
@@ -353,7 +351,7 @@ class Smullyan(Rule):
     DISJUNCTIVE = {
         'false and':     [False, False,  False],
         'true or':       [True,  True,   True],
-        'true imp':      [False, True,   False],
+        'true imp':      [False, True,   True],
         'false revimp':  [True,  False,  False],
         'true nand':     [False, False,  True],
         'false nor':     [True,  True,   False],
@@ -401,6 +399,8 @@ class Smullyan(Rule):
         sentence = branch[sentenceID] 
         if sentence[tokenID].startswith('sentvar'):
             raise FormalError("You can't divide a sentence by a variable")
+        elif sentence[tokenID].startswith('not'):
+            raise FormalError("You can't divide a sentence by a negation")
         elif sentence[tokenID] in '()':
             raise FormalError("You can't divide a sentence by a parenthesis")
         

@@ -3,6 +3,7 @@ Tutaj umieść dokumentację swojego pluginu
 """
 import typing as tp
 import Formal.__utils__ as utils
+from history import History
 from proof import Proof
 from sentence import Sentence
 from usedrule import UsedRule
@@ -21,7 +22,7 @@ def prepare_for_proving(statement: utils.Sentence) -> utils.Sentence:
     pass
 
 
-def check_closure(branch: list[utils.Sentence], used: set[tuple[str]]) -> tp.Union[None, tuple[utils.close.Close, str]]:
+def check_closure(branch: list[utils.Sentence], used: History) -> tp.Union[None, tuple[utils.close.Close, str]]:
     """Sprawdza możliwość zamknięcia gałęzi, zwraca obiekty zamknięcia oraz komunikat do wyświetlenia"""
     pass
 

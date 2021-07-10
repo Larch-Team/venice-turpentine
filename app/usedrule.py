@@ -1,5 +1,6 @@
 from dataclasses import asdict, dataclass, field
 from typing import NewType
+
 from sentence import Sentence
 
 _BranchCentric = NewType('_BranchCentric', object)
@@ -12,6 +13,7 @@ class UsedRule(object):
     _proof: _BranchCentric
     context: dict = field(default_factory=dict)
     decisions: dict = field(default_factory=dict)
+    auto: bool = False
 
     def to_dict(self):
         return asdict(self)
