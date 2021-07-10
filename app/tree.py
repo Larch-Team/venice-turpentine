@@ -1,15 +1,21 @@
 from __future__ import annotations
 
+import json
+import random
 import typing as tp
-import json, random
-from collections import namedtuple, OrderedDict
+from collections import OrderedDict, namedtuple
 from math import inf as INFINITY
-from anytree import NodeMixin, util, LevelOrderIter
-from history import *
+
+from anytree import NodeMixin, util
+
 from close import *
+from history import *
 
 Sentence = tp.NewType("Sentence", list[str])
 PrintedProofNode = namedtuple('PrintedProofNode', ('sentence', 'children', 'closer'))
+
+SentenceTupleStructure = tp.NewType('SentenceTupleStructure', tuple[tuple[Sentence]])
+HistoryTupleStructure = tp.NewType('HistoryTupleStructure', tuple[tuple[tp.Union[Sentence, int, tp.Callable]]])
 
 def getcolors():
     """
@@ -106,6 +112,17 @@ class ProofNode(ProofBase, NodeMixin):
             return self.branch, *[str(namegen.randint(0, 1000)) for i in range(am-1)]
         return self.branch, *namegen.choices(possible, k=am-1)
     
+    
+    # Static
+    
+    @staticmethod
+    def insert_history(used_extention: HistoryTupleStructure, children: Iterable[ProofNode]):
+        assert len(children) == len(used_extention), "Liczba gałęzi i list komend dla historii powinna być taka sama"
+        for j, s in zip(children, used_extention):
+            j.History(*s)
+            for k in j.descendants:
+                k.History(*s)
+
 
     # Nawigacja
 
@@ -113,6 +130,12 @@ class ProofNode(ProofBase, NodeMixin):
     def getbranchnames(self):
         """Zwraca nazwy wszystkich gałęzi w dowodzie"""
         return [i.branch for i in self.getleaves()]
+
+
+    def getbranch_nodes(self) -> tuple[list[ProofNode], Close]:
+        """Zwraca gałąź dowodu w formie węzłów z informacjami o jej zamknięciu"""
+        assert self.is_leaf, "Gałąź nie jest kompletna, gdyż węzeł nie jest liściem"
+        return [i for i in self.path], self.closed
 
 
     def getbranch_sentences(self) -> tuple[list[Sentence], Close]:
@@ -187,7 +210,7 @@ class ProofNode(ProofBase, NodeMixin):
 
     # Modyfikacja
 
-    def append(self, sentences: tp.Iterable[tuple[Sentence]], namegen: random.Random) -> int:
+    def append(self, sentences: SentenceTupleStructure, namegen: random.Random) -> int:
         """Dodaje zdania do drzewa, zwraca warstwę"""
         names = self.gen_name(namegen, am=len(sentences))
         layer = max((i.layer for i in self.getleaves()))+1

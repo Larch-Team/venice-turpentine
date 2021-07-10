@@ -1,13 +1,18 @@
 """
-Tutaj umieść dokumentację swojego pluginu
+Zastępstwo zeroth_order_logic z zaimplementowanym checkerem opartych na intuicjach zbiorów Hintikki oraz prostym solverem. Korzysta z nowo wprowadzonych drzew regułowych. Reguły działają na bazie tablic Smullyana. Po raz pierwszy zaimplementowany został system naiwny.
 """
-from collections import namedtuple
 import typing as tp
-import Formal.__utils__ as utils
+from collections import namedtuple
+
+from history import History
 from proof import Proof
 from rule import Rule, SentenceID
 from sentence import Sentence
+from tree import ProofNode
 from usedrule import UsedRule
+
+import Formal.__utils__ as utils
+from Formal.__template__ import check_closure
 
 SOCKET = 'Formal'
 VERSION = '0.2.0'
@@ -162,6 +167,7 @@ RULES = {
 
 double_not = RULES['double not']
 
+ROOT_RULE = RULES['double not']
 RULES['double not'].children = (RULES['true and'],)
 RULES['true and'].children = (RULES['false or'],)
 RULES['false or'].children = (RULES['false imp'],)
@@ -172,7 +178,7 @@ RULES['false and'].children = (RULES['true imp'],)
 
 @double_not.setStrict
 def strict_doublenot(sentence: Sentence):
-    return utils.reduce_prefix(utils.reduce_prefix(sentence, 'not'), 'not')
+    return utils.reduce_prefix(utils.reduce_prefix(utils.empty_creator(sentence), 'not'), 'not')
 
 
 @double_not.setNaive
@@ -186,12 +192,12 @@ def naive_doublenot(branch: list[Sentence], sentenceID: SentenceID):
 # def checker(rule: UsedRule, conclusion: Sentence) -> bool:
 #     # sourcery skip: merge-duplicate-blocks
 #     premiss = rule.get_premisses()[0]
-#     connective, use_result = premiss.getMainConnective()
+#     connective, use_result = premiss.getComponents()
 #     if connective.startswith('not'):
 #         # zastosowanie reguły dla prawdziwości na zanegowanej formule
 #         if rule.rule.startswith('true'):
 #             return False
-#         connective, use_result = use_result[0].getMainConnective()
+#         connective, use_result = use_result[0].getComponents()
 #     # zastosowanie reguły dla fałszywości na niezanegowanej formule
 #     elif rule.rule.startswith('false'):
 #         return False
@@ -217,15 +223,129 @@ def checker(rule: UsedRule, conclusion: Sentence) -> bool:
 # SOLVER
 
 
-def solver(proof: Proof) -> list[str]:
-    pass
+SignedSentence = namedtuple('SignedSentence', ['sentence', 'branch', 'id'])
 
 
-# INNE
+def find_rule(sentence: Sentence) -> str:
+    main, other = sentence.getComponents()
+    if main is None:
+        return None
+    if main.startswith('not_'):
+        negated = 'false'
+        main, _ = other.getComponents()
+    else:
+        negated = 'true'
+
+    if main.startswith('not_'):
+        return 'double not'
+    else:
+        return f"{negated} {main.split('_')[0]}"
 
 
-def check_closure(branch: list[utils.Sentence], used: set[tuple[str]]) -> tp.Union[None, tuple[utils.close.Close, str]]:
+def group_by_rules(proof: Proof) -> dict[str, list[SignedSentence]]:
+
+    containers = {i: [] for i in RULES.keys()}
+    for leaf in proof.nodes.getleaves():
+        branch, closed = leaf.getbranch_sentences()
+        if closed:
+            continue
+
+        for num, sentence in enumerate(branch):
+            if sentence in leaf.history:
+                continue
+
+            if (rule := find_rule(sentence)) is not None:
+                containers[rule].append(
+                    SignedSentence(sentence, leaf.branch, num))
+    return containers
+
+
+def append_by_rules(containers: dict[str, list[SignedSentence]], nodes: tp.Iterable[ProofNode]) -> dict[str, list[SignedSentence]]:
+
+    for node in nodes:
+        num = len(node.path)
+        
+        if (rule := find_rule(node.sentence)) is not None:
+            containers[rule].append(
+                SignedSentence(node.sentence, node.branch, num))
+    return containers
+
+
+def use_strict(proof: Proof, rule: Rule, sentence: SignedSentence) -> tuple[ProofNode]:
+    old = proof.nodes.getleaf(sentence.branch)
+
+    # Rule usage
+    fin = rule.strict(sentence.sentence)
+    assert fin
+
+    layer = proof.append(fin, sentence.branch)
+    ProofNode.insert_history(
+        ([[0]] if rule.reusable else [[sentence]]), old.children)
+
+    context = {
+        'sentenceID': sentence.id,
+        'tokenID': sentence.sentence
+    }
+
+    proof.metadata['usedrules'].append(
+        UsedRule(layer, sentence.branch, rule, proof, context=context, auto=True))
+    return old.children
+
+
+def _pop_default(l: list, index: int = -1, default: tp.Any = None) -> tp.Any:
+    try:
+        return l.pop(index)
+    except IndexError:
+        return default
+
+
+def propagate_rule(proof: Proof, rule: Rule, containers: dict[str, list[SignedSentence]]) -> dict[str, list[SignedSentence]]:
+    if not containers[rule.name]:
+        return containers
+    closed = []
+    while (sentence := _pop_default(containers[rule.name])):
+        if sentence.branch in closed:
+            continue
+        new = use_strict(proof, rule, sentence)
+        for nodes in new:
+            if proof.deal_closure_func(check_closure, new.branch):
+                closed.append(new.branch)
+        containers = append_by_rules(containers, new)
+    return {i:[k for k in j if not k.branch in closed] for i,j in containers.items()}
+
+
+def _solver(proof: Proof, rule: Rule, containers: dict[str, list[SignedSentence]]) -> bool:
+    start_used = proof.metadata['usedrules'][:]
+    start_layer = start_used[-1].layer
+    containers = propagate_rule(proof, rule)
+    if proof.nodes.is_closed():
+        return True
+    
+    while any(containers[i.name] for i in rule.ancestors):
+        for past_rule in rule.ancestors:
+            containers = propagate_rule(proof, rule)
+    if proof.nodes.is_closed():
+        return True
+    
+    for child in Rule.children:
+        if _solver(proof, child, containers[:]):
+            return True
+        
+    proof.metadata['usedrules'] = start_used
+    proof.nodes.pop(start_layer+1)
+    return False
+                
+
+def solver(proof: Proof):
+    containers = group_by_rules(proof)
+    return _solver(proof, ROOT_RULE, containers)
+
+
+def check_closure(branch: list[utils.Sentence], used: History) -> tp.Union[None, tuple[utils.close.Close, str]]:
     """Sprawdza możliwość zamknięcia gałęzi, zwraca obiekty zamknięcia oraz komunikat do wyświetlenia"""
+    if all(i in used or not i.getMainConnective() for i in branch):
+        return utils.close.Emptiness(), "Nothing else to be done, branch was closed."
+    
     for num1, statement_1 in enumerate(branch):
         for num2, statement_2 in enumerate(branch):
             if statement_1[0].startswith('not') and not statement_2[0].startswith('not'):

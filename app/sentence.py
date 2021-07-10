@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from typing import Callable, Union, NewType
 
 _Sentence = NewType('Sentence', list[str])
@@ -18,9 +19,9 @@ def _split_keys(dictionary: dict, key: int) -> dict:
 
 class Sentence(list):
 
-    def __init__(self, sen, session: Session, precedenceBaked: dict[str, float] = {}):
+    def __init__(self, sen, session: Session, precedenceBaked: dict[str, float] = None):
         self.S = session
-        self.precedenceBaked = precedenceBaked
+        self.precedenceBaked = precedenceBaked or {}
         self._pluggedFS = None
         super().__init__(sen)
 
@@ -98,6 +99,8 @@ class Sentence(list):
 
 
     def getLowest(self, dictionary: dict[int, float]):
+        if not dictionary:
+            return None
         min_prec = min(dictionary.values())
         min_prec_indexes = (i for i,j in dictionary.items() if j==min_prec)
         if min_prec == max(self.getPrecedence().values()):
@@ -127,7 +130,7 @@ class Sentence(list):
             self._pluggedFS = self.S.config['chosen_plugins']['Formal']
             precedence = self.getPrecedence()
 
-        self.precedenceBaked = {}
+        self.precedenceBaked = OrderedDict()
 
         lvl = 0
         prec_div = max(precedence.values())+1
@@ -142,17 +145,25 @@ class Sentence(list):
         return self.precedenceBaked
 
 
-    def _split(self, index: int):
+    def splitByIndex(self, index: int):
         """
         Dzieli zdanie na dwa na podstawie podanego indeksu.
         """
         p_left, p_right = _split_keys(self.precedenceBaked, index)
-        left = Sentence(self[:index], self.S, p_left) if self[:index] else None
-        right = Sentence(self[index+1:], self.S, p_right) if self[index+1:] else None
+        left = Sentence(self[:index], self.S, p_left).reduceBrackets() if self[:index] else None
+        right = Sentence(self[index+1:], self.S, p_right).reduceBrackets() if self[index+1:] else None
         return left, right
 
 
-    def getMainConnective(self, precedence: dict[str, int] = None) -> tuple[str, tuple[_Sentence, _Sentence]]:
+    def getMainConnective(self, precedence: dict[str, int] = None) -> int:
+        sentence = self.reduceBrackets()
+        prec = sentence.readPrecedence(precedence)
+
+        if len(prec)==0:
+            return None, None
+        return self.getLowest(prec)
+
+    def getComponents(self, precedence: dict[str, int] = None) -> tuple[str, tuple[_Sentence, _Sentence]]:
         """
         Na podstawie kolejności wykonywania działań wyznacza najwyżej położony spójnik.
         Zwraca None gdy nie udało się znaleźć spójnika
@@ -163,28 +174,20 @@ class Sentence(list):
         :rtype: tuple[str, tuple[_Sentence, _Sentence]]
         """
         sentence = self.reduceBrackets()
-        prec = sentence.readPrecedence(precedence)
-
-        if len(prec)==0:
-            return None, None
-        con_index = self.getLowest(prec)
-        return sentence[con_index], sentence._split(con_index)
-    
-    
-    def splitByIndex(self, index: int):
-        return self[:index].reduceBrackets(), self[index+1:].reduceBrackets()
+        con_index = sentence.getMainConnective(precedence)
+        return sentence[con_index], sentence.splitByIndex(con_index)
 
 
     def getNonNegated(self) -> _Sentence:
         """
         Zwracane zdanie jest konceptualnie podobne do literału, ale rozszerzone na całe zdanie. W skrócie redukowane są wszystkie negacje obejmujące całe zdanie
         """
-        conn, new = self.getMainConnective()
+        conn, new = self.getComponents()
         if not conn or not conn.startswith('not'):
             return self
 
         while conn.startswith('not'):
-            conn, new = new[0].getMainConnective()
+            conn, new = new[0].getComponents()
         return new[0]
 
     # Overwriting list methods
