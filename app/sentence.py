@@ -103,7 +103,8 @@ class Sentence(list):
             return None
         min_prec = min(dictionary.values())
         min_prec_indexes = (i for i,j in dictionary.items() if j==min_prec)
-        if min_prec == max(self.getPrecedence().values()):
+        max_prec = max(self.getPrecedence().values())
+        if min_prec == max_prec/(max_prec+1):
             return min(min_prec_indexes)
         else:
             return max(min_prec_indexes)
@@ -175,6 +176,8 @@ class Sentence(list):
         """
         sentence = self.reduceBrackets()
         con_index = sentence.getMainConnective(precedence)
+        if con_index is None:
+            return None, None
         return sentence[con_index], sentence.splitByIndex(con_index)
 
 

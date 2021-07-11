@@ -22,7 +22,8 @@ class Proof(object):
         self.nodes = ProofNode(sentence, self.START_BRANCH)
         self.metadata = dict(
             usedrules = [],
-            decision_points = []
+            decision_points = [],
+            used_solver = False
         )
         self.name_seed = name_seed or random.random()*10**7
         self.namegen = random.Random(self.name_seed)
@@ -139,8 +140,9 @@ class BranchCentric(Proof):
         super().__init__(sentence, config, name_seed=name_seed)
         self.branch = self.START_BRANCH
 
-    def append(self, sentences: Iterable[tuple[Sentence]]) -> int:
-        return super().append(sentences, self.branch)
+    def append(self, sentences: Iterable[tuple[Sentence]], branch: str = None) -> int:
+        branch = branch or self.branch
+        return super().append(sentences, branch)
 
     def get_node(self):
         return self.nodes.getleaf(self.branch)

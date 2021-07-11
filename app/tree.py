@@ -100,7 +100,11 @@ class ProofNode(ProofBase, NodeMixin):
         super().__init__(sentence=sentence, branch=branch_name, layer=layer, history=history)
         self.parent = parent or None
         self.children = children
-    
+
+
+    def __repr__(self) -> str:
+        return f"{self.branch}:{len(self.ancestors)}{' (closed)' if self.closed else ''} - {self.sentence.getReadable()}"
+
 
     def gen_name(self, namegen: random.Random, am=2) -> tuple[str]:
         """Zwraca `am` nazw dla gałęzi z czego jedną jest nazwa aktualnej"""
@@ -154,6 +158,10 @@ class ProofNode(ProofBase, NodeMixin):
             closer = str(self.closed) if self.closed else None
         return PrintedProofNode(sentence=self.sentence, children=children, closer=closer)
 
+
+    def notused(self) -> list[ProofNode]:
+        return [i for i in self.getbranch_nodes()[0] if i.sentence not in self.history]
+    
 
     def getleaves(self, *names: tp.Iterable[str]) -> list[ProofNode]:
         """Zwraca wszystkie liście *całego drzewa*, bądź tylko liście o wybranych nazwach (jeśli zostaną podane w `names`)

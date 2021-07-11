@@ -236,7 +236,7 @@ class Session(object):
         closure, info = self.proof.deal_closure(self.acc('Formal'), branch_name)
         if closure:
             EngineLog(f"Closing {branch_name}: {str(closure)}, {info=}")
-            return f"{branch_name}: {info}"
+            return info
         else:
             return None
 
@@ -288,7 +288,7 @@ class Session(object):
         if not self.proof:
             raise EngineError(
                 "There is no proof started")
-        if len(self.proof.metadata['usedrules'])<2:
+        if len(self.proof.metadata['usedrules'])<actions_amount:
             raise EngineError("Nothing to undo")
 
         rules = [self.proof.metadata['usedrules'].pop() for _ in range(actions_amount)]
@@ -311,6 +311,16 @@ class Session(object):
         return self.proof.check(self.acc('Formal').checker)
         
 
+    def solve(self) -> tuple[str]:
+        if not self.proof:
+            raise EngineError(
+                "There is no proof started")
+        
+        if self.acc('Formal').solver(self.proof):
+            return ("Udało się zakończyć dowód", f"Formuła {'nie '*(not self.proof.nodes.is_successful())}jest tautologią")
+        else:
+            return ("Nie udało się zakończyć dowodu",)
+    
     # Proof navigation
 
 
