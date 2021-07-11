@@ -11,31 +11,42 @@ _Rule = NewType('_Rule', NodeMixin)
 ContextDef = namedtuple(
     'ContextDef', ('variable', 'official', 'docs', 'type_'))
 
-def ParameterContext(type_: Type, variable: str, official: str = '', docs: str = ''):
+class _SentenceID(int):
+    pass
+
+class _TokenID(int):
+    pass
+
+def ParameterContext(parent: Type, type_: str, variable: str = '', official: str = '', docs: str = ''):
     """
     Używane do definiowania elementów kontekstu reguł - dodatkowych przesłanek pochodzących od użytkownika
 
-    :param type_: Typ przesłanki
+    :param parent: Typ, z którego przesłanka będzie dziedziczyć type hinting
     :type type_: Type
-    :param name_var: Nazwa klucza, pod jakim element będzie przechowywany, nie może być powtarzalny
-    :type name_var: str
-    :param name_official: [description], defaults to ''
+    :param type_: Nazwa typu
+    :type type_: str
+    :param variable: Nazwa klucza, pod jakim element będzie przechowywany, nie może być powtarzalny
+    :type variable: str
+    :param name_official: Nazwa wyświetlalna dla użytkownika, defaults to ''
     :type name_official: str, optional
-    :param docs: [description], defaults to ''
+    :param docs: Dokumentacja, defaults to ''
     :type docs: str, optional
     """
-    context_type = NewType(variable, type_)
+    context_type = NewType(type_, parent)
 
+    if variable == '':
+        variable = type_
     if official == '':
         official = variable
         
+    context_type.variable = variable
     context_type.official = official
     context_type.__doc__ = docs
     return context_type
     
         
-SentenceID = ParameterContext(int, 'sentenceID', 'Sentence Number', 'The number of the sentence in this branch')
-TokenID = ParameterContext(int, 'tokenID', 'Token Number', 'The number of the symbol in the sentence')
+SentenceID = ParameterContext(_SentenceID, 'sentenceID', official='Sentence Number', docs='The number of the sentence in this branch')
+TokenID = ParameterContext(_TokenID, 'tokenID', official='Token Number', docs='The number of the symbol in the sentence')
 
 class RuleBase(object):
     def __init__(self, name: str, symbolic: str, docs: str, reusable: bool, context: Iterable[ContextDef] = None) -> None:
@@ -57,10 +68,10 @@ class RuleBase(object):
             for i in params.values():
                 if hasattr(i.annotation, 'official'):
                     self.context.append(ContextDef(
-                        variable = i.annotation.__name__,
+                        variable = i.annotation.variable,
                         official = i.annotation.official,
                         docs = i.annotation.__doc__,
-                        type_ = i.annotation.__supertype__
+                        type_ = i.annotation.__name__
                     ))
                 elif i.annotation == list[Sentence]:
                     continue                

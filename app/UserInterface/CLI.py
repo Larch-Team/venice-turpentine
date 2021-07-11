@@ -326,6 +326,15 @@ def do_leave(session) -> str:
     return "Proof was deleted"
 
 
+def do_check(session: engine.Session) -> str:
+    """Checks the proof"""
+    problems = session.check()
+    if problems:
+        return "\n".join(problems)
+    else:
+        return "Dowód jest poprawny"
+
+
 # Proof navigation
 
 
@@ -385,6 +394,7 @@ command_dict = OrderedDict({
     'leave': {'comm': do_leave, 'args': []},
     'prove': {'comm': do_prove, 'args': 'multiple_strings'},
     'auto': {'comm': do_auto, 'args': []},
+    'check': {'comm': do_check, 'args': []},
     # Program interaction
     'plugin switch': {'comm': do_plug_switch, 'args': [str, str]},
     'plugin list all': {'comm': do_plug_list_all, 'args': []},

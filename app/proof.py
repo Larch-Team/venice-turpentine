@@ -1,5 +1,7 @@
 import random
-from typing import Any, Callable, Iterable, Union
+from typing import Any, Callable, Iterable, OrderedDict, Union
+
+from anytree.iterators.preorderiter import PreOrderIter
 
 from close import Close
 from exceptions import EngineError, FormalError
@@ -96,7 +98,7 @@ class Proof(object):
 
         layer = old.append(out, self.namegen)
         children = old.children
-        self.insert_history(used_extention, children)
+        self.nodes.insert_history(used_extention, children)
 
         self.metadata['usedrules'].append(UsedRule(layer, self.branch, rule, self, context, decisions))
         return tuple(i.branch for i in children)
@@ -104,7 +106,31 @@ class Proof(object):
     
     def get_histories(self) -> dict[str, History]:
         leaves = self.nodes.leaves
-        return {leaf.branch:leaf.gethistory() for leaf in leaves}        
+        return {leaf.branch:leaf.gethistory() for leaf in leaves}       
+    
+    
+    def _group_by_layers(self) -> list[tuple[UsedRule, list[Sentence]]]:
+        d = {i.layer:[] for i in self.metadata['usedrules']}
+        for node in PreOrderIter(self.nodes):
+            if node.layer == 0:
+                continue
+            d[node.layer].append(node.sentence)
+        return [(i,d[i.layer]) for i in self.metadata['usedrules']]
+    
+    def check(self, checker: Callable[[UsedRule, Sentence], str]) -> tuple[str]:
+        if not self.nodes.is_closed():
+            return ("Nie możesz sprawdzić nieskończonego dowodu",)
+        if not self.metadata['usedrules']:
+            return ("Nie wykonano żadnej operacji")
+        
+        problems = OrderedDict()
+        for used, sentences in self._group_by_layers():
+            for i in sentences:
+                if (info := checker(used, i)):
+                    problems[info] = None
+        return tuple(problems.keys())
+        
+                    
 
 
 class BranchCentric(Proof):

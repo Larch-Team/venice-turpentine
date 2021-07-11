@@ -305,9 +305,10 @@ class Session(object):
 
 
     def check(self) -> tuple[str]:
-        if not self.is_closed():
-            return ("Nie możesz sprawdzić nieskończonego dowodu")
-
+        if not self.proof:
+            raise EngineError(
+                "There is no proof started")
+        return self.proof.check(self.acc('Formal').checker)
         
 
     # Proof navigation

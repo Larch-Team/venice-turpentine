@@ -197,7 +197,7 @@ def naive_doublenot(branch: list[Sentence], sentenceID: SentenceID):
 #         # zastosowanie reguły dla prawdziwości na zanegowanej formule
 #         if rule.rule.startswith('true'):
 #             return False
-#         connective, use_result = use_result[0].getComponents()
+#         connective, use_result = use_result[1].getComponents()
 #     # zastosowanie reguły dla fałszywości na niezanegowanej formule
 #     elif rule.rule.startswith('false'):
 #         return False
@@ -210,14 +210,19 @@ def naive_doublenot(branch: list[Sentence], sentenceID: SentenceID):
 #         return conclusion.getNonNegated() in {i.getNonNegated() for i in use_result}
 
 
-def checker(rule: UsedRule, conclusion: Sentence) -> bool:
+def checker(rule: UsedRule, conclusion: Sentence) -> tp.Union[str, None]:
     """
-    Na podstawie informacji o użytych regułach i podanym wyniku zwraca wartość prawda/fałsz informującą o wyprowadzalności wniosku z reguły.
+    Na podstawie informacji o użytych regułach i podanym wyniku zwraca informacje o błędach. None wskazuje na poprawność wyprowadzenia wniosku z reguły.
     Konceptualnie przypomina zbiory Hintikki bez reguły o niesprzeczności.
     """
-    premiss = rule.get_premisses()[0]  # Istnieje tylko jedna
+    premiss = rule.get_premisses()['sentenceID']  # Istnieje tylko jedna
     entailed = RULES[rule.rule].strict(premiss)
-    return conclusion in sum(entailed, [])
+    if not entailed:
+        return f"'{rule.rule}' can't be used on '{premiss.getReadable()}'"
+    elif conclusion in sum(entailed, ()) and find_rule(premiss) == rule.rule:
+        return None
+    else:
+        return f"Check which connective is the main one in '{premiss.getReadable()}'"
 
 
 # SOLVER
@@ -232,7 +237,7 @@ def find_rule(sentence: Sentence) -> str:
         return None
     if main.startswith('not_'):
         negated = 'false'
-        main, _ = other.getComponents()
+        main, _ = other[1].getComponents()
     else:
         negated = 'true'
 
@@ -336,16 +341,13 @@ def _solver(proof: Proof, rule: Rule, containers: dict[str, list[SignedSentence]
     return False
                 
 
-def solver(proof: Proof):
+def solver(proof: Proof) -> bool:
     containers = group_by_rules(proof)
     return _solver(proof, ROOT_RULE, containers)
 
 
 def check_closure(branch: list[utils.Sentence], used: History) -> tp.Union[None, tuple[utils.close.Close, str]]:
-    """Sprawdza możliwość zamknięcia gałęzi, zwraca obiekty zamknięcia oraz komunikat do wyświetlenia"""
-    if all(i in used or not i.getMainConnective() for i in branch):
-        return utils.close.Emptiness(), "Nothing else to be done, branch was closed."
-    
+    """Sprawdza możliwość zamknięcia gałęzi, zwraca obiekty zamknięcia oraz komunikat do wyświetlenia""" 
     for num1, statement_1 in enumerate(branch):
         for num2, statement_2 in enumerate(branch):
             if statement_1[0].startswith('not') and not statement_2[0].startswith('not'):
@@ -358,6 +360,8 @@ def check_closure(branch: list[utils.Sentence], used: History) -> tp.Union[None,
             if utils.reduce_prefix(negated, 'not') == statement:
                 return utils.close.Contradiction(sentenceID1=num1+1, sentenceID2=num2+1), "Sentences contradict. The branch was closed."
 
+    if all(i in used or i.isLiteral() for i in branch):
+        return utils.close.Emptiness, "Nothing else to be done, branch was closed."
     return None
 
 
@@ -372,7 +376,7 @@ def get_rules_docs() -> dict[str, str]:
 
 def get_needed_context(rule_name: str) -> tuple[utils.ContextDef]:
     """Zwraca informacje o wymaganym przez daną regułę kontekście w formie obiektów ContextDef"""
-    return RULES[rule_name].context
+    return RULES[rule_name].context if RULES.get(rule_name) else None
 
 
 def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, context: dict[str, tp.Any], decisions: dict[str, tp.Any]) -> tuple[utils.SentenceTupleStructure, utils.HistoryTupleStructure, dict[str, tp.Any]]:

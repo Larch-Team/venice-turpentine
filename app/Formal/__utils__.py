@@ -374,21 +374,21 @@ class Smullyan(Rule):
     def _strict(self, sentence: Sentence) -> tp.Union[None, SentenceTupleStructure]:
         """Służy do wywoływania reguły, zwraca strukturę krotek"""
         
-        stripped = sentence if self.whole else reduce_prefix(sentence, 'not', '~')
+        stripped = sentence if self.whole else reduce_prefix(sentence, 'not')
 
         if self.comp1 and self.comp2:
             return strip_around(stripped, self.main, self.split)
         if self.split:
             branch1, branch2 = strip_around(stripped, self.main, self.split)
             return (
-                (add_prefix(branch1[0], 'not', '~') if self.comp1 else branch1[0],),
-                (add_prefix(branch2[0], 'not', '~') if self.comp2 else branch2[0],)
+                (add_prefix(branch1[0], 'not', '~') if not self.comp1 else branch1[0],),
+                (add_prefix(branch2[0], 'not', '~') if not self.comp2 else branch2[0],)
             )
         else:
             branch = strip_around(stripped, self.main, self.split)[0]
             return ((
-                add_prefix(branch[0], 'not', '~') if self.comp1 else branch[0],
-                add_prefix(branch[1], 'not', '~') if self.comp2 else branch[1]
+                add_prefix(branch[0], 'not', '~') if not self.comp1 else branch[0],
+                add_prefix(branch[1], 'not', '~') if not self.comp2 else branch[1]
             ),)
             
     def _naive(self, branch: list[Sentence], sentenceID: SentenceID, tokenID: TokenID) -> tp.Union[None, SentenceTupleStructure]:
@@ -411,15 +411,14 @@ class Smullyan(Rule):
         tokenID = tokenID - (len(sentence)+1-len(stripped))//2
         
         # Sentence splitting
+        branch1, branch2 = stripped.splitByIndex(tokenID)
         if self.split:
-            branch1, branch2 = stripped.splitByIndex(tokenID)
             return (
                 (branch1 if self.comp1 else add_prefix(branch1, 'not', '~'),),
                 (branch2 if self.comp2 else add_prefix(branch2, 'not', '~'),)
             )
         else:
-            branch = stripped.splitByIndex(tokenID)
             return ((
-                branch[0] if self.comp1 else add_prefix(branch[0], 'not', '~'),
-                branch[1] if self.comp2 else add_prefix(branch[1], 'not', '~')
+                branch1 if self.comp1 else add_prefix(branch1, 'not', '~'),
+                branch2 if self.comp2 else add_prefix(branch2, 'not', '~')
             ),)

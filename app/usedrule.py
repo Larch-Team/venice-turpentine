@@ -20,7 +20,7 @@ class UsedRule(object):
 
     def get_premisses(self) -> dict[str, Sentence]:
         """Zwraca szystkie zdania, których sentenceID w tej gałęzi został wspomniany w dowodzie"""
-        branch, _ = self._proof.nodes.getbranch_sentences()
-        context_defs = self._proof.S.acc('FormalSystem').get_needed_context(self.rule)
-        sentids = (i.variable for i in context_defs if i.type_ == 'sentenceID')
+        branch, _ = self._proof.nodes.getleaf(self.branch).getbranch_sentences()
+        context_defs = self._proof.S.acc('Formal').get_needed_context(self.rule)
+        sentids = [i.variable for i in context_defs if i.type_ == 'sentenceID']
         return {i: branch[j] for i, j in self.context.items() if i in sentids}

@@ -228,7 +228,15 @@ class ProofNode(ProofBase, NodeMixin):
         :param layer: Warstwa (najwyższą można uzyskać przez sprawdzenie wartości w stosie użytych reguł)
         :type layer: int
         """
-        node = self.root
-        node.children = [i for i in self.children if i.layer>=layer]
-        for i in node.children:
-            i.pop(layer)
+        self.root._pop(layer)
+
+    def _pop(self, layer: int):
+        """
+        Usuwa z dowodu wszystkie węzły o danej, lub wyższej warstwie
+
+        :param layer: Warstwa (najwyższą można uzyskać przez sprawdzenie wartości w stosie użytych reguł)
+        :type layer: int
+        """
+        self.children = [i for i in self.children if i.layer<layer]
+        for i in self.children:
+            i._pop(layer)

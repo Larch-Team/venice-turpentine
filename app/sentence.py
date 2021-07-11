@@ -150,17 +150,17 @@ class Sentence(list):
         Dzieli zdanie na dwa na podstawie podanego indeksu.
         """
         p_left, p_right = _split_keys(self.precedenceBaked, index)
-        left = Sentence(self[:index], self.S, p_left).reduceBrackets() if self[:index] else None
-        right = Sentence(self[index+1:], self.S, p_right).reduceBrackets() if self[index+1:] else None
+        left = Sentence(self[:index], self.S, p_left).reduceBrackets().reduceBrackets() if self[:index] else None
+        right = Sentence(self[index+1:], self.S, p_right).reduceBrackets().reduceBrackets() if self[index+1:] else None
         return left, right
 
 
-    def getMainConnective(self, precedence: dict[str, int] = None) -> int:
+    def getMainConnective(self, precedence: dict[str, int] = None) -> Union[int, None]:
         sentence = self.reduceBrackets()
         prec = sentence.readPrecedence(precedence)
 
         if len(prec)==0:
-            return None, None
+            return None
         return self.getLowest(prec)
 
     def getComponents(self, precedence: dict[str, int] = None) -> tuple[str, tuple[_Sentence, _Sentence]]:
@@ -187,8 +187,12 @@ class Sentence(list):
             return self
 
         while conn.startswith('not'):
-            conn, new = new[0].getComponents()
-        return new[0]
+            conn, new = new[1].getComponents()
+        return new[1]
+    
+    def isLiteral(self) -> bool:
+        main = self.getMainConnective()
+        return main is None or (main == 0 and len(self.readPrecedence()) == 1)
 
     # Overwriting list methods
 

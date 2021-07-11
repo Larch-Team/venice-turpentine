@@ -46,21 +46,35 @@ def get_used_types() -> tuple[str]:
     pass
 
 
-def solver(proof: Proof) -> list[str]:
+def solver(proof: Proof) -> bool:
     pass
 
-def checker(rule: UsedRule, conclusion: Sentence) -> bool:
+def find_rule(sentence: Sentence) -> str:
+    main, other = sentence.getComponents()
+    if main is None:
+        return None
+    if main.startswith('not_'):
+        negated = 'false'
+        main, _ = other.getComponents()
+    else:
+        negated = 'true'
+
+    if main.startswith('not_'):
+        return 'double not'
+    else:
+        return f"{negated} {main.split('_')[0]}"
+
+def checker(rule: UsedRule, conclusion: Sentence) -> tp.Union[str, None]:
     """
-    Na podstawie informacji o użytych regułach i podanym wyniku zwraca wartość prawda/fałsz informującą o wyprowadzalności wniosku z reguły.
+    Na podstawie informacji o użytych regułach i podanym wyniku zwraca informacje o błędach. None wskazuje na poprawność wyprowadzenia wniosku z reguły.
     Konceptualnie przypomina zbiory Hintikki bez reguły o niesprzeczności.
-    
-    Niżej podano przykład implementacji
     """
-    RULES = {} # w tym zbiorze globalnie przechowywane są reguły
-    
-    premiss = rule.get_premisses()[0] # Istnieje tylko jedna
-    entailed = RULES[rule.rule].strict(premiss)
-    return conclusion in sum(entailed, [])
+    premiss = rule.get_premisses()['sentenceID']  # Istnieje tylko jedna
+    entailed = None #RULES[rule.rule].strict(premiss) # You need to define a rule dictionary
+    if conclusion in sum(entailed, []) and find_rule(premiss) == rule.rule:
+        return None
+    else:
+        return f"'{rule.rule}' can't be used on '{premiss.getReadable()}'"
 
 def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, context: dict[str, tp.Any], decisions: dict[str, tp.Any]) -> tuple[utils.SentenceTupleStructure, utils.HistoryTupleStructure, dict[str, tp.Any]]:
     """
