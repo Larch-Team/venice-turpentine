@@ -3,6 +3,7 @@ Zastępstwo zeroth_order_logic z zaimplementowanym checkerem opartych na intuicj
 """
 import typing as tp
 from collections import namedtuple
+from exceptions import FormalError
 
 from history import History
 from proof import Proof
@@ -251,10 +252,27 @@ def append_by_rules(containers: dict[str, list[SignedSentence]], nodes: tp.Itera
     for node in nodes:
         num = len(node.path)
         
-        if (rule := find_rule(node.sentence)) is not None:
+        if not node.closed and (rule := find_rule(node.sentence)) is not None:
             containers[rule].append(
                 SignedSentence(node.sentence, node.branch, num))
     return containers
+
+
+def multiply_for_branches(containers: dict[str, list[SignedSentence]], target: str, branches: tp.Iterable[str]) -> dict[str, list[SignedSentence]]:
+    to_copy = {key: [i for i in val if i.branch == target] for key, val in containers.items()}
+
+    for key, value in containers.items():
+        value.extend(
+            change_branch_container(
+                to_copy[key], [i for i in branches if i != target]
+            )
+        )
+
+    return containers
+
+
+def change_branch_container(container: list[SignedSentence], branches: tp.Iterable[str]) -> list[SignedSentence]:
+    return [SignedSentence(i.sentence, j, i.id) for i in container for j in branches]
 
 
 def use_strict(proof: Proof, rule: Rule, sentence: SignedSentence) -> tuple[ProofNode]:
@@ -295,23 +313,24 @@ def propagate_rule(proof: Proof, rule: Rule, containers: dict[str, list[SignedSe
         new = use_strict(proof, rule, sentence)
         for node in new:
             if proof.deal_closure_func(check_closure, node.branch)[0]:
-                closed.append(node.branch)
+                closed.append(node.branch)        
+                
+        modified_branches = {i.branch for i in new}
+        if len(modified_branches) > 1:
+            containers = multiply_for_branches(containers, node.parent.branch, modified_branches)
         containers = append_by_rules(containers, new)
-    return {i:[k for k in j if not k.branch in closed] for i,j in containers.items()}
+    return {i:[k for k in j if k.branch not in closed] for i,j in containers.items()}
 
 
 def _solver(proof: Proof, rule: Rule, containers: dict[str, list[SignedSentence]]) -> bool:
     start_used = proof.metadata['usedrules'][:]
     start_layer = start_used[-1].layer if start_used else 0
-    containers = propagate_rule(proof, rule, containers)
-    if proof.nodes.is_closed():
-        return True
-    
-    while any(containers[i.name] for i in rule.ancestors):
-        for past_rule in rule.ancestors:
+        
+    while any(len(containers[i.name])>0 for i in rule.path):
+        for past_rule in rule.path:
             containers = propagate_rule(proof, past_rule, containers)
-    if proof.nodes.is_closed():
-        return True
+        if proof.nodes.is_closed():
+            return True
     
     for child in rule.children:
         if _solver(proof, child, containers):
