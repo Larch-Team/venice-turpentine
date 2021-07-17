@@ -4,7 +4,7 @@ import sys
 sys.path.append('../app')
 from sentence import Sentence
 
-class TestgetMainConnective(unittest.TestCase):
+class TestgetComponents(unittest.TestCase):
 
     def setUp(self):
         self.precedence = {
@@ -23,7 +23,7 @@ class TestgetMainConnective(unittest.TestCase):
                 ['sentvar_q']
             )
         )
-        self.assertEqual(sentence.getMainConnective(self.precedence), result)
+        self.assertEqual(sentence.getComponents(self.precedence), result)
 
 if __name__ == "__main__":
     unittest.main()

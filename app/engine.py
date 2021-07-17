@@ -5,15 +5,12 @@ import logging
 import os
 import typing as tp
 
-from anytree import node
-
 import pop_engine as pop
-from proof import BranchCentric, Proof
-from sentence import Sentence
-from tree import ProofNode
-from close import Close
-from usedrule import *
 from exceptions import EngineError
+from proof import BranchCentric
+from rule import ContextDef
+from sentence import Sentence
+from usedrule import *
 
 Module = pop.Module
 
@@ -51,14 +48,15 @@ def DealWithPOP(func):
 # Input type handling
 
 TYPE_LEXICON = {
-    'sentenceID':int
+    'sentenceID':int,
+    'tokenID':int
 }
 
-def type_translator(type_):
-    if isinstance(type_, str):
-        return TYPE_LEXICON[type_]
+def contextdef_translate(contextdef: ContextDef):
+    if isinstance(contextdef, str):
+        return TYPE_LEXICON[contextdef]
     else:
-        return type_
+        return contextdef
 
 # Session
 
@@ -69,8 +67,11 @@ class Session(object):
     Wszystkie wyjątki określane jako `EngineError` mają wbudowany string w formie "dostępnej dla użytkownika"
     """
     ENGINE_VERSION = '0.0.1'
-    SOCKETS = ('Application', 'FormalSolver', 'FormalUser', 'Lexicon', 'Output')
-    SOCKETS_NOT_IN_CONFIG = ('Application')
+    SOCKETS = {'Assistant': '0.0.1', 
+               'Formal': '0.2.0', 
+               'Lexicon': '0.0.1',
+               'Output': '0.0.1'}
+    SOCKETS_NOT_IN_CONFIG = ()
 
     def __init__(self, session_ID: str, config_file: str):
         """Obekty sesji stanowią pojedyncze instancje działającego silnika.
@@ -83,10 +84,10 @@ class Session(object):
         self.id = session_ID
         self.config_name = config_file
         self.read_config()
-        self.sockets = {name: pop.Socket(name, os.path.abspath(name), self.ENGINE_VERSION, '__template__.py',
-                                         self.config['chosen_plugins'].get(name, None)) for name in self.SOCKETS}
+        self.sockets = {name: pop.Socket(name, os.path.abspath(name), version, '__template__.py',
+                                         self.config['chosen_plugins'].get(name, None)) for name, version in self.SOCKETS.items()}
         self.sockets["UserInterface"] = pop.DummySocket("UserInterface", os.path.abspath(
-            "UserInterface"), self.ENGINE_VERSION, '__template__.py')
+            "UserInterface"), '0.0.1', '__template__.py')
 
         self.defined = {}
         self.proof = None
@@ -204,16 +205,16 @@ class Session(object):
         """
         try:
             tokenized = self.acc('Lexicon').tokenize(
-                statement, self.acc('FormalUser').get_used_types(), self.defined)
+                statement, self.acc('Formal').get_used_types(), self.defined)
         except self.acc('Lexicon').utils.CompilerError as e:
             raise EngineError(str(e))
         tokenized = Sentence(tokenized, self)
-        problem = self.acc('FormalUser').check_syntax(tokenized)
+        problem = self.acc('Formal').check_syntax(tokenized)
         if problem:
             logger.warning(f"{statement} is not a valid statement \n{problem}")
             raise EngineError(problem)
         else:
-            tokenized = self.acc('FormalUser').prepare_for_proving(tokenized)
+            tokenized = self.acc('Formal').prepare_for_proving(tokenized)
             
             self.proof = BranchCentric(tokenized, self.config)
 
@@ -232,10 +233,10 @@ class Session(object):
             raise EngineError("There is no proof started")
         
         # Branch checking
-        closure, info = self.proof.deal_closure(self.acc('FormalUser'), branch_name)
+        closure, info = self.proof.deal_closure(self.acc('Formal'), branch_name)
         if closure:
             EngineLog(f"Closing {branch_name}: {str(closure)}, {info=}")
-            return f"{branch_name}: {info}"
+            return info
         else:
             return None
 
@@ -250,17 +251,17 @@ class Session(object):
         docs        - Dokumentacja dla zmiennej wyświetlalna dla użytkownika
         type_       - Typ zmiennej, albo jest to dosłownie typ, albo string wyrażony w `TYPE_LEXICON`
         """
-        return self.acc('FormalUser').get_needed_context(rule)
+        return self.acc('Formal').get_needed_context(rule)
 
 
     @EngineLog
     @DealWithPOP
     def use_rule(self, rule: str, context: dict[str, tp.Any]) -> tp.Union[None, tuple[str]]:
         """Uses a rule of the given name on the current branch of the proof.
-        Context allows to give the FormalUser additional arguments 
-        Use `self.acc('FormalUser').get_needed_context(rule)` to check for needed context
+        Context allows to give the Formal additional arguments 
+        Use `self.acc('Formal').get_needed_context(rule)` to check for needed context
 
-        :param rule: Rule name (from `FormalUser` plugin)
+        :param rule: Rule name (from `Formal` plugin)
         :type rule: str
         :param context: Arguments for rule usage
         :type context: dict[str, tp.Any]
@@ -271,15 +272,15 @@ class Session(object):
         if not self.proof:
             raise EngineError(
                 "There is no proof started")
-        if rule not in self.acc('FormalUser').get_rules().keys():
+        if rule not in self.acc('Formal').get_rules_docs().keys():
             raise EngineError("No such rule")
 
         # Context checking
-        context_info = self.acc('FormalUser').get_needed_context(rule)
+        context_info = self.acc('Formal').get_needed_context(rule)
         if {i.variable for i in context_info} != set(context.keys()):
             raise EngineError("Wrong context")
 
-        return self.proof.use_rule(self.acc('FormalUser'), rule, context, None)
+        return self.proof.use_rule(self.acc('Formal'), rule, context, None)
 
 
     @EngineLog
@@ -287,14 +288,39 @@ class Session(object):
         if not self.proof:
             raise EngineError(
                 "There is no proof started")
+        if len(self.proof.metadata['usedrules'])<actions_amount:
+            raise EngineError("Nothing to undo")
 
-        rules = [self.metadata['usedrules'].pop() for _ in range(actions_amount)]
+        rules = [self.proof.metadata['usedrules'].pop() for _ in range(actions_amount)]
         min_layer = min((r.layer for r in rules))
         self.proof.nodes.pop(min_layer)
-
+        
+        # Poprawianie gałęzi
+        if self.proof.metadata['usedrules']:
+            self.proof.branch = self.proof.metadata['usedrules'][-1].branch
+        else:
+            self.proof.branch = self.proof.START_BRANCH
+        
         return rules
 
 
+    def check(self) -> tuple[str]:
+        if not self.proof:
+            raise EngineError(
+                "There is no proof started")
+        return self.proof.check(self.acc('Formal').checker)
+        
+
+    def solve(self) -> tuple[str]:
+        if not self.proof:
+            raise EngineError(
+                "There is no proof started")
+        
+        if self.acc('Formal').solver(self.proof):
+            return ("Udało się zakończyć dowód", f"Formuła {'nie '*(not self.proof.nodes.is_successful())}jest tautologią")
+        else:
+            return ("Nie udało się zakończyć dowodu",)
+    
     # Proof navigation
 
 
@@ -306,7 +332,7 @@ class Session(object):
         except KeyError:
             raise EngineError(
                 f"Branch '{self.branch}' doesn't exist in this proof")
-        except AttributeError:
+        except AttributeError as e:
             raise EngineError("There is no proof started")
         reader = lambda x: self.acc('Output').get_readable(x, self.acc('Lexicon').get_lexem)
         if closed:
@@ -327,7 +353,7 @@ class Session(object):
     @DealWithPOP
     def getrules(self) -> dict[str, str]:
         """Zwraca nazwy reguł wraz z dokumentacją"""
-        return self.acc('FormalUser').get_rules()
+        return self.acc('Formal').get_rules_docs()
 
 
     @DealWithPOP

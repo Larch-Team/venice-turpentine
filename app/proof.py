@@ -1,21 +1,29 @@
 import random
-from typing import Any, Iterable, Union
+from typing import Any, Callable, Iterable, OrderedDict, Union
+
+from anytree.iterators.preorderiter import PreOrderIter
+
 from close import Close
+from exceptions import EngineError, FormalError
+from history import History
 from pop_engine import Socket
 from sentence import Sentence
 from tree import ProofNode
-from exceptions import EngineError, FormalUserError
 from usedrule import UsedRule
 
-class Proof(object):
 
-    def __init__(self, sentence: Sentence, config: dict, name_seed: int = None) -> None:
+class Proof(object):
+    START_BRANCH = 'Green'
+
+    def __init__(self, sentence: Sentence, config: dict = None, name_seed: int = None) -> None:
         super().__init__()
-        self.config = config
-        self.nodes = ProofNode(sentence, 'Green')
+        self.S = sentence.S # Session
+        self.config = config or self.S.get_config()
+        self.nodes = ProofNode(sentence, self.START_BRANCH)
         self.metadata = dict(
             usedrules = [],
-            decision_points = []
+            decision_points = [],
+            used_solver = False
         )
         self.name_seed = name_seed or random.random()*10**7
         self.namegen = random.Random(self.name_seed)
@@ -24,13 +32,17 @@ class Proof(object):
 
     def append(self, sentences: Iterable[tuple[Sentence]], branch: str) -> int:
         leaf = self.nodes.getleaf(branch)
-        leaf.append(sentences, self.namegen)
+        return leaf.append(sentences, self.namegen)
 
 
     # Proof manipulation
 
     def deal_closure(self, FormalSystem: Socket, branch_name: str) -> tuple[Close, str]:
-        """Wywołuje proces sprawdzenia zamykalności gałęzi oraz (jeśli można) zamyka ją; Zwraca informacje o podjętych akcjach"""
+        """Wywołuje proces sprawdzenia zamykalności gałęzi oraz (jeśli można) zamyka ją; Zwraca informacje o zamknięciu"""
+        return self.deal_closure_func(FormalSystem.check_closure, branch_name)
+
+    def deal_closure_func(self, func: Callable[[list[Sentence], History], Union[None, tuple[Close, str]]], branch_name: str) -> tuple[Close, str]:
+        """Wywołuje proces sprawdzenia zamykalności gałęzi oraz (jeśli można) zamyka ją; Zwraca informacje o zamknięciu"""
         try:
             branch, _ = self.nodes.getleaf(branch_name).getbranch_sentences()
         except ValueError as e:
@@ -42,7 +54,7 @@ class Proof(object):
         used = self.nodes.getleaf(branch_name).gethistory()
         
         # Branch checking
-        out = FormalSystem.check_closure(branch, used)
+        out = func(branch, used)
 
         if out:
             closure, info = out
@@ -50,7 +62,6 @@ class Proof(object):
             return closure, f"{branch_name}: {info}"
         else:
             return None, None
-
 
     def use_rule(self, FormalSystem: Socket, branch: str, rule: str, context: dict[str, Any], decisions: dict = None) -> tuple[str]:
         """
@@ -79,7 +90,7 @@ class Proof(object):
         # Rule execution
         try:
             out, used_extention, decisions = FormalSystem.use_rule(rule, branch, used, context, decisions)
-        except FormalUserError as e:
+        except FormalError as e:
             raise EngineError(str(e))
 
         # Adding to used rules and returning
@@ -88,24 +99,50 @@ class Proof(object):
 
         layer = old.append(out, self.namegen)
         children = old.children
-        assert len(children) == len(used_extention), "Liczba gałęzi i list komend powinna być taka sama"
-        for j, s in zip(children, used_extention):
-            j.History(*s)
-            for k in j.descendants:
-                k.History(*s)
+        self.nodes.insert_history(used_extention, children)
 
-        self.metadata['usedrules'].append(UsedRule(layer, self.branch, rule, context, decisions))
+        self.metadata['usedrules'].append(UsedRule(layer, self.branch, rule, self, context, decisions))
         return tuple(i.branch for i in children)
+
+    
+    def get_histories(self) -> dict[str, History]:
+        leaves = self.nodes.leaves
+        return {leaf.branch:leaf.gethistory() for leaf in leaves}       
+    
+    
+    def _group_by_layers(self) -> list[tuple[UsedRule, list[Sentence]]]:
+        d = {i.layer:[] for i in self.metadata['usedrules']}
+        for node in PreOrderIter(self.nodes):
+            if node.layer == 0:
+                continue
+            d[node.layer].append(node.sentence)
+        return [(i,d[i.layer]) for i in self.metadata['usedrules']]
+    
+    def check(self, checker: Callable[[UsedRule, Sentence], str]) -> tuple[str]:
+        if not self.nodes.is_closed():
+            return ("Nie możesz sprawdzić nieskończonego dowodu",)
+        if not self.metadata['usedrules']:
+            return ("Nie wykonano żadnej operacji")
+        
+        problems = OrderedDict()
+        for used, sentences in self._group_by_layers():
+            for i in sentences:
+                if (info := checker(used, i)):
+                    problems[info] = None
+        return tuple(problems.keys())
+        
+                    
 
 
 class BranchCentric(Proof):
 
     def __init__(self, sentence: Sentence, config: dict, name_seed: int = None) -> None:
         super().__init__(sentence, config, name_seed=name_seed)
-        self.branch = 'Green'
+        self.branch = self.START_BRANCH
 
-    def append(self, sentences: Iterable[tuple[Sentence]]) -> int:
-        return super().append(sentences, self.branch)
+    def append(self, sentences: Iterable[tuple[Sentence]], branch: str = None) -> int:
+        branch = branch or self.branch
+        return super().append(sentences, branch)
 
     def get_node(self):
         return self.nodes.getleaf(self.branch)

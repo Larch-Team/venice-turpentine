@@ -1,15 +1,21 @@
 from __future__ import annotations
 
+import json
+import random
 import typing as tp
-import json, random
-from collections import namedtuple, OrderedDict
+from collections import OrderedDict, namedtuple
 from math import inf as INFINITY
-from anytree import NodeMixin, util, LevelOrderIter
-from history import *
+
+from anytree import NodeMixin, util
+
 from close import *
+from history import *
 
 Sentence = tp.NewType("Sentence", list[str])
 PrintedProofNode = namedtuple('PrintedProofNode', ('sentence', 'children', 'closer'))
+
+SentenceTupleStructure = tp.NewType('SentenceTupleStructure', tuple[tuple[Sentence]])
+HistoryTupleStructure = tp.NewType('HistoryTupleStructure', tuple[tuple[tp.Union[Sentence, int, tp.Callable]]])
 
 def getcolors():
     """
@@ -24,7 +30,7 @@ class ProofNodeError(Exception):
         super().__init__(msg, *args, **kwargs)
 
 
-class ProofElement(object):
+class ProofBase(object):
     """Klasa macierzysta dla ProofNode implementująca wszystkie czysto dowodowe elementy"""
 
 
@@ -72,7 +78,7 @@ class ProofElement(object):
 
 
 
-class ProofNode(ProofElement, NodeMixin):
+class ProofNode(ProofBase, NodeMixin):
     """Reprezentacja pojedynczego zdania w drzewie"""
 
     def __init__(self, sentence: Sentence, branch_name: str, layer: int = 0, history: History = None, parent: ProofNode = None, children: tp.Iterable[ProofNode] = []):
@@ -94,7 +100,11 @@ class ProofNode(ProofElement, NodeMixin):
         super().__init__(sentence=sentence, branch=branch_name, layer=layer, history=history)
         self.parent = parent or None
         self.children = children
-    
+
+
+    def __repr__(self) -> str:
+        return f"{self.branch}:{len(self.ancestors)}{' (closed)' if self.closed else ''} - {self.sentence.getReadable()}"
+
 
     def gen_name(self, namegen: random.Random, am=2) -> tuple[str]:
         """Zwraca `am` nazw dla gałęzi z czego jedną jest nazwa aktualnej"""
@@ -106,6 +116,17 @@ class ProofNode(ProofElement, NodeMixin):
             return self.branch, *[str(namegen.randint(0, 1000)) for i in range(am-1)]
         return self.branch, *namegen.choices(possible, k=am-1)
     
+    
+    # Static
+    
+    @staticmethod
+    def insert_history(used_extention: HistoryTupleStructure, children: Iterable[ProofNode]):
+        assert len(children) == len(used_extention), "Liczba gałęzi i list komend dla historii powinna być taka sama"
+        for j, s in zip(children, used_extention):
+            j.History(*s)
+            for k in j.descendants:
+                k.History(*s)
+
 
     # Nawigacja
 
@@ -113,6 +134,12 @@ class ProofNode(ProofElement, NodeMixin):
     def getbranchnames(self):
         """Zwraca nazwy wszystkich gałęzi w dowodzie"""
         return [i.branch for i in self.getleaves()]
+
+
+    def getbranch_nodes(self) -> tuple[list[ProofNode], Close]:
+        """Zwraca gałąź dowodu w formie węzłów z informacjami o jej zamknięciu"""
+        assert self.is_leaf, "Gałąź nie jest kompletna, gdyż węzeł nie jest liściem"
+        return [i for i in self.path], self.closed
 
 
     def getbranch_sentences(self) -> tuple[list[Sentence], Close]:
@@ -131,6 +158,10 @@ class ProofNode(ProofElement, NodeMixin):
             closer = str(self.closed) if self.closed else None
         return PrintedProofNode(sentence=self.sentence, children=children, closer=closer)
 
+
+    def notused(self) -> list[ProofNode]:
+        return [i for i in self.getbranch_nodes()[0] if i.sentence not in self.history]
+    
 
     def getleaves(self, *names: tp.Iterable[str]) -> list[ProofNode]:
         """Zwraca wszystkie liście *całego drzewa*, bądź tylko liście o wybranych nazwach (jeśli zostaną podane w `names`)
@@ -187,7 +218,7 @@ class ProofNode(ProofElement, NodeMixin):
 
     # Modyfikacja
 
-    def append(self, sentences: tp.Iterable[tuple[Sentence]], namegen: random.Random) -> int:
+    def append(self, sentences: SentenceTupleStructure, namegen: random.Random) -> int:
         """Dodaje zdania do drzewa, zwraca warstwę"""
         names = self.gen_name(namegen, am=len(sentences))
         layer = max((i.layer for i in self.getleaves()))+1
@@ -205,7 +236,15 @@ class ProofNode(ProofElement, NodeMixin):
         :param layer: Warstwa (najwyższą można uzyskać przez sprawdzenie wartości w stosie użytych reguł)
         :type layer: int
         """
-        node = self.root
-        node.children = [i for i in self.children if i.layer>=layer]
-        for i in node.children:
-            i.pop(layer)
+        self.root._pop(layer)
+
+    def _pop(self, layer: int):
+        """
+        Usuwa z dowodu wszystkie węzły o danej, lub wyższej warstwie
+
+        :param layer: Warstwa (najwyższą można uzyskać przez sprawdzenie wartości w stosie użytych reguł)
+        :type layer: int
+        """
+        self.children = [i for i in self.children if i.layer<layer]
+        for i in self.children:
+            i._pop(layer)

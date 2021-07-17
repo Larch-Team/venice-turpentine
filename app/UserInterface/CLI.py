@@ -115,11 +115,10 @@ def performer(command: Command, session: engine.Session) -> str:
     """Wykonuje funkcję na obiekcie sesji"""
     if command.docs:
         return command.docs
+    if isinstance(command.args, str):
+        return command.func(session, command.args)
     else:
-        if isinstance(command.args, str):
-            return command.func(session, command.args)
-        else:
-            return command.func(session, *command.args)
+        return command.func(session, *command.args)
 
 
 # Commands
@@ -227,18 +226,6 @@ def do_prove(session: engine.Session, sentence: str) -> str:
     else:
         return "Sentence tokenized successfully \nProof initialized"
 
-
-def do_auto(session: engine.Session):
-    """Not reliable, do not use yet"""
-    try:
-        out = session.auto()
-    except engine.EngineError as e:
-        return str(e)
-    if out:
-        return "\n".join(out)
-    else:
-        return "Nothing more can be done"
-
 def do_use(session: engine.Session, command) -> str:
     """Uses a rule in the proof
 
@@ -266,7 +253,7 @@ def do_use(session: engine.Session, command) -> str:
         if i == len(c_values):
             return "More arguments needed: {}".format(", ".join((i.official for i in context_info[i:])))
 
-        vartype = engine.type_translator(c.type_)
+        vartype = engine.contextdef_translate(c.type_)
         try:
             new = vartype(c_values[i])
         except ValueError:
@@ -302,13 +289,16 @@ def do_use(session: engine.Session, command) -> str:
     return "\n".join(out)
 
 
-def do_undo(session: engine.Session, amount: int):
+def do_undo(session: engine.Session, amount: int) -> str:
     """Undos last [arg] actions"""
-    rules = session.undo(amount)
-    return "\n".join(f'Undid rule: {i.rule}' for i in rules)
+    try:
+        rules = session.undo(amount)
+        return "\n".join(f'Undid rule: {i.rule}' for i in rules)
+    except engine.EngineError as e:
+        return str(e)
 
 
-def do_contra(session: engine.Session, branch: str):
+def do_contra(session: engine.Session, branch: str) -> str:
     """Detects contradictions and handles them by closing their branches"""
     cont = session.deal_closure(branch)
     if cont:
@@ -321,6 +311,19 @@ def do_leave(session) -> str:
     """Deletes the proof"""
     session.reset_proof()
     return "Proof was deleted"
+
+
+def do_check(session: engine.Session) -> str:
+    """Checks the proof"""
+    problems = session.check()
+    if problems:
+        return "\n".join(problems)
+    else:
+        return "Dowód jest poprawny"
+    
+def do_solve(session: engine.Session) -> str:
+    """Solves the proof"""
+    return "\n".join(session.solve())
 
 
 # Proof navigation
@@ -349,7 +352,7 @@ def do_next(session: engine.Session):
         return str(e)
 
 
-def do_get_rules(session):
+def do_get_rules_docs(session):
     """Returns all of the rules that can be used in this proof system"""
     try:
         return "\n\n".join(("\n---\n".join(i) for i in session.getrules().items()))
@@ -370,7 +373,7 @@ def do_debug_get_methods(session: engine.Session) -> str:
 command_dict = OrderedDict({
     # Navigation
     'exit': {'comm': do_exit, 'args': []},
-    'get rules': {'comm': do_get_rules, 'args': []},
+    'get rules': {'comm': do_get_rules_docs, 'args': []},
     'get tree': {'comm': do_get_tree, 'args': []},
     'jump': {'comm': do_jump, 'args': [str]},
     'next': {'comm': do_next, 'args': []},
@@ -381,7 +384,8 @@ command_dict = OrderedDict({
     'undo': {'comm': do_undo, 'args': [int]},
     'leave': {'comm': do_leave, 'args': []},
     'prove': {'comm': do_prove, 'args': 'multiple_strings'},
-    'auto': {'comm': do_auto, 'args': []},
+    'solve': {'comm': do_solve, 'args': []},
+    'check': {'comm': do_check, 'args': []},
     # Program interaction
     'plugin switch': {'comm': do_plug_switch, 'args': [str, str]},
     'plugin list all': {'comm': do_plug_list_all, 'args': []},
