@@ -2,10 +2,12 @@ from collections import namedtuple
 import typing as tp
 import close
 from history import History
+from proof import Proof
 from sentence import Sentence
 from exceptions import FormalError
 from rule import Rule, ParameterContext, SentenceID, TokenID, ContextDef
-from tree import HistoryTupleStructure, SentenceTupleStructure
+from tree import HistoryTupleStructure, ProofNode, SentenceTupleStructure
+from usedrule import UsedRule
 
 
 # Rule decorators
@@ -51,6 +53,37 @@ def Modifier(func):
 
     return wrapper
 
+
+SignedSentence = namedtuple('SignedSentence', ['sentence', 'branch', 'id'])
+
+def strict_filler(func: tp.Callable[..., SentenceTupleStructure]) -> tp.Callable[..., tuple[ProofNode]]:
+    """
+    Dekorator uzupełniający funkcję wykonującą regułę dowodzenia strict o otoczkę techniczną
+
+    :param func: Funkcja wykonująca operacje, pierwszym argumentem powinno być Rule, a drugim Sentence
+    :type func: tp.Callable[..., SentenceTupleStructure]
+    :return: Nowa funkcja z dodatkowym argumentem Proof na początku
+    :rtype: tp.Callable[..., tuple[ProofNode]]
+    """
+    def wrapper(proof: Proof, rule: Rule, sentence: SignedSentence, *args, **kwargs):
+        old = proof.nodes.getleaf(sentence.branch)
+
+        # Rule usage
+        fin = func(rule, sentence, *args, **kwargs)
+
+        layer = proof.append(fin, sentence.branch)
+        ProofNode.insert_history(
+            len(fin)*([[0]] if rule.reusable else [[sentence.sentence]]), old.children)
+
+        context = {
+            'sentenceID': sentence.id,
+            'tokenID': sentence.sentence.getMainConnective()
+        }
+
+        proof.metadata['usedrules'].append(
+            UsedRule(layer, sentence.branch, rule.name, proof, context=context, auto=True))
+        return old.descendants
+    return wrapper
 
 # Formating and cleaning
 

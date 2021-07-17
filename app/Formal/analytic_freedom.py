@@ -7,7 +7,7 @@ from exceptions import FormalError
 
 from history import History
 from proof import Proof
-from rule import Rule, SentenceID
+from rule import Rule, SentenceID, SentenceTupleStructure
 from sentence import Sentence
 from tree import ProofNode
 from usedrule import UsedRule
@@ -208,10 +208,10 @@ def checker(rule: UsedRule, conclusion: Sentence) -> tp.Union[str, None]:
 # SOLVER
 
 
-SignedSentence = namedtuple('SignedSentence', ['sentence', 'branch', 'id'])
-
-
 def find_rule(sentence: Sentence) -> str:
+    """
+    Rozpoznaje jaka reguła powinna zostać użyta na formule
+    """
     main, other = sentence.getComponents()
     if main is None:
         return None
@@ -230,8 +230,10 @@ def find_rule(sentence: Sentence) -> str:
         return f"{negated} {second.split('_')[0]}"
 
 
-def group_by_rules(proof: Proof) -> dict[str, list[SignedSentence]]:
-
+def group_by_rules(proof: Proof) -> dict[str, list[utils.SignedSentence]]:
+    """
+    Grupuje formuły w dowodzie do kontenerów na podstawie reguł, których można na nich użyć
+    """
     containers = {i: [] for i in RULES.keys()}
     for leaf in proof.nodes.getleaves():
         branch, closed = leaf.getbranch_sentences()
@@ -244,22 +246,45 @@ def group_by_rules(proof: Proof) -> dict[str, list[SignedSentence]]:
 
             if (rule := find_rule(sentence)) is not None:
                 containers[rule].append(
-                    SignedSentence(sentence, leaf.branch, num))
+                    utils.SignedSentence(sentence, leaf.branch, num))
     return containers
 
-def append_by_rules(containers: dict[str, list[SignedSentence]], nodes: tp.Iterable[ProofNode]) -> dict[str, list[SignedSentence]]:
 
+def append_by_rules(containers: dict[str, list[utils.SignedSentence]], nodes: tp.Iterable[ProofNode]) -> dict[str, list[utils.SignedSentence]]:
+    """
+    Uzupełnia kontenery wygenerowane przez group_by_rules o dodatkowe elementy
+
+    :param containers: kontenery wygenerowane przez group_by_rules
+    :type containers: dict[str, list[utils.SignedSentence]]
+    :param nodes: Węzły, o które mają zostać uzupełnione kontenery
+    :type nodes: tp.Iterable[ProofNode]
+    :return: Uzupełnione kontenery
+    :rtype: dict[str, list[utils.SignedSentence]]
+    """
     for node in nodes:
         num = len(node.path)
-        
+
         if not node.closed and (rule := find_rule(node.sentence)) is not None:
             containers[rule].append(
-                SignedSentence(node.sentence, node.branch, num))
+                utils.SignedSentence(node.sentence, node.branch, num))
     return containers
 
 
-def multiply_for_branches(containers: dict[str, list[SignedSentence]], target: str, branches: tp.Iterable[str]) -> dict[str, list[SignedSentence]]:
-    to_copy = {key: [i for i in val if i.branch == target] for key, val in containers.items()}
+def multiply_for_branches(containers: dict[str, list[utils.SignedSentence]], target: str, branches: tp.Iterable[str]) -> dict[str, list[utils.SignedSentence]]:
+    """
+    Generuje dodatkowe reprezentacje zdań w innych gałęziach
+
+    :param containers: kontenery wygenerowane przez group_by_rules
+    :type containers: dict[str, list[utils.SignedSentence]]
+    :param target: Gałąź, która ma być używana jako wzorzec
+    :type target: str
+    :param branches: Gałęzie, dla których należy wygenerować zdania
+    :type branches: tp.Iterable[str]
+    :return: Uzupełnione kontenery
+    :rtype: dict[str, list[utils.SignedSentence]]
+    """
+    to_copy = {key: [i for i in val if i.branch == target]
+               for key, val in containers.items()}
 
     for key, value in containers.items():
         value.extend(
@@ -271,29 +296,15 @@ def multiply_for_branches(containers: dict[str, list[SignedSentence]], target: s
     return containers
 
 
-def change_branch_container(container: list[SignedSentence], branches: tp.Iterable[str]) -> list[SignedSentence]:
-    return [SignedSentence(i.sentence, j, i.id) for i in container for j in branches]
+def change_branch_container(container: list[utils.SignedSentence], branches: tp.Iterable[str]) -> list[utils.SignedSentence]:
+    return [utils.SignedSentence(i.sentence, j, i.id) for i in container for j in branches]
 
 
-def use_strict(proof: Proof, rule: Rule, sentence: SignedSentence) -> tuple[ProofNode]:
-    old = proof.nodes.getleaf(sentence.branch)
-
-    # Rule usage
+@utils.strict_filler
+def use_strict(rule: Rule, sentence: utils.SignedSentence) -> SentenceTupleStructure:
+    """Funkcja ma de facto inne parametry ze względu na działanie dekoratora - pierwszym jest Proof. Funkcja wykonuje regułę dowodzenia w formie strict na zdaniu"""
     fin = rule.strict(sentence.sentence)
     assert fin
-
-    layer = proof.append(fin, sentence.branch)
-    ProofNode.insert_history(
-        len(fin)*([[0]] if rule.reusable else [[sentence.sentence]]), old.children)
-
-    context = {
-        'sentenceID': sentence.id,
-        'tokenID': sentence.sentence
-    }
-
-    proof.metadata['usedrules'].append(
-        UsedRule(layer, sentence.branch, rule.name, proof, context=context, auto=True))
-    return old.descendants
 
 
 def _pop_default(l: list, index: int = -1, default: tp.Any = None) -> tp.Any:
@@ -303,7 +314,11 @@ def _pop_default(l: list, index: int = -1, default: tp.Any = None) -> tp.Any:
         return default
 
 
-def propagate_rule(proof: Proof, rule: Rule, containers: dict[str, list[SignedSentence]]) -> dict[str, list[SignedSentence]]:
+def propagate_rule(proof: Proof, rule: Rule, containers: dict[str, list[utils.SignedSentence]]) -> dict[str, list[utils.SignedSentence]]:
+    """
+    Przypominająca operację konsekwencji funkcja, która stosuje daną funkcję i wszystkie jej poprzedniki na całości dowodu.
+    Zwraca kontenery z nierozwiązanymi zdaniami
+    """
     if not containers[rule.name]:
         return containers
     closed = []
@@ -313,34 +328,43 @@ def propagate_rule(proof: Proof, rule: Rule, containers: dict[str, list[SignedSe
         new = use_strict(proof, rule, sentence)
         for node in new:
             if proof.deal_closure_func(check_closure, node.branch)[0]:
-                closed.append(node.branch)        
-                
+                closed.append(node.branch)
+
         modified_branches = {i.branch for i in new}
         if len(modified_branches) > 1:
-            containers = multiply_for_branches(containers, node.parent.branch, modified_branches)
+            containers = multiply_for_branches(
+                containers, node.parent.branch, modified_branches)
         containers = append_by_rules(containers, new)
-    return {i:[k for k in j if k.branch not in closed] for i,j in containers.items()}
+    return {i: [k for k in j if k.branch not in closed] for i, j in containers.items()}
 
 
-def _solver(proof: Proof, rule: Rule, containers: dict[str, list[SignedSentence]]) -> bool:
+def _solver(proof: Proof, rule: Rule, containers: dict[str, list[utils.SignedSentence]]) -> bool:
+    """ 
+    Rekurencyjna funkcja solvera, zwraca informację, czy dowód udało się ukończyć (powinna być zawsze True)
+    Używać solver zamiast tej.
+    """
     start_used = proof.metadata['usedrules'][:]
     start_layer = start_used[-1].layer if start_used else 0
-        
-    while any(len(containers[i.name])>0 for i in rule.path):
+
+    while any(len(containers[i.name]) > 0 for i in rule.path):
         for past_rule in rule.path:
             containers = propagate_rule(proof, past_rule, containers)
         if proof.nodes.is_closed():
             return True
-    
+
     for child in rule.children:
         if _solver(proof, child, containers):
             return True
-        
+
     proof.metadata['usedrules'] = start_used
     proof.nodes.pop(start_layer+1)
-    return False            
+    return False
+
 
 def solver(proof: Proof) -> bool:
+    """ 
+    Funkcja solvera, zwraca informację, czy dowód udało się ukończyć (powinna być zawsze True)
+    """
     containers = group_by_rules(proof)
     s = _solver(proof, ROOT_RULE, containers)
     proof.metadata['used_solver'] = s
@@ -348,7 +372,7 @@ def solver(proof: Proof) -> bool:
 
 
 def check_closure(branch: list[utils.Sentence], used: History) -> tp.Union[None, tuple[utils.close.Close, str]]:
-    """Sprawdza możliwość zamknięcia gałęzi, zwraca obiekty zamknięcia oraz komunikat do wyświetlenia""" 
+    """Sprawdza możliwość zamknięcia gałęzi, zwraca obiekty zamknięcia oraz komunikat do wyświetlenia"""
     for num1, statement_1 in enumerate(branch):
         for num2, statement_2 in enumerate(branch):
             if statement_1[0].startswith('not') and not statement_2[0].startswith('not'):

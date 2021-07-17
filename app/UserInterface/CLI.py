@@ -115,11 +115,10 @@ def performer(command: Command, session: engine.Session) -> str:
     """Wykonuje funkcję na obiekcie sesji"""
     if command.docs:
         return command.docs
+    if isinstance(command.args, str):
+        return command.func(session, command.args)
     else:
-        if isinstance(command.args, str):
-            return command.func(session, command.args)
-        else:
-            return command.func(session, *command.args)
+        return command.func(session, *command.args)
 
 
 # Commands
