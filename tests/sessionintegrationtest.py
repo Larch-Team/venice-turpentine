@@ -46,12 +46,14 @@ print('POPRAWNE ARGUMENTY\n\n')
 for i,list in enumerate(lists_acc):
         print(f'LISTA {i}\n')
         for com in list:
-                print(f'{com}: --[{runner(com)}]--')
+                print(f'{com}:',end=' ')
+                print(f'--[{runner(com)}]--')
 print('\n\n ZLE ARGUMENTY\n\n')
 for i,list in enumerate(lists_wrong):
         print(f'LISTA {i}\n')
         for com in list:
-                print(f'{com}: --[{runner(com)}]--') 
+                print(f'{com}:',end=' ')
+                print(f'--[{runner(com)}]--')
 
 # print(random.choice(list(args.values())[random.randint(0,len(args.values())-1)]))
 # p = runner('plugin list FormalSystem')
