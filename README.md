@@ -87,7 +87,3 @@ Oraz wszyscy, którzy bacznie przyglądali się rozwojowi aplikacji.
 ### Autorzy pluginów
 
 - Michał Gajdziszewski - algorytm printujący w `actual_tree`
-
-## Licencja
-
-Korzystamy z licencji [GNU GPL 3.0](COPYING)
