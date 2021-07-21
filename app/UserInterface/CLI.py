@@ -341,7 +341,10 @@ def do_get_rules(session):
 
 def do_get_tree(session: engine.Session) -> str:
     """Returns the proof in the form of a tree"""
-    return "\n".join(session.gettree())
+    try:
+        return "\n".join(session.gettree())
+    except engine.EngineError as e:
+            return str(e)
 
 
 def do_debug_get_methods(session: engine.Session) -> str:

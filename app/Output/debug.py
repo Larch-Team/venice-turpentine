@@ -8,7 +8,7 @@ Autorzy:
 """
 import typing as tp
 import Output.__utils__ as utils
-from anytree import Node
+from anytree import Node, RenderTree
 
 SOCKET = 'Output'
 VERSION = '0.0.1'
@@ -27,12 +27,12 @@ def get_readable(sentence: utils.Sentence, lexem_parser: callable) -> str:
     assert isinstance(sentence, utils.Sentence)
     return "<"+"> <".join(sentence)+">"
 
-def write_tree(tree: utils.PrintedTree, lexem_parser: callable) -> list[str]:
+def write_tree(tree: utils.PrintedProofNode, lexem_parser: callable) -> list[str]:
     """
     Zwraca drzewiastą reprezentację dowodu
 
     :param tree: Drzewo do konwersji
-    :type tree: utils.PrintedTree
+    :type tree: utils.PrintedProofNode
     :param lexem_parser: funkcja jednoargumentowa konwertująca tokeny na leksemy
     :type lexem_parser: callable
     :return: Dowód w liście
@@ -41,21 +41,21 @@ def write_tree(tree: utils.PrintedTree, lexem_parser: callable) -> list[str]:
     return [
         f"{pre}{node.name}".rstrip('\n')
         for pre, _, node in RenderTree(
-            get_nodes(tree.sentences, lexem_parser, tree.children)[0]
+            get_nodes(tree.sentence, lexem_parser, tree.children)[0]
         )
     ]
 
 
-def get_nodes(sentences: list[str], lexem_parser: callable, children: list[utils.PrintedTree]) -> list[Node]: 
+def get_nodes(sentences: list[str], lexem_parser: callable, children: list[utils.PrintedProofNode]) -> list[Node]: 
     """Zwraca listę dzieci do dodania do drzewa.
     Jeżeli istnieją jeszcze zdania w sentences, to mają one pierwszeństwo. W innym przypadku wyliczane są dzieci.
 
-    :param sentences: PrintedTree.sentences
+    :param sentences: PrintedProofNode.sentences
     :type sentences: list[str]
     :param lexem_parser: Transformuje tokeny w leksemy
     :type lexem_parser: callable
-    :param children: PrintedTree.children
-    :type children: list[PrintedTree]
+    :param children: PrintedProofNode.children
+    :type children: list[PrintedProofNode]
     :return: Lista dzieci do dodania do węzła
     :rtype: list[Node]
     """

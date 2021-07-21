@@ -32,12 +32,12 @@ def get_readable(sentence: utils.Sentence, lexem_parser: callable) -> str:
     return "".join(readable).replace("  ", " ")
 
 
-def write_tree(tree: utils.PrintedTree, lexem_parser: callable) -> list[str]:
+def write_tree(tree: utils.PrintedProofNode, lexem_parser: callable) -> list[str]:
     """
     Zwraca drzewiastą reprezentację dowodu
 
     :param tree: Drzewo do konwersji
-    :type tree: utils.PrintedTree
+    :type tree: utils.PrintedProofNode
     :param lexem_parser: Funkcja jednoargumentowa konwertująca tokeny na leksemy
     :type lexem_parser: callable
     :return: Dowód w liście
@@ -51,16 +51,16 @@ def write_tree(tree: utils.PrintedTree, lexem_parser: callable) -> list[str]:
     ]
 
 
-def get_nodes(sentence: list[str], lexem_parser: callable, children: list[utils.PrintedTree]) -> list[Node]: 
+def get_nodes(sentence: list[str], lexem_parser: callable, children: list[utils.PrintedProofNode]) -> list[Node]: 
     """Zwraca listę dzieci do dodania do drzewa.
     Jeżeli istnieją jeszcze zdania w sentence, to mają one pierwszeństwo. W innym przypadku wyliczane są dzieci.
 
-    :param sentence: PrintedTree.sentence
+    :param sentence: PrintedProofNode.sentence
     :type sentence: list[str]
     :param lexem_parser: Transformuje tokeny w leksemy
     :type lexem_parser: callable
-    :param children: PrintedTree.children
-    :type children: list[PrintedTree]
+    :param children: PrintedProofNode.children
+    :type children: list[PrintedProofNode]
     :return: Lista dzieci do dodania do węzła
     :rtype: list[Node]
     """

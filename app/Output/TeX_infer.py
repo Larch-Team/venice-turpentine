@@ -38,18 +38,18 @@ def get_readable(sentence: utils.Sentence, lexem_parser: callable) -> str:
             readable.append(lexem)
     return "".join(readable).replace("  ", " ")
 
-def write_tree(tree: utils.PrintedTree, lexem_parser: callable) -> list[str]:
+def write_tree(tree: utils.PrintedProofNode, lexem_parser: callable) -> list[str]:
     """
     Zwraca drzewiastą reprezentację dowodu
 
     :param tree: Drzewo do konwersji
-    :type tree: utils.PrintedTree
+    :type tree: utils.PrintedProofNode
     :param lexem_parser: Funkcja jednoargumentowa konwertująca tokeny na leksemy
     :type lexem_parser: callable
     :return: Dowód w liście
     :rtype: list[str]
     """
-    return [_write_tree(tree.sentences, tree.children, lexem_parser)]
+    return [_write_tree(tree.sentence, tree.children, lexem_parser)]
 
 
 def _translate(s: utils.Sentence, lexem_parser: callable):
@@ -63,14 +63,11 @@ def _translate(s: utils.Sentence, lexem_parser: callable):
             readable.append(lexem_parser(i))
     return " ".join(readable)
 
-
-def _write_tree(sentences, children, lexem_parser: callable) -> str:
-    if len(sentences)>0:
-        return _gen_infer(_translate(sentences[0], lexem_parser), _write_tree(sentences[1:], children, lexem_parser))
-    elif children is not None:
-        return " & ".join((_write_tree(i.sentences, i.children, lexem_parser) for i in children))
-    else:
-        return ""
-
 def _gen_infer(s1, s2):
     return "\\infer{%s}{%s}" % (s1, s2)
+
+def _write_tree(sentence, children, lexem_parser: callable) -> str:
+    if children is None:
+        return _gen_infer(_translate(sentence, lexem_parser), "")
+    else:
+        return _gen_infer(_translate(sentence, lexem_parser), " & ".join((_write_tree(i.sentences, i.children, lexem_parser) for i in children)))

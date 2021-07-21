@@ -7,8 +7,8 @@ from math import inf as INFINITY
 from anytree import NodeMixin, util, LevelOrderIter
 from tree_helpers import *
 from close import *
+from sentence import Sentence
 
-Sentence = tp.NewType("Sentence", list[str])
 PrintedProofNode = namedtuple('PrintedProofNode', ('sentence', 'children', 'closer'))
 
 def getcolors():
@@ -31,7 +31,7 @@ class ProofElement(object):
     def __init__(self, sentence: Sentence, branch: str, layer: int = 0, history: History = None) -> None:
         """Używaj ProofNode"""
         super().__init__()
-        self.sentence = sentence
+        self.sentence = sentence if isinstance(sentence, Sentence) else Sentence(sentence)
         self.branch = branch
         self.closed = None
         self.history = History() if history is None else history.copy()
