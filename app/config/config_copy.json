@@ -1,1 +1,1 @@
-{"chosen_plugins": {"UserInterface": "CLI", "Lexicon": "basic", "FormalSystem": "zeroth_order_logic", "Output": "actual_tree", "Auto": "seqcal"}}
+{"chosen_plugins": {"UserInterface": "CLI", "Lexicon": "classic", "FormalSystem": "int_seqcal_scottish", "Output": "actual_tree", "Auto": "seqcal"}}

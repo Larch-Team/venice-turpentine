@@ -29,7 +29,7 @@ def get_readable(sentence: utils.Sentence) -> str:
     """
     assert isinstance(sentence, utils.Sentence)
     readable = []
-    for lexem in sentence.getReadable():
+    for lexem in sentence.getLexems():
         if len(lexem) > 1:
             readable.append(f" {lexem} ")
         else:

@@ -527,8 +527,4 @@ class Runner(object):
             return e
         except TypeError as e:
             return "błąd: złe argumenty"
-<<<<<<< HEAD
         return performer(procedure, self.session)
-=======
-        return performer(procedure, self.session)
->>>>>>> development
