@@ -19,55 +19,42 @@ TEX_DICTIONARY = {
     ")"         :   ")",
 }
 
-def get_readable(sentence: utils.Sentence, lexem_parser: callable) -> str:
+def get_readable(sentence: utils.Sentence) -> str:
     """Zwraca zdanie w czytelnej formie
 
     :param sentence: Zdanie do transformacji
     :type sentence: Sentence
-    :param lexem_parser: Funkcja jednoargumentowa konwertująca tokeny na leksemy
-    :type lexem_parser: callable
     :return: Przepisane zdanie
     :rtype: str
     """
     assert isinstance(sentence, utils.Sentence)
     readable = []
-    for lexem in (lexem_parser(i) for i in sentence):
+    for lexem in sentence.getReadable():
         if len(lexem) > 1:
             readable.append(f" {lexem} ")
         else:
             readable.append(lexem)
     return "".join(readable).replace("  ", " ")
 
-def write_tree(tree: utils.PrintedProofNode, lexem_parser: callable) -> list[str]:
+def write_tree(tree: utils.PrintedProofNode) -> list[str]:
     """
     Zwraca drzewiastą reprezentację dowodu
 
     :param tree: Drzewo do konwersji
     :type tree: utils.PrintedProofNode
-    :param lexem_parser: Funkcja jednoargumentowa konwertująca tokeny na leksemy
-    :type lexem_parser: callable
-    :return: Dowód w liście
-    :rtype: list[str]
     """
-    return [_write_tree(tree.sentence, tree.children, lexem_parser)]
+    return [_write_tree(tree.sentence, tree.children)]
 
 
-def _translate(s: utils.Sentence, lexem_parser: callable):
-    readable = []
-    for i in s:
-        for typ in TEX_DICTIONARY.keys():
-            if i.startswith(typ):
-                readable.append(TEX_DICTIONARY[typ])
-                break
-        else:
-            readable.append(lexem_parser(i))
+def _translate(s: utils.Sentence):
+    readable = [TEX_DICTIONARY.get(t, l) for t, l in s.getItems()]
     return " ".join(readable)
 
 def _gen_infer(s1, s2):
     return "\\infer{%s}{%s}" % (s1, s2)
 
-def _write_tree(sentence, children, lexem_parser: callable) -> str:
+def _write_tree(sentence, children) -> str:
     if children is None:
-        return _gen_infer(_translate(sentence, lexem_parser), "")
+        return _gen_infer(_translate(sentence), "")
     else:
-        return _gen_infer(_translate(sentence, lexem_parser), " & ".join((_write_tree(i.sentences, i.children, lexem_parser) for i in children)))
+        return _gen_infer(_translate(sentence), " & ".join((_write_tree(i.sentences, i.children) for i in children)))

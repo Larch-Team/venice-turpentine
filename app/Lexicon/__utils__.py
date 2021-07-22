@@ -1,19 +1,17 @@
-import typing as tp
-from sentence import Sentence
+from lexer import RuleConstraint, Lexicon
+# Rule Constraints
 
-lexicon = None
+class use_language(RuleConstraint):
 
+    def __init__(self, arg: str) -> None:
+        super().__init__(arg)
 
-class CompilerError(Exception):
-    pass
+class find_new(RuleConstraint):
 
+    def __init__(self) -> None:
+        super().__init__('')
 
-class MultipleTypesError(CompilerError):
+class no_generation(RuleConstraint):
 
-    def __init__(self, multiple, *args, **kwargs):
-        lists = [" - ".join((i[0], ", ".join(i[1]))) for i in multiple.items()]
-        msg = "\n".join(("Multiple types found for:", *lists))
-        super().__init__(msg, *args, **kwargs)
-
-
-NON_CONVERTIBLE = ("(", ")")
+    def __init__(self) -> None:
+        super().__init__('')

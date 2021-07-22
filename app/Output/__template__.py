@@ -8,19 +8,17 @@ SOCKET = 'Output'
 VERSION = '0.0.1'
 
 
-def get_readable(sentence: utils.Sentence, lexem_parser: callable) -> str:
+def get_readable(sentence: utils.Sentence) -> str:
     """Returns a readable version of the sentence
 
     :param sentence: Transcribed sentence
     :type sentence: Sentence
-    :param lexem_parser: Transforms tokens into lexems to use (get_lexem for example)
-    :type lexem_parser: callable
     :return: Transcribed string
     :rtype: str
     """
     pass
 
-def write_tree(tree: utils.PrintedProofNode, lexem_parser: callable) -> list[str]:
+def write_tree(tree: utils.PrintedProofNode) -> list[str]:
     """
     Returns a tree/table representation of the whole proof
     """

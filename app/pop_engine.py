@@ -257,11 +257,10 @@ class Socket(object):
         Raises:
             FunctionInterfaceError: Socket doesn't allow this function interface - wrong type of arguments/returned value.
         """
-        if self.functions.get(func.__name__, None) == None:
+        if self.functions.get(func.__name__, None) is None:
             return True
         sig = inspect.signature(func)
-        args = tuple(
-            [sig.parameters[j].annotation for j in sig.parameters.keys()])
+        args = tuple(sig.parameters[j].annotation for j in sig.parameters.keys())
         proper = self.functions[func.__name__]
 
         # Argument checking
@@ -273,9 +272,9 @@ class Socket(object):
             raise FunctionInterfaceError(
                 False, self, func, sig.return_annotation)
         else:
-            return True
             logger.debug(f"{func.__name__} compatible")
-
+            return True
+            
     def read_template(self, template: tp.Union[str, dict[str, tuple[tuple[tp.Any], tp.Any]]]):
         """
         Reads/Retrieves a template and modifies the shape of the socket according to the objects given in the template

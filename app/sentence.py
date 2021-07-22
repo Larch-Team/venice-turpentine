@@ -18,9 +18,10 @@ def _split_keys(dictionary: dict, key: int) -> dict:
 
 class Sentence(list):
 
-    def __init__(self, sen, session: Session, precedenceBaked: Union[dict[str, float], None] = None):
+    def __init__(self, sen, session: Session, precedenceBaked: dict[str, float] = {}):
         self.S = session
         self.precedenceBaked = precedenceBaked
+        self._pluggedFS = None
         super().__init__(sen)
 
     # The actual definitions
@@ -33,8 +34,12 @@ class Sentence(list):
         """Zwraca ze zdania leksemy użyte przez użytkownika"""
         return [i.split('_')[-1] for i in self]
 
+    def getItems(self) -> list[tuple[str, str]]:
+        """Zwraca listę kolejno występujących typów w zdaniu"""
+        return [i.split('_') for i in self]
+
     def getReadable(self) -> str:
-        return self.S.acc('Output').get_readable(self, self.S.acc('Lexicon').get_lexem)
+        return self.S.acc('Output').get_readable(self)
 
     def getUnique(self) -> list[str]:
         """Zwraca zapis unikalny dla tego zdania; odporne na różnice w formacie zapisu"""
@@ -46,15 +51,10 @@ class Sentence(list):
                 ret.append(typ)
         return ret
 
+    def getPrecedence(self) -> dict[str, int]:
+        return self.S.acc('FormalSystem').get_operator_precedence()
 
     # Manipulacja zdaniem
-
-    @staticmethod
-    def calcPrecedenceVal(connective: str, precedence: dict[str,int], lvl: int = 0, prec_div: int = None) -> float:
-        if prec_div is not None:
-            return lvl + precedence[connective]/prec_div
-        else:
-            return lvl + precedence[connective]/max(precedence.values())+1
 
     def reduceBrackets(self) -> _Sentence:
         """Minimalizuje nawiasy w zdaniu; zakłada poprawność ich rozmieszczenia"""
@@ -93,18 +93,41 @@ class Sentence(list):
         return Sentence(-min_left*["("] + reduced + right*[")"], self.S, new_baked)
 
 
-    def readPrecedence(self, precedence: dict[str, int]) -> dict[int, float]:
+    @staticmethod
+    def static_calcPrecedenceVal(connective: str, precedence: dict[str, int], lvl: int = 0, prec_div: int = None) -> float:
+        if prec_div is not None:
+            return lvl + precedence[connective]/prec_div
+        else:
+            return lvl + precedence[connective]/max(precedence.values())+1
+
+
+    def getLowest(self, dictionary: dict[int, float]):
+        min_prec = min(dictionary.values())
+        min_prec_indexes = (i for i,j in dictionary.items() if j==min_prec)
+        if min_prec == max(self.getPrecedence().values()):
+            return min(min_prec_indexes)
+        else:
+            return max(min_prec_indexes)
+
+
+    def calcPrecedenceVal(self, connective: str, lvl: int = 0, prec_div: int = None) -> float:
+        precedence = self.getPrecedence()
+        return self.static_calcPrecedenceVal(connective, precedence, lvl, prec_div)
+        
+
+    def readPrecedence(self) -> dict[int, float]:
         """
         Oblicza, bądź zwraca informacje o sile spójników w danym zdaniu. *Powinno być przywołane przed dowolnym użyciem precedenceBaked*
 
-        :param precedence: Siła wiązania spójników (podane same typy) - im wyższa wartość, tym mocniej wiąże
-        :type precedence: dict[str, int]
         :return: Indeksy spójników oraz siła wiązania - im wyższa wartość, tym mocniej wiąże
         :rtype: dict[str, float]
         """
-        if self.precedenceBaked:
+        if self.precedenceBaked and self._pluggedFS == self.S.config['chosen_plugins']['FormalSystem']:
             return self.precedenceBaked
+        self._pluggedFS = self.S.config['chosen_plugins']['FormalSystem']
+
         self.precedenceBaked = {}
+        precedence = self.getPrecedence()
 
         lvl = 0
         prec_div = max(precedence.values())+1
@@ -114,7 +137,7 @@ class Sentence(list):
             elif t == ')':
                 lvl -= 1
             elif t in precedence:
-                self.precedenceBaked[i] = self.calcPrecedenceVal(t, precedence, lvl, prec_div)
+                self.precedenceBaked[i] = self.static_calcPrecedenceVal(t, precedence, lvl, prec_div)
     
         return self.precedenceBaked
 
@@ -132,6 +155,7 @@ class Sentence(list):
     def getMainConnective(self, precedence: dict[str, int]) -> tuple[str, tuple[_Sentence, _Sentence]]:
         """
         Na podstawie kolejności wykonywania działań wyznacza najwyżej położony spójnik.
+        Zwraca None gdy nie udało się znaleźć spójnika
 
         :param precedence: Siła wiązania spójników (podane same typy) - im wyższa wartość, tym mocniej wiąże
         :type precedence: dict[str, int]
@@ -139,11 +163,11 @@ class Sentence(list):
         :rtype: tuple[str, tuple[_Sentence, _Sentence]]
         """
         sentence = self.reduceBrackets()
-        prec = sentence.readPrecedence(precedence)
+        prec = sentence.readPrecedence()
 
-        if len(self) == 1:
+        if len(prec)==0:
             return None, None
-        con_index, _ = min(prec.items(), key=lambda x: x[1])
+        con_index = self.getLowest(prec)
         return sentence[con_index], sentence._split(con_index)
                 
 

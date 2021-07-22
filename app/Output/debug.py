@@ -14,54 +14,44 @@ SOCKET = 'Output'
 VERSION = '0.0.1'
 
 
-def get_readable(sentence: utils.Sentence, lexem_parser: callable) -> str:
+def get_readable(sentence: utils.Sentence) -> str:
     """Konwertuje tokeny do formy <typ_leksem>
 
     :param sentence: Zdanie do transformacji
     :type sentence: Sentence
-    :param lexem_parser: nieużywany parametr
-    :type lexem_parser: callable
     :return: Przekonwertowane zdanie
     :rtype: str
     """
     assert isinstance(sentence, utils.Sentence)
     return "<"+"> <".join(sentence)+">"
 
-def write_tree(tree: utils.PrintedProofNode, lexem_parser: callable) -> list[str]:
+def write_tree(tree: utils.PrintedProofNode) -> list[str]:
     """
     Zwraca drzewiastą reprezentację dowodu
 
     :param tree: Drzewo do konwersji
     :type tree: utils.PrintedProofNode
-    :param lexem_parser: funkcja jednoargumentowa konwertująca tokeny na leksemy
-    :type lexem_parser: callable
     :return: Dowód w liście
     :rtype: list[str]
     """
     return [
         f"{pre}{node.name}".rstrip('\n')
         for pre, _, node in RenderTree(
-            get_nodes(tree.sentence, lexem_parser, tree.children)[0]
+            get_nodes(tree.sentence, tree.children)[0]
         )
     ]
 
 
-def get_nodes(sentences: list[str], lexem_parser: callable, children: list[utils.PrintedProofNode]) -> list[Node]: 
+def get_nodes(sentence: list[str], children: list[utils.PrintedProofNode]) -> list[Node]: 
     """Zwraca listę dzieci do dodania do drzewa.
-    Jeżeli istnieją jeszcze zdania w sentences, to mają one pierwszeństwo. W innym przypadku wyliczane są dzieci.
+    Jeżeli istnieją jeszcze zdania w sentence, to mają one pierwszeństwo. W innym przypadku wyliczane są dzieci.
 
-    :param sentences: PrintedProofNode.sentences
-    :type sentences: list[str]
-    :param lexem_parser: Transformuje tokeny w leksemy
-    :type lexem_parser: callable
+    :param sentence: PrintedProofNode.sentence
+    :type sentence: list[str]
     :param children: PrintedProofNode.children
-    :type children: list[PrintedProofNode]
+    :type children: list[PrintedTree]
     :return: Lista dzieci do dodania do węzła
     :rtype: list[Node]
     """
-    if sentences:
-        return [Node(get_readable(sentences[0], lexem_parser), children=get_nodes(sentences[1:], lexem_parser, children))]
-    elif children:
-        return sum((get_nodes(child.sentences, lexem_parser, child.children) for child in children), [])
-    else:
-        return []
+    ch = sum((get_nodes(child.sentence, child.children) for child in children), []) if children else []
+    return [Node(get_readable(sentence), children=ch)]

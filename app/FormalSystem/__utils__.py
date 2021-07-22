@@ -225,7 +225,7 @@ def strip_around(sentence: Sentence, border_type: str, split: bool, precedence: 
         return None
 
     middle, subsents = sentence.getMainConnective(precedence)
-    if middle.split('_')[0] != border_type:
+    if middle is None or middle.split('_')[0] != border_type:
         return None
     
     left, right = subsents
@@ -256,7 +256,7 @@ def reduce_prefix(sentence: Sentence, prefix_type: str, precedence: dict[str, in
         return None
 
     middle, subsents = sentence.getMainConnective(precedence)
-    if middle.split('_')[0] != prefix_type:
+    if middle is None or middle.split('_')[0] != prefix_type:
         return None
     
     _, right = subsents
@@ -278,10 +278,8 @@ def add_prefix(sentence: Sentence, prefix: str, lexem: str) -> Sentence:
     """
     if len(sentence) == 1:
         return Sentence([f"{prefix}_{lexem}", *sentence], sentence.S)
-    new = [f"{prefix}_{lexem}", '(', *sentence, ')']
-    return Sentence(new, sentence.S)
-        # TODO: dodawanie 1. spójknika z odpowiednią wartością
-        # return Sentence([f"{prefix}_{lexem}", '(', *sentence, ')'], sentence.S, {i+2:j+1 for i,j in sentence.precedenceBaked.values()} | {0:sentence.calcPrecedenceVal(prefix, )})
+    new_record = {0:sentence.calcPrecedenceVal(prefix)}
+    return Sentence([f"{prefix}_{lexem}", '(', *sentence, ')'], sentence.S, {i+2:j+1 for i,j in sentence.precedenceBaked.values()} | new_record)
 
 
 @Modifier

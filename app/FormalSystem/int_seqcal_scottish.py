@@ -13,6 +13,8 @@ import FormalSystem.__utils__ as utils
 SOCKET = 'FormalSystem'
 VERSION = '0.0.1'
 
+def get_tags() -> tuple[str]:
+    return 'sequent calculus', 'propositional'
 
 USED_TYPES = ('and', 'or', 'imp', 'sentvar', 'sep', 'turnstile','falsum')
 PRECEDENCE = {
@@ -502,3 +504,7 @@ def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, conte
         return utils.merge_tupstruct(left, right, "turnstile_=>"), history
     else:
         return None, None
+
+def get_operator_precedence() -> dict[str, int]:
+    """Zwraca siłę wiązania danych spójników, im wyższa, tym mocniej wiąże (negacja ma najwyższą przykładowo)"""
+    return PRECEDENCE

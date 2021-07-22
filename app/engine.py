@@ -9,6 +9,7 @@ import pop_engine as pop
 from sentence import Sentence
 from tree import ProofNode
 from close import Close
+import lexer
 
 Module = pop.Module
 
@@ -35,7 +36,7 @@ def EngineChangeLog(func):
 
 
 def DealWithPOP(func):
-    """A decorator which convert all PluginErrors to EngineErrors for simpler handling in the UI socket"""
+    """Converts all PluginErrors to EngineErrors for simpler handling in the UI socket"""
     def new(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -95,6 +96,8 @@ class Session(object):
         self.proof = None
         self.branch = ""
 
+        self.compileLexer()
+
 
     def __repr__(self):
         return f"Session({self.id=})"
@@ -143,6 +146,9 @@ class Session(object):
         self.config['chosen_plugins'][socket_name] = new
         self.write_config()
 
+        # Deal with lexer
+        if socket_name == 'Lexicon':
+            self.compileLexer()
 
     def plug_list(self, socket: str) -> list[str]:
         """Zwraca listę wszystkich pluginów dla danej nazwy.
@@ -175,6 +181,14 @@ class Session(object):
             sock.generate_template(name)
 
 
+    # Lexer
+
+    def compileLexer(self) -> None:
+        self.lexer = lexer.BuiltLexer(self.acc('Lexicon').get_lexicon(),
+            use_language = self.acc('FormalSystem').get_tags()
+        ) 
+
+
     # Config reading and writing
 
 
@@ -205,9 +219,8 @@ class Session(object):
         :raises EngineError: Takie zdanie nie może istnieć
         """
         try:
-            tokenized = self.acc('Lexicon').tokenize(
-                statement, self.acc('FormalSystem').get_used_types(), self.defined)
-        except self.acc('Lexicon').utils.CompilerError as e:
+            tokenized = self.lexer.tokenize(statement)
+        except lexer.LrchLexerError as e:
             raise EngineError(str(e))
         tokenized = Sentence(tokenized, self)
         problem = self.acc('FormalSystem').check_syntax(tokenized)
@@ -380,7 +393,7 @@ class Session(object):
                 f"Branch '{self.branch}' doesn't exist in this proof")
         except AttributeError:
             raise EngineError("There is no proof started")
-        reader = lambda x: self.acc('Output').get_readable(x, self.acc('Lexicon').get_lexem)
+        reader = lambda x: self.acc('Output').get_readable(x)
         if closed:
             return [reader(i) for i in branch], str(closed)
         else:
@@ -410,7 +423,7 @@ class Session(object):
                 "There is no proof started")
         
         printed = self.proof.gettree()
-        return self.acc('Output').write_tree(printed, self.acc('Lexicon').get_lexem)
+        return self.acc('Output').write_tree(printed)
 
 
     def next(self) -> None:

@@ -1,32 +1,29 @@
 """
-Tutaj umieść dokumentację swojego pluginu
+Nowy system definicji języka.
+Syntax do dodawania nowych jednostek:
+```
+
+    Lex[TYP] = LEKSEMY
+
+```
+
+Możliwe jest też wykorzystywanie kontekstów zawartych w `__utils__.py` przez zapis:
+```
+
+    with KONTEKST(ARGUMENTY): 
+        Lex[TYP] = LEKSEMY
+
+```
+
 """
-import typing as tp
 import Lexicon.__utils__ as utils
 
 SOCKET = 'Lexicon'
 VERSION = '0.0.1'
 
-
-def tokenize(statement: str, used_tokens: tp.Iterable[str], defined: dict[str, str] = dict()) -> utils.Sentence:
-    pass
+Lex = utils.Lexicon()
 
 
-def get_lexem(token: str) -> str:
-    """Returns the lexem which was used to find the token"""
-    pass
 
-
-def get_type(token: str) -> str:
-    """Returns the type of a token"""
-    pass
-
-
-def join_to_string(s: utils.Sentence) -> str:
-    """Writes the sentence as a string, where tokens are written as `<[token type]_[lexem]>`"""
-    pass
-
-
-def sign_list(type_: str) -> list[str]:
-    """Zwraca listę potencjalnych znaków dla typów zmiennych (sentvar, predicate itp.)"""
-    pass
+def get_lexicon() -> utils.Lexicon:
+    return Lex

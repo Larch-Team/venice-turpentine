@@ -129,7 +129,7 @@ class ProofNode(ProofElement, NodeMixin):
             closer = ''
         else:
             children = None
-            closer = self.closed[0] if self.closed else None
+            closer = str(self.closed)
         return PrintedProofNode(sentence=self.sentence, children=children, closer=closer)
 
 

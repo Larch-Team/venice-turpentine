@@ -10,7 +10,9 @@ VERSION = '0.0.1'
 
 # Rule definition
 
-USED_TYPES = ('and', 'or', 'imp', 'not', 'sentvar')
+def get_tags() -> tuple[str]:
+    return 'propositional', 'uses negation'
+
 PRECEDENCE = {
     'and':3,
     'or':3,
@@ -192,10 +194,6 @@ def get_rules() -> dict[str, str]:
     }
 
 
-def get_used_types() -> tuple[str]:
-    return USED_TYPES
-
-
 def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, context: dict[str, tp.Any], auto: bool = False) -> tuple[tp.Union[tuple[tuple[utils.Sentence]], None], tp.Union[tuple[tuple[tp.Union[int, callable, utils.Sentence]]], None]]:
     """
     Używa określonej reguły na podanej gałęzi.
@@ -241,3 +239,7 @@ def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, conte
 def get_needed_context(rule_name: str) -> tuple[utils.ContextDef]:
     """Zwraca informacje o wymaganym przez daną regułę kontekście w formie obiektów ContextDef"""
     return tuple([utils.ContextDef(variable='sentenceID', official='Sentence Number', docs='The number of the sentence in this branch', type_='sentenceID')])
+    
+def get_operator_precedence() -> dict[str, int]:
+    """Zwraca siłę wiązania danych spójników, im wyższa, tym mocniej wiąże (negacja ma najwyższą przykładowo)"""
+    return PRECEDENCE
