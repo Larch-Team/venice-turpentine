@@ -87,10 +87,10 @@ class Session(object):
         self.id = session_ID
         self.config_name = config_file
         self.read_config()
-        self.sockets = {name: pop.Socket(name, os.path.abspath(name), self.ENGINE_VERSION, '__template__.py',
+        self.sockets = {name: pop.Socket(name, os.path.abspath(f"plugins/{name}"), self.ENGINE_VERSION, '__template__.py',
                                          self.config['chosen_plugins'].get(name, None)) for name in self.SOCKETS}
         self.sockets["UserInterface"] = pop.DummySocket("UserInterface", os.path.abspath(
-            "UserInterface"), self.ENGINE_VERSION, '__template__.py')
+            "plugins/UserInterface"), self.ENGINE_VERSION, '__template__.py')
 
         self.defined = {}
         self.proof = None

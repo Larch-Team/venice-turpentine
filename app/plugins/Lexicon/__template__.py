@@ -16,7 +16,7 @@ Możliwe jest też wykorzystywanie kontekstów zawartych w `__utils__.py` przez 
 ```
 
 """
-import Lexicon.__utils__ as utils
+import plugins.Lexicon.__utils__ as utils
 
 SOCKET = 'Lexicon'
 VERSION = '0.0.1'

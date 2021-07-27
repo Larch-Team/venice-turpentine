@@ -2,7 +2,7 @@
 Tutaj umieść dokumentację swojego pluginu
 """
 import typing as tp
-import Output.__utils__ as utils
+import plugins.Output.__utils__ as utils
 
 SOCKET = 'Output'
 VERSION = '0.0.1'

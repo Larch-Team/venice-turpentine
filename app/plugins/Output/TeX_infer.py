@@ -2,7 +2,7 @@
 Konwertuje dowód do kodu TeX, który, z pomocą paczki proof.sty dostępnej na stronie http://research.nii.ac.jp/~tatsuta/proof-sty.html, może zostać wyrenderowany do dowodu stylizowanego na rachunek sekwentów.
 """
 import typing as tp
-import Output.__utils__ as utils
+import plugins.Output.__utils__ as utils
 
 SOCKET = 'Output'
 VERSION = '0.0.1'

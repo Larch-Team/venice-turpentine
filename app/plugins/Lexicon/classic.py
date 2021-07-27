@@ -1,7 +1,7 @@
 """
 Transkrypcja basic.py na nowy format definicji języka
 """
-from Lexicon.__utils__ import *
+from plugins.Lexicon.__utils__ import *
 
 SOCKET = 'Lexicon'
 VERSION = '0.0.1'
