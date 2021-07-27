@@ -161,8 +161,12 @@ def do_plug_list(session: engine.Session, socket: str) -> str:
     Arguments:
         - Socket name [str]
     """
-    plugins = "; ".join(session.plug_list(socket))
-    return f"Plugins available locally for {socket}:\n{plugins}"
+    try:
+        plugins = "; ".join(session.plug_list(socket))
+    except engine.EngineError as e:
+        return str(e)
+    else:
+        return f"Plugins available locally for {socket}:\n{plugins}"
 
 
 def do_plug_list_all(session: engine.Session) -> str:

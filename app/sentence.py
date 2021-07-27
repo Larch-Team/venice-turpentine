@@ -35,8 +35,12 @@ class Sentence(list):
         return [i.split('_')[-1] for i in self]
 
     def getItems(self) -> list[tuple[str, str]]:
-        """Zwraca listę kolejno występujących typów w zdaniu"""
-        return [i.split('_') for i in self]
+        """Zwraca listę kolejno występujących par typów i leksemów"""
+        items = []
+        for i in self:
+            sp = i.split('_')
+            items.append((sp[0], sp[-1]))
+        return items
 
     def getReadable(self) -> str:
         return self.S.acc('Output').get_readable(self)
