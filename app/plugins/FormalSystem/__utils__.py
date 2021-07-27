@@ -3,6 +3,7 @@ import typing as tp
 import close
 from tree_helpers import History
 from sentence import Sentence
+from misc import get_plugin_path
 
 Rule = namedtuple('Rule', ('symbolic', 'docs', 'func', 'context', 'reusable'))
 

@@ -1,4 +1,6 @@
 from lexer import RuleConstraint, Lexicon
+from misc import get_plugin_path
+
 # Rule Constraints
 
 class use_language(RuleConstraint):

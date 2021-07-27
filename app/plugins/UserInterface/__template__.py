@@ -1,6 +1,7 @@
 """
 Tutaj umieść dokumentację swojego pluginu
 """
+import plugins.UserInterface.__utils__ as utils
 
 SOCKET = 'UserInterface'
 VERSION = '0.0.1'
