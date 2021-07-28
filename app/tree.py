@@ -213,7 +213,7 @@ class ProofNode(ProofBase, NodeMixin):
 
     def is_successful(self) -> bool:
         """Sprawdza, czy wszystkie liście zamknięto *ze względu na sukces*"""
-        return all((i.closed is not None and i.closed.success == 1 for i in self.getleaves()))
+        return all((i.closed is not None and i.closed.success is True for i in self.getleaves()))
 
 
     # Modyfikacja
