@@ -226,7 +226,7 @@ class Session(object):
         problem = self.acc('FormalSystem').check_syntax(tokenized)
         if problem:
             logger.warning(f"{statement} is not a valid statement \n{problem}")
-            raise EngineError(f"Syntax error: {problem}")
+            raise EngineError(problem)
         else:
             tokenized = self.acc('FormalSystem').prepare_for_proving(tokenized)
             
@@ -249,7 +249,7 @@ class Session(object):
             raise EngineError("There is no proof started")
 
         try:
-            branch, _ = self.proof.getleaves(branch_name)[0].getbranch()
+            branch, _ = self.proof.getleaves(branch_name)[0].getbranch_sentences()
             used = self.proof.getleaves(branch_name)[0].gethistory()
         except ValueError as e:
             if e.message == 'not enough values to unpack (expected 2, got 1)':
@@ -311,8 +311,9 @@ class Session(object):
             raise EngineError("Wrong context")
 
         # Statement and used retrieving
-        branch = self._get_node().getbranch()[0][:]
-        used = self._get_node().gethistory()
+        old = self._get_node()
+        branch = old.getbranch_sentences()[0][:]
+        used = old.gethistory()
 
         # Rule execution
         try:
@@ -324,11 +325,13 @@ class Session(object):
         if out is None:
             return None
 
-        old = self._get_node()
-        self._get_node().append(out)
+        old.append(out)
         children = old.children
+        assert len(children) == len(used_extention), "Liczba gałęzi i list komend powinna być taka sama"
         for j, s in zip(children, used_extention):
             j.History(*s)
+            for k in j.descendants:
+                k.History(*s)
         return tuple(i.branch for i in children)
 
 
@@ -381,10 +384,10 @@ class Session(object):
 
 
     @DealWithPOP
-    def getbranch(self) -> list[list[str], str]:
+    def getbranch_strings(self) -> list[list[str], str]:
         """Zwraca gałąź oraz stan zamknięcia w formie czytelnej dla użytkownika"""
         try:
-            branch, closed = self._get_node().getbranch()
+            branch, closed = self._get_node().getbranch_sentences()
         except KeyError:
             raise EngineError(
                 f"Branch '{self.branch}' doesn't exist in this proof")
@@ -477,5 +480,8 @@ class Session(object):
 
     def _get_node(self):
         return self.proof.getleaves(self.branch)[0]
+
+    def get_methods(self) -> list[str]:
+        return [i for i in dir(self) if callable(getattr(self, i)) and not i.startswith('__')]
 
 # Misc

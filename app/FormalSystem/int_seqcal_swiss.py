@@ -9,6 +9,7 @@ https://github.com/PogromcaPapai/Larch/blob/24e1391c183d08842aa0cf7df971eeb01a1a
 """
 import typing as tp
 import FormalSystem.__utils__ as utils
+from sentence import Sentence
 
 SOCKET = 'FormalSystem'
 VERSION = '0.0.1'
@@ -281,7 +282,7 @@ def prepare_for_proving(statement: utils.Sentence) -> utils.Sentence:
     """Przygotowuje zdanie do dowodzenia - czyszczenie, dodawanie elementów"""
     statement = utils.reduce_brackets(statement)
     if 'turnstile_=>' not in statement:
-        return ['turnstile_=>']+statement
+        return utils.add_prefix(statement, 'turnstile', '=>')
     else:
         return statement
 

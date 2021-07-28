@@ -30,12 +30,12 @@ def get_readable(sentence: utils.Sentence) -> str:
     return "".join(readable).replace("  ", " ")
 
 
-def write_tree(tree: utils.PrintedTree) -> list[str]:
+def write_tree(tree: utils.PrintedProofNode) -> list[str]:
     """
     Zwraca drzewiastą reprezentację dowodu
 
     :param tree: Drzewo do konwersji
-    :type tree: utils.PrintedTree
+    :type tree: utils.PrintedProofNode
     :return: Dowód w liście
     :rtype: list[str]
     """
@@ -47,13 +47,13 @@ def write_tree(tree: utils.PrintedTree) -> list[str]:
     ]
 
 
-def get_nodes(sentence: list[str], children: list[utils.PrintedTree]) -> list[Node]: 
+def get_nodes(sentence: list[str], children: list[utils.PrintedProofNode]) -> list[Node]: 
     """Zwraca listę dzieci do dodania do drzewa.
     Jeżeli istnieją jeszcze zdania w sentence, to mają one pierwszeństwo. W innym przypadku wyliczane są dzieci.
 
-    :param sentence: PrintedTree.sentence
+    :param sentence: PrintedProofNode.sentence
     :type sentence: list[str]
-    :param children: PrintedTree.children
+    :param children: PrintedProofNode.children
     :type children: list[PrintedTree]
     :return: Lista dzieci do dodania do węzła
     :rtype: list[Node]

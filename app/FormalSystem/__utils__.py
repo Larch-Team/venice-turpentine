@@ -221,7 +221,7 @@ def strip_around(sentence: Sentence, border_type: str, split: bool, precedence: 
     :return: Struktura krotek
     :rtype: tuple[tuple[Sentence]]
     """
-    if not sentence:
+    if not sentence or len(sentence)==1:
         return None
 
     middle, subsents = sentence.getMainConnective(precedence)
@@ -252,7 +252,7 @@ def reduce_prefix(sentence: Sentence, prefix_type: str, precedence: dict[str, in
     :return: Nowe zdanie
     :rtype: Sentence
     """
-    if not sentence:
+    if not sentence or len(sentence)==1:
         return None
 
     middle, subsents = sentence.getMainConnective(precedence)

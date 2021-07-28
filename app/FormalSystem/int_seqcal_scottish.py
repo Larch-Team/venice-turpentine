@@ -356,7 +356,7 @@ def prepare_for_proving(statement: utils.Sentence) -> utils.Sentence:
     """Przygotowuje zdanie do dowodzenia - czyszczenie, dodawanie elementów"""
     statement = utils.reduce_brackets(statement)
     if 'turnstile_=>' not in statement:
-        return ['turnstile_=>']+statement
+        return utils.add_prefix(statement, 'turnstile', '=>')
     else:
         return statement
 

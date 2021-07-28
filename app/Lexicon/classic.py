@@ -29,7 +29,7 @@ with use_language('predicate'):
         Lex['function'] = r'[F-O]'
 
 with use_language('sequent calculus'):
-    Lex['turnstile'] = '=>', '|-'
+    Lex['turnstile'] = r'=>', r'\|-'
     Lex['sep'] = ';'
     Lex['falsum'] = 'bot', 'F'
 

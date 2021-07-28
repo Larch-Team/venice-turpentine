@@ -29,37 +29,32 @@ def get_readable(sentence: utils.Sentence) -> str:
     """
     assert isinstance(sentence, utils.Sentence)
     readable = []
-    for lexem in sentence.getReadable():
+    for lexem in sentence.getLexems():
         if len(lexem) > 1:
             readable.append(f" {lexem} ")
         else:
             readable.append(lexem)
     return "".join(readable).replace("  ", " ")
 
-def write_tree(tree: utils.PrintedTree) -> list[str]:
+def write_tree(tree: utils.PrintedProofNode) -> list[str]:
     """
     Zwraca drzewiastą reprezentację dowodu
 
     :param tree: Drzewo do konwersji
-    :type tree: utils.PrintedTree
-    :return: Dowód w liście
-    :rtype: list[str]
+    :type tree: utils.PrintedProofNode
     """
-    return [_write_tree(tree.sentences, tree.children)]
+    return [_write_tree(tree.sentence, tree.children)]
 
 
 def _translate(s: utils.Sentence):
     readable = [TEX_DICTIONARY.get(t, l) for t, l in s.getItems()]
     return " ".join(readable)
 
-
-def _write_tree(sentences, children) -> str:
-    if len(sentences)>0:
-        return _gen_infer(_translate(sentences[0]), _write_tree(sentences[1:], children))
-    elif children is not None:
-        return " & ".join((_write_tree(i.sentences, i.children) for i in children))
-    else:
-        return ""
-
 def _gen_infer(s1, s2):
     return "\\infer{%s}{%s}" % (s1, s2)
+
+def _write_tree(sentence, children) -> str:
+    if children is None:
+        return _gen_infer(_translate(sentence), "")
+    else:
+        return _gen_infer(_translate(sentence), " & ".join((_write_tree(i.sentences, i.children) for i in children)))

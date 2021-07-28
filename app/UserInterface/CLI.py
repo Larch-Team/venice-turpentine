@@ -161,8 +161,12 @@ def do_plug_list(session: engine.Session, socket: str) -> str:
     Arguments:
         - Socket name [str]
     """
-    plugins = "; ".join(session.plug_list(socket))
-    return f"Plugins available locally for {socket}:\n{plugins}"
+    try:
+        plugins = "; ".join(session.plug_list(socket))
+    except engine.EngineError as e:
+        return str(e)
+    else:
+        return f"Plugins available locally for {socket}:\n{plugins}"
 
 
 def do_plug_list_all(session: engine.Session) -> str:
@@ -227,18 +231,6 @@ def do_prove(session: engine.Session, sentence: str) -> str:
     else:
         return "Sentence tokenized successfully \nProof initialized"
 
-
-def do_auto(session: engine.Session):
-    """Not reliable, do not use yet"""
-    try:
-        out = session.auto()
-    except engine.EngineError as e:
-        return str(e)
-    if out:
-        return "\n".join(out)
-    else:
-        return "Nothing more can be done"
-
 def do_use(session: engine.Session, command) -> str:
     """Uses a rule in the proof
 
@@ -302,7 +294,7 @@ def do_use(session: engine.Session, command) -> str:
     return "\n".join(out)
 
 
-def do_contra(session, branch: str):
+def do_contra(session: engine.Session, branch: str):
     """Detects contradictions and handles them by closing their branches"""
     cont = session.deal_closure(branch)
     if cont:
@@ -353,7 +345,15 @@ def do_get_rules(session):
 
 def do_get_tree(session: engine.Session) -> str:
     """Returns the proof in the form of a tree"""
-    return "\n".join(session.gettree())
+    try:
+        return "\n".join(session.gettree())
+    except engine.EngineError as e:
+            return str(e)
+
+
+def do_debug_get_methods(session: engine.Session) -> str:
+    """Returns all methods of the session object"""
+    return "\n".join(session.get_methods())
 
 
 command_dict = OrderedDict({
@@ -369,13 +369,13 @@ command_dict = OrderedDict({
     'use': {'comm': do_use, 'args': 'multiple_strings'},
     'leave': {'comm': do_leave, 'args': []},
     'prove': {'comm': do_prove, 'args': 'multiple_strings'},
-    'auto': {'comm': do_auto, 'args': []},
     # Program interaction
     'plugin switch': {'comm': do_plug_switch, 'args': [str, str]},
     'plugin list all': {'comm': do_plug_list_all, 'args': []},
     'plugin list': {'comm': do_plug_list, 'args': [str]},
     'plugin gen': {'comm': do_plug_gen, 'args': [str, str]},
     'clear': {'comm': do_clear, 'args': []},
+    'debug get methods': {'comm': do_debug_get_methods, 'args': []}
 })
 
 
@@ -388,7 +388,7 @@ command_dict['?'] = {'comm': do_help, 'args': []}
 
 # Front-end setup
 
-def get_rprompt(session, colors):
+def get_rprompt(session: engine.Session, colors):
     """
     Generuje podgląd gałęzi po prawej
     """
@@ -397,7 +397,7 @@ def get_rprompt(session, colors):
 
     # Proof retrieval
     if session.proof:
-        prompt, closed = session.getbranch()
+        prompt, closed = session.getbranch_strings()
         background = colors.get(session.branch, colors['Grey']) 
     else:
         prompt = DEF_PROMPT
@@ -501,11 +501,29 @@ def run() -> int:
             ptk.print_formatted_text(performer(procedure, session))
 
 
+def inAppDir(func):
+    def wrapper(*args, **kwargs):
+        assert os.getcwd().endswith(("/tests", "\\tests")), "cwd musi być folderem `tests` położonym równolegle do `app`"
+        os.chdir('../app')
+        if not os.path.exists('config/config_copy.json'):
+            from shutil import copy
+            copy('config/config.json', 'config/config_copy.json')
+            
+        ret = func(*args, **kwargs)
+
+        os.chdir('../tests')
+        return ret
+    return wrapper
+
+
 class Runner(object):
+
+    @inAppDir
     def __init__(self) -> None:
         super().__init__()
-        self.session = engine.Session('main', 'config.json')
+        self.session = engine.Session('main', 'config_copy.json')
 
+    @inAppDir
     def __call__(self, command: str) -> str:
         try:
             procedure = parser(command, command_dict)[0]

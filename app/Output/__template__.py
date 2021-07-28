@@ -18,7 +18,7 @@ def get_readable(sentence: utils.Sentence) -> str:
     """
     pass
 
-def write_tree(tree: utils.PrintedTree) -> list[str]:
+def write_tree(tree: utils.PrintedProofNode) -> list[str]:
     """
     Returns a tree/table representation of the whole proof
     """
