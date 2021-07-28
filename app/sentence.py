@@ -106,12 +106,14 @@ class Sentence(list):
             return lvl + precedence[connective]/max(precedence.values())+1
 
 
-    def getLowest(self, dictionary: dict[int, float]):
+    def getLowest(self, dictionary: dict[int, float], precedence: dict[str, int] = None):
         if not dictionary:
             return None
+        if precedence is None:
+            precedence = self.getPrecedence()
         min_prec = min(dictionary.values())
         min_prec_indexes = (i for i,j in dictionary.items() if j==min_prec)
-        max_prec = max(dictionary.values())
+        max_prec = max(precedence.values())
         if min_prec == max_prec/(max_prec+1):
             return min(min_prec_indexes)
         else:
@@ -169,7 +171,7 @@ class Sentence(list):
 
         if len(prec)==0:
             return None
-        return self.getLowest(prec)
+        return self.getLowest(prec, precedence)
 
     def getComponents(self, precedence: dict[str, int] = None) -> tuple[str, tuple[_Sentence, _Sentence]]:
         """

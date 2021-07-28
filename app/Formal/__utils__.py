@@ -372,6 +372,7 @@ def on_part(sentence: Sentence, split_type: str, sent_num: int, func: tp.Callabl
 
 
 class Smullyan(Rule):
+    #                    A      B       AoB
     CONJUNCTIVE = {
         'true and':     [True,  True,   True],
         'false or':     [False, False,  False],
