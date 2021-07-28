@@ -5,7 +5,7 @@ import sys
 
 sys.path.append('../app')
 from sentence import Sentence
-from FormalSystem import zeroth_order_logic as zol
+from plugins.FormalSystem import zeroth_order_logic as zol
 
 def join_to_string(sentence) -> str:
     """Writes the sentence as a string, where tokens are written as `<[token type]_[lexem]>`"""

@@ -5,7 +5,7 @@ import sys
 
 
 sys.path.append('../app')
-import lexer, Lexicon.classic as classic
+import lexer, plugins.Lexicon.classic as classic
 
 class TestTokenize(test.TestCase):
     
