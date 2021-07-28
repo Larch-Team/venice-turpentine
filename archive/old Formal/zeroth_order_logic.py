@@ -2,9 +2,9 @@
 Tabele analityczne KRZ w stylizacji Smullyana bez formuł sygnowanych.
 """
 import typing as tp
-import FormalSystem.__utils__ as utils
+import Formal.__utils__ as utils
 
-SOCKET = 'FormalSystem'
+SOCKET = 'Formal'
 VERSION = '0.0.1'
 
 
@@ -99,7 +99,7 @@ def check_closure(branch: list[utils.Sentence], used: set[tuple[str]]) -> tp.Uni
                 continue
 
             if utils.reduce_prefix(negated, 'not', PRECEDENCE) == statement:
-                return utils.close.Contradiction(sentID1 = num1, sentID2=num2), "Sentences contradict. The branch was closed."
+                return utils.close.Contradiction(sentenceID1 = num1+1, sentenceID2 = num2+1), "Sentences contradict. The branch was closed."
 
     return None
                 
@@ -186,7 +186,7 @@ def check_syntax(sentence: utils.Sentence) -> tp.Union[str, None]:
             return f'Spójnik dwuargumentowy na pozycji {indexes[er]+1} nie ma lewego argumentu'
     raise Exception('Zdanie nie jest poprawne')
 
-def get_rules() -> dict[str, str]:
+def get_rules_docs() -> dict[str, str]:
     """Zwraca reguły rachunku z opisem"""
     return {
         name: "\n".join((rule.symbolic, rule.docs))
@@ -194,18 +194,22 @@ def get_rules() -> dict[str, str]:
     }
 
 
-def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, context: dict[str, tp.Any], auto: bool = False) -> tuple[tp.Union[tuple[tuple[utils.Sentence]], None], tp.Union[tuple[tuple[tp.Union[int, callable, utils.Sentence]]], None]]:
+def get_used_types() -> tuple[str]:
+    return USED_TYPES
+
+
+def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, context: dict[str, tp.Any], decisions: dict[str, tp.Any]) -> tuple[utils.SentenceTupleStructure, utils.HistoryTupleStructure, dict[str, tp.Any]]:
     """
     Używa określonej reguły na podanej gałęzi.
     Więcej: https://www.notion.so/szymanski/Gniazda-w-Larchu-637a500c36304ee28d3abe11297bfdb2#98e96d34d3c54077834bc0384020ff38
 
-    :param name: Nazwa używanej reguły, listę można uzyskać z pomocą FormalSystem.get_rules()
+    :param name: Nazwa używanej reguły, listę można uzyskać z pomocą Formal.get_rules_docs()
     :type name: str
     :param branch: Lista zdań w gałęzi, na której została użyta reguła
     :type branch: list[utils.Sentence]
     :param used: Obiekt historii przechowujący informacje o już rozłożonych zdaniach
     :type used: utils.History
-    :param context: kontekst wymagany do zastosowania reguły, listę można uzyskać z pomocą FormalSystem.get_needed_context(rule)
+    :param context: kontekst wymagany do zastosowania reguły, listę można uzyskać z pomocą Formal.get_needed_context(rule)
         Kontekst reguł: https://www.notion.so/szymanski/Zarz-dzanie-kontekstem-regu-2a5abea2a1bc492e8fa3f8b1c046ad3a
     :type context: dict[str, tp.Any]
     :param auto: , defaults to False
@@ -213,7 +217,7 @@ def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, conte
     :return: Struktura krotek, reprezentująca wynik reguły oraz strukturę reprezentującą operacje do wykonania na zbiorze zamknięcia.
         Struktury krotek: https://www.notion.so/szymanski/Reprezentacja-dowod-w-w-Larchu-cd36457b437e456a87b4e0c2c2e38bd5#014dccf44246407380c4e30b2ea598a9
         Zamykanie gałęzi: https://www.notion.so/szymanski/Zamykanie-ga-zi-53249279f1884ab4b6f58bbd6346ec8d
-    :rtype: tuple[tp.Union[tuple[tuple[utils.Sentence]], None], tp.Union[tuple[tuple[tp.Union[int, callable, utils.Sentence]]], None]]
+    :rtype: tuple[tp.Union[tuple[tuple[utils.Sentence]], None], tp.Union[tuple[tuple[tp.Union[int, Callable, utils.Sentence]]], None]]
     """
     
     rule = RULES[name]
@@ -221,19 +225,20 @@ def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, conte
 
     # Sentence getting
     if statement_ID < 0 or statement_ID > len(branch)-1:
-        raise utils.FormalSystemError("No such sentence")
+        raise utils.FormalError("No such sentence")
 
     tokenized_statement = branch[statement_ID]
 
     if not rule.reusable and tokenized_statement in used: # Used sentence filtering
-        raise utils.FormalSystemError("This sentence was already used in a non-reusable rule")
+        raise utils.FormalError("This sentence was already used in a non-reusable rule")
 
     # Rule usage
-    fin = rule.func(tokenized_statement)
+    fin = rule.naive(tokenized_statement, **context)
     if fin:
-        return fin, len(fin)*([[0]] if rule.reusable else [[tokenized_statement]])
+        # 
+        return fin, len(fin)*([[0]] if rule.reusable else [[tokenized_statement]]), None
     else:
-        return None, None
+        return None, None, None
 
 
 def get_needed_context(rule_name: str) -> tuple[utils.ContextDef]:

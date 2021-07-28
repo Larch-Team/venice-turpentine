@@ -1,4 +1,4 @@
-from typing import Any, Union, NewType, Iterable
+from typing import Any, Callable, Union, Iterable
 from sentence import Sentence
 def _f():
     pass
@@ -24,12 +24,12 @@ class History(set):
         else:
             raise TypeError("History can only store sentences")
 
-    def __call__(self, *coms: tuple[Union[list, Sentence, int, callable]]) -> None:
+    def __call__(self, *coms: tuple[Union[list, Sentence, int, Callable]]) -> None:
         """ Używane do manipulacji historią
 
             Możliwe argumenty:
                 - `Sentence`    - dodaje formułę do historii 
-                - `callable`    - wykonuje operacje `callable(history)` na obiekcie historii, a wynik nadpisuje jako nową historię; traktuj ją jako `set`
+                - `Callable`    - wykonuje operacje `callable(history)` na obiekcie historii, a wynik nadpisuje jako nową historię; traktuj ją jako `set`
                 - `int`         - wykonuje jedną z predefiniowanych operacji:
                     -  0 - operacja pusta
                     - -1 - czyszczenie historii

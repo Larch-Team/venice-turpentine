@@ -1,17 +1,13 @@
 from collections import namedtuple
 import typing as tp
 import close
-from tree_helpers import History
+from history import History
+from proof import Proof
 from sentence import Sentence
-
-Rule = namedtuple('Rule', ('symbolic', 'docs', 'func', 'context', 'reusable'))
-
-ContextDef = namedtuple(
-    'ContextDef', ('variable', 'official', 'docs', 'type_'))
-
-
-class FormalSystemError(Exception):
-    pass
+from exceptions import FormalError
+from rule import Rule, ParameterContext, SentenceID, TokenID, ContextDef
+from tree import HistoryTupleStructure, ProofNode, SentenceTupleStructure
+from usedrule import UsedRule
 
 
 # Rule decorators
@@ -53,10 +49,42 @@ def Modifier(func):
             result = func(sentence[:], *args, **kwargs)
             return transform_to_sentences(result, sentence.S)
         else:
-            raise TypeError("Modifier is not a sentence nor a tuple")
+            raise TypeError("Modifier was given nor a sentence nor a tuple")
 
     return wrapper
 
+
+SignedSentence = namedtuple('SignedSentence', ['sentence', 'branch', 'id'])
+
+def strict_filler(func: tp.Callable[..., SentenceTupleStructure]) -> tp.Callable[..., tuple[ProofNode]]:
+    """
+    Dekorator uzupełniający funkcję wykonującą regułę dowodzenia strict o otoczkę techniczną
+
+    :param func: Funkcja wykonująca operacje, pierwszym argumentem powinno być Rule, a drugim Sentence
+    :type func: tp.Callable[..., SentenceTupleStructure]
+    :return: Nowa funkcja z dodatkowym argumentem Proof na początku
+    :rtype: tp.Callable[..., tuple[ProofNode]]
+    """
+    def wrapper(proof: Proof, rule: Rule, sentence: SignedSentence, *args, **kwargs):
+        old = proof.nodes.getleaf(sentence.branch)
+
+        # Rule usage
+        fin = func(rule, sentence, *args, **kwargs)
+        assert fin is not None, "Reguła nie zwróciła nic"
+
+        layer = proof.append(fin, sentence.branch)
+        ProofNode.insert_history(
+            len(fin)*([[0]] if rule.reusable else [[sentence.sentence]]), old.children)
+
+        context = {
+            'sentenceID': sentence.id,
+            'tokenID': sentence.sentence.getMainConnective()
+        }
+
+        proof.metadata['usedrules'].append(
+            UsedRule(layer, sentence.branch, rule.name, proof, context=context, auto=True))
+        return old.descendants
+    return wrapper
 
 # Formating and cleaning
 
@@ -136,7 +164,7 @@ def merge_tupstruct(left: tuple[tuple[str]], right: tuple[tuple[str]], glue: str
             raise AssertionError((l_correct*"left")+(l_correct*r_correct *' and ')+(r_correct*"right") + "tuple is messed up")
 
 
-def select(tuple_structure: tuple[tuple[Sentence]], selection: tuple[tuple[bool]], func: callable) -> tuple[tuple[Sentence]]:
+def select(tuple_structure: tuple[tuple[Sentence]], selection: tuple[tuple[bool]], func: tp.Callable) -> tuple[tuple[Sentence]]:
     """Selektywne wykonywanie funkcji na elementach struktury krotek
 
     Przykłady:
@@ -181,7 +209,7 @@ def select(tuple_structure: tuple[tuple[Sentence]], selection: tuple[tuple[bool]
     return _select(tuple_structure, selection, func)
 
 
-def _select(filtered, selection, func: callable) -> tuple[tuple[Sentence]]:
+def _select(filtered, selection, func: tp.Callable) -> tuple[tuple[Sentence]]:
     """Recursion used in `select`; DO NOT USE"""
     after = []
 
@@ -207,7 +235,7 @@ def empty_creator(sentence: Sentence):
 
 @cleaned
 @Creator
-def strip_around(sentence: Sentence, border_type: str, split: bool, precedence: dict[str, int]) -> tuple[tuple[Sentence]]:
+def strip_around(sentence: Sentence, border_type: str, split: bool) -> tuple[tuple[Sentence]]:
     """Dzieli zdanie wokół głównego spójnika, jeśli spójnikiem jest `border_type`
 
     :param sentence: zdanie do podziału
@@ -216,15 +244,13 @@ def strip_around(sentence: Sentence, border_type: str, split: bool, precedence: 
     :type border_type: str
     :param split: Czy tworzyć nowe gałęzie?
     :type split: bool
-    :param precedence: Kolejność wykonywania działań
-    :type precedence: dict[str, int]
     :return: Struktura krotek
     :rtype: tuple[tuple[Sentence]]
     """
     if not sentence or len(sentence)==1:
         return None
 
-    middle, subsents = sentence.getMainConnective(precedence)
+    middle, subsents = sentence.getComponents()
     if middle is None or middle.split('_')[0] != border_type:
         return None
     
@@ -240,7 +266,7 @@ def strip_around(sentence: Sentence, border_type: str, split: bool, precedence: 
 
 @cleaned
 @Modifier
-def reduce_prefix(sentence: Sentence, prefix_type: str, precedence: dict[str, int]) -> Sentence:
+def reduce_prefix(sentence: Sentence, prefix_type: str) -> Sentence:
     """Usuwa prefiksy ze zdań
 
     :param sentence: zdanie do modyfikacji
@@ -255,8 +281,8 @@ def reduce_prefix(sentence: Sentence, prefix_type: str, precedence: dict[str, in
     if not sentence or len(sentence)==1:
         return None
 
-    middle, subsents = sentence.getMainConnective(precedence)
-    if middle is None or middle.split('_')[0] != prefix_type:
+    middle, subsents = sentence.getComponents()
+    if middle is None or not middle.startswith(prefix_type):
         return None
     
     _, right = subsents
@@ -264,7 +290,7 @@ def reduce_prefix(sentence: Sentence, prefix_type: str, precedence: dict[str, in
 
 
 @Modifier
-def add_prefix(sentence: Sentence, prefix: str, lexem: str) -> Sentence:
+def add_prefix(sentence: Sentence, prefix: str, lexem: str = None) -> Sentence:
     """Dodaje prefiks do zdania
 
     :param sentence: Zdanie do modyfikacji
@@ -276,6 +302,8 @@ def add_prefix(sentence: Sentence, prefix: str, lexem: str) -> Sentence:
     :return: Zmieniony prefiks
     :rtype: Sentence
     """
+    if not lexem:
+        lexem = sentence.S.lexe.generate(sentence, prefix)
     if len(sentence) == 1:
         return Sentence([f"{prefix}_{lexem}", *sentence], sentence.S)
     new_record = {0:sentence.calcPrecedenceVal(prefix)}
@@ -283,7 +311,7 @@ def add_prefix(sentence: Sentence, prefix: str, lexem: str) -> Sentence:
 
 
 @Modifier
-def on_part(sentence: Sentence, split_type: str, sent_num: int, func: callable):
+def on_part(sentence: Sentence, split_type: str, sent_num: int, func: tp.Callable):
     """Wykonuje funkcję na pewnej części zdania (części oddzielone są `split_type`)
     Ex.:
               onpart(s, sep*, 1, f)
@@ -338,3 +366,97 @@ def on_part(sentence: Sentence, split_type: str, sent_num: int, func: callable):
         return tuple(l)
     else:
         return None
+    
+
+# Smullyan representation
+
+
+class Smullyan(Rule):
+    CONJUNCTIVE = {
+        'true and':     [True,  True,   True],
+        'false or':     [False, False,  False],
+        'false imp':    [True,  False,  False],
+        'false revimp': [False, True,   False],
+        'false nand':   [True,  True,   False],
+        'true nor':     [False, False,  True],
+    }
+
+    DISJUNCTIVE = {
+        'false and':     [False, False,  False],
+        'true or':       [True,  True,   True],
+        'true imp':      [False, True,   True],
+        'false revimp':  [True,  False,  False],
+        'true nand':     [False, False,  True],
+        'false nor':     [True,  True,   False],
+    }
+
+    TABLE = CONJUNCTIVE | DISJUNCTIVE
+
+    def __init__(self, name: str, symbolic: str, docs: str, reusable: bool, context: tp.Iterable[ContextDef] = None, parent: Rule = None, children: tp.Iterable[Rule] = None) -> None:
+        """Generuje regułę według tabel Smullyanowskich"""
+        assert name in self.TABLE, "Reguła nie została zdefiniowana"
+        super().__init__(name, symbolic, docs, reusable, context, parent=parent, children=children)
+
+        self.comp1, self.comp2, self.whole = self.TABLE[name]
+        self.split = name in self.DISJUNCTIVE
+        self.main = name.split(' ')[1]
+        self.setStrict(self._strict)
+        self.setNaive(self._naive)
+
+
+    def _strict(self, sentence: Sentence) -> tp.Union[None, SentenceTupleStructure]:
+        """Służy do wywoływania reguły, zwraca strukturę krotek"""
+        
+        stripped = sentence if self.whole else reduce_prefix(sentence, 'not')
+
+        if not stripped:
+            return None
+        if self.comp1 and self.comp2:
+            return strip_around(stripped, self.main, self.split)
+        branch = strip_around(stripped, self.main, self.split)
+        if branch is None:
+            return None
+        if self.split:
+            branch1, branch2 = branch
+            return (
+                (add_prefix(branch1[0], 'not', '~') if not self.comp1 else branch1[0],),
+                (add_prefix(branch2[0], 'not', '~') if not self.comp2 else branch2[0],)
+            )
+        else:
+            branch1 = branch[0]
+            return ((
+                add_prefix(branch1[0], 'not', '~') if not self.comp1 else branch1[0],
+                add_prefix(branch1[1], 'not', '~') if not self.comp2 else branch1[1]
+            ),)
+            
+    def _naive(self, branch: list[Sentence], sentenceID: SentenceID, tokenID: TokenID) -> tp.Union[None, SentenceTupleStructure]:
+        
+        # Sentence getting
+        if sentenceID < 0 or sentenceID >= len(branch):
+            raise FormalError("No such sentence")
+        sentence = branch[sentenceID] 
+        if sentence[tokenID].startswith('sentvar'):
+            raise FormalError("You can't divide a sentence by a variable")
+        elif sentence[tokenID].startswith('not'):
+            raise FormalError("You can't divide a sentence by a negation")
+        elif sentence[tokenID] in '()':
+            raise FormalError("You can't divide a sentence by a parenthesis")
+        
+        # Sentence negating
+        stripped = sentence if self.whole else reduce_prefix(sentence, 'not')
+        if stripped is None:
+            raise FormalError("You can't reduce a negation if it doesn't exist")
+        tokenID = tokenID - (len(sentence)+1-len(stripped))//2
+        
+        # Sentence splitting
+        branch1, branch2 = stripped.splitByIndex(tokenID)
+        if self.split:
+            return (
+                (branch1 if self.comp1 else add_prefix(branch1, 'not', '~'),),
+                (branch2 if self.comp2 else add_prefix(branch2, 'not', '~'),)
+            )
+        else:
+            return ((
+                branch1 if self.comp1 else add_prefix(branch1, 'not', '~'),
+                branch2 if self.comp2 else add_prefix(branch2, 'not', '~')
+            ),)

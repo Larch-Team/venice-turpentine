@@ -37,7 +37,7 @@ class Close(object):
 
 
 Emptiness = Close(False, "---")
-Contradiction = Close(True, "XXX", "XXX ($sentID1, $sentID2)")
+Contradiction = Close(True, "XXX", "XXX ($sentenceID1, $sentenceID2)")
 LoopCheck = Close(False, "...")
 Axiom = Close(True, 'Ax')
 Falsum = Close(True, 'Falsum')

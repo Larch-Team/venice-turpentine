@@ -1,4 +1,5 @@
-from typing import Any, Union, NewType
+from collections import OrderedDict
+from typing import Callable, Union, NewType
 
 _Sentence = NewType('Sentence', list[str])
 Session = NewType('Session', object)
@@ -7,7 +8,7 @@ Session = NewType('Session', object)
 class SentenceError(Exception):
     pass
 
-def _operate_on_keys(dictionary: dict, op: callable) -> dict:
+def _operate_on_keys(dictionary: dict, op: Callable) -> dict:
     return {op(i):j for i, j in dictionary.items()}
 
 def _split_keys(dictionary: dict, key: int) -> dict:
@@ -18,9 +19,9 @@ def _split_keys(dictionary: dict, key: int) -> dict:
 
 class Sentence(list):
 
-    def __init__(self, sen, session: Session, precedenceBaked: dict[str, float] = {}):
+    def __init__(self, sen, session: Session, precedenceBaked: dict[str, float] = None):
         self.S = session
-        self.precedenceBaked = precedenceBaked
+        self.precedenceBaked = precedenceBaked or {}
         self._pluggedFS = None
         super().__init__(sen)
 
@@ -56,12 +57,13 @@ class Sentence(list):
         return ret
 
     def getPrecedence(self) -> dict[str, int]:
-        return self.S.acc('FormalSystem').get_operator_precedence()
+        return self.S.acc('Formal').get_operator_precedence()
 
     # Manipulacja zdaniem
 
     def reduceBrackets(self) -> _Sentence:
         """Minimalizuje nawiasy w zdaniu; zakłada poprawność ich rozmieszczenia"""
+        # TODO: Redukcja nawiasów w *całości* zdania
 
         if len(self)<2:
             return self[:]
@@ -96,7 +98,6 @@ class Sentence(list):
         right = opened_left-opened_right-min_left
         return Sentence(-min_left*["("] + reduced + right*[")"], self.S, new_baked)
 
-
     @staticmethod
     def static_calcPrecedenceVal(connective: str, precedence: dict[str, int], lvl: int = 0, prec_div: int = None) -> float:
         if prec_div is not None:
@@ -106,9 +107,12 @@ class Sentence(list):
 
 
     def getLowest(self, dictionary: dict[int, float]):
+        if not dictionary:
+            return None
         min_prec = min(dictionary.values())
         min_prec_indexes = (i for i,j in dictionary.items() if j==min_prec)
-        if min_prec == max(self.getPrecedence().values()):
+        max_prec = max(dictionary.values())
+        if min_prec == max_prec/(max_prec+1):
             return min(min_prec_indexes)
         else:
             return max(min_prec_indexes)
@@ -119,19 +123,23 @@ class Sentence(list):
         return self.static_calcPrecedenceVal(connective, precedence, lvl, prec_div)
         
 
-    def readPrecedence(self) -> dict[int, float]:
+    def readPrecedence(self, precedence: dict[str, int] = None) -> dict[int, float]:
         """
         Oblicza, bądź zwraca informacje o sile spójników w danym zdaniu. *Powinno być przywołane przed dowolnym użyciem precedenceBaked*
+        W testach używać można argument opcjonalny, aby nie odwoływać się do 
 
+        :param precedence: Siła wiązania spójników (podane same typy) - im wyższa wartość, tym mocniej wiąże, optional
+        :type precedence: dict[str, int]
         :return: Indeksy spójników oraz siła wiązania - im wyższa wartość, tym mocniej wiąże
         :rtype: dict[str, float]
         """
-        if self.precedenceBaked and self._pluggedFS == self.S.config['chosen_plugins']['FormalSystem']:
-            return self.precedenceBaked
-        self._pluggedFS = self.S.config['chosen_plugins']['FormalSystem']
+        if precedence is None:
+            if self.precedenceBaked and self._pluggedFS == self.S.config['chosen_plugins']['Formal']:
+                return self.precedenceBaked
+            self._pluggedFS = self.S.config['chosen_plugins']['Formal']
+            precedence = self.getPrecedence()
 
-        self.precedenceBaked = {}
-        precedence = self.getPrecedence()
+        self.precedenceBaked = OrderedDict()
 
         lvl = 0
         prec_div = max(precedence.values())+1
@@ -146,34 +154,55 @@ class Sentence(list):
         return self.precedenceBaked
 
 
-    def _split(self, index: int):
+    def splitByIndex(self, index: int):
         """
         Dzieli zdanie na dwa na podstawie podanego indeksu.
         """
         p_left, p_right = _split_keys(self.precedenceBaked, index)
-        left = Sentence(self[:index], self.S, p_left) if self[:index] else None
-        right = Sentence(self[index+1:], self.S, p_right) if self[index+1:] else None
+        left = Sentence(self[:index], self.S, p_left).reduceBrackets().reduceBrackets() if self[:index] else None
+        right = Sentence(self[index+1:], self.S, p_right).reduceBrackets().reduceBrackets() if self[index+1:] else None
         return left, right
 
 
-    def getMainConnective(self, precedence: dict[str, int]) -> tuple[str, tuple[_Sentence, _Sentence]]:
+    def getMainConnective(self, precedence: dict[str, int] = None) -> Union[int, None]:
+        prec = self.readPrecedence(precedence)
+
+        if len(prec)==0:
+            return None
+        return self.getLowest(prec)
+
+    def getComponents(self, precedence: dict[str, int] = None) -> tuple[str, tuple[_Sentence, _Sentence]]:
         """
         Na podstawie kolejności wykonywania działań wyznacza najwyżej położony spójnik.
         Zwraca None gdy nie udało się znaleźć spójnika
 
-        :param precedence: Siła wiązania spójników (podane same typy) - im wyższa wartość, tym mocniej wiąże
+        :param precedence: Siła wiązania spójników (podane same typy) - im wyższa wartość, tym mocniej wiąże, optional
         :type precedence: dict[str, int]
         :return: Główny spójnik oraz powstałe zdania; None jeśli dane zdanie nie istnieje
         :rtype: tuple[str, tuple[_Sentence, _Sentence]]
         """
         sentence = self.reduceBrackets()
-        prec = sentence.readPrecedence()
-
-        if len(prec)==0:
+        con_index = self.getMainConnective(precedence)
+        if con_index is None:
             return None, None
-        con_index = self.getLowest(prec)
-        return sentence[con_index], sentence._split(con_index)
-                
+        return sentence[con_index], sentence.splitByIndex(con_index)
+
+
+    def getNonNegated(self) -> _Sentence:
+        """
+        Zwracane zdanie jest konceptualnie podobne do literału, ale rozszerzone na całe zdanie. W skrócie redukowane są wszystkie negacje obejmujące całe zdanie
+        """
+        conn, new = self.getComponents()
+        if not conn or not conn.startswith('not'):
+            return self
+
+        while conn.startswith('not'):
+            conn, new = new[1].getComponents()
+        return new[1]
+    
+    def isLiteral(self) -> bool:
+        main = self.getMainConnective()
+        return main is None or (main == 0 and len(self.readPrecedence()) == 1)
 
     # Overwriting list methods
 

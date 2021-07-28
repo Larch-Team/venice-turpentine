@@ -115,11 +115,10 @@ def performer(command: Command, session: engine.Session) -> str:
     """Wykonuje funkcję na obiekcie sesji"""
     if command.docs:
         return command.docs
+    if isinstance(command.args, str):
+        return command.func(session, command.args)
     else:
-        if isinstance(command.args, str):
-            return command.func(session, command.args)
-        else:
-            return command.func(session, *command.args)
+        return command.func(session, *command.args)
 
 
 # Commands
@@ -258,7 +257,7 @@ def do_use(session: engine.Session, command) -> str:
         if i == len(c_values):
             return "More arguments needed: {}".format(", ".join((i.official for i in context_info[i:])))
 
-        vartype = engine.type_translator(c.type_)
+        vartype = engine.contextdef_translate(c.type_)
         try:
             new = vartype(c_values[i])
         except ValueError:
@@ -294,7 +293,16 @@ def do_use(session: engine.Session, command) -> str:
     return "\n".join(out)
 
 
-def do_contra(session: engine.Session, branch: str):
+def do_undo(session: engine.Session, amount: int) -> str:
+    """Undos last [arg] actions"""
+    try:
+        rules = session.undo(amount)
+        return "\n".join(f'Undid rule: {i.rule}' for i in rules)
+    except engine.EngineError as e:
+        return str(e)
+
+
+def do_contra(session: engine.Session, branch: str) -> str:
     """Detects contradictions and handles them by closing their branches"""
     cont = session.deal_closure(branch)
     if cont:
@@ -308,6 +316,25 @@ def do_leave(session) -> str:
     session.reset_proof()
     return "Proof was deleted"
 
+
+def do_check(session: engine.Session) -> str:
+    """Checks the proof"""
+    try:
+        problems = session.check()
+    except engine.EngineError as e:
+        return str(e)
+    
+    if problems:
+        return "\n".join(problems)
+    else:
+        return "Dowód jest poprawny"
+    
+def do_solve(session: engine.Session) -> str:
+    """Solves the proof"""
+    try:
+        return "\n".join(session.solve())
+    except engine.EngineError as e:
+        return str(e)
 
 # Proof navigation
 
@@ -335,7 +362,7 @@ def do_next(session: engine.Session):
         return str(e)
 
 
-def do_get_rules(session):
+def do_get_rules_docs(session):
     """Returns all of the rules that can be used in this proof system"""
     try:
         return "\n\n".join(("\n---\n".join(i) for i in session.getrules().items()))
@@ -359,7 +386,7 @@ def do_debug_get_methods(session: engine.Session) -> str:
 command_dict = OrderedDict({
     # Navigation
     'exit': {'comm': do_exit, 'args': []},
-    'get rules': {'comm': do_get_rules, 'args': []},
+    'get rules': {'comm': do_get_rules_docs, 'args': []},
     'get tree': {'comm': do_get_tree, 'args': []},
     'jump': {'comm': do_jump, 'args': [str]},
     'next': {'comm': do_next, 'args': []},
@@ -367,8 +394,11 @@ command_dict = OrderedDict({
     # Czy zrobić oddzielne save i write? save serializowałoby tylko do wczytania, a write drukowałoby input
     'write': {'comm': do_write, 'args': [str]},
     'use': {'comm': do_use, 'args': 'multiple_strings'},
+    'undo': {'comm': do_undo, 'args': [int]},
     'leave': {'comm': do_leave, 'args': []},
     'prove': {'comm': do_prove, 'args': 'multiple_strings'},
+    'solve': {'comm': do_solve, 'args': []},
+    'check': {'comm': do_check, 'args': []},
     # Program interaction
     'plugin switch': {'comm': do_plug_switch, 'args': [str, str]},
     'plugin list all': {'comm': do_plug_list_all, 'args': []},
@@ -478,7 +508,7 @@ def run() -> int:
     session = engine.Session('main', 'config.json')
     ptk.print_formatted_text(ptk.HTML(
         '<b>Logika -> Psychika</b>\nType ? to get command list; type [command]? to get help'))
-    console = ptk.PromptSession(message=lambda: f"{session.branch+bool(session.branch)*' '}# ", rprompt=lambda: get_rprompt(
+    console = ptk.PromptSession(message=lambda: f"{session.get_current_branch()+bool(session.get_current_branch())*' '}# ", rprompt=lambda: get_rprompt(
         session, getcolors()), complete_in_thread=True, complete_while_typing=True, completer=Autocomplete(session))
     while True:
         command = console.prompt().strip()

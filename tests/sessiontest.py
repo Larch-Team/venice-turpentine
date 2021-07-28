@@ -1,4 +1,5 @@
 import sys
+# TODO: dostosować do reguł naiwnych
 
 from multiprocessing import Pool
 sys.path.append('../app')
