@@ -131,4 +131,4 @@ dmypy.json
 
 .vscode
 app/config/.
-crashes/.
+app/crashes/.
