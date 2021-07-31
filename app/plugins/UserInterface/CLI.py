@@ -115,11 +115,10 @@ def performer(command: Command, session: engine.Session) -> str:
     """Wykonuje funkcję na obiekcie sesji"""
     if command.docs:
         return command.docs
+    if isinstance(command.args, str):
+        return command.func(session, command.args)
     else:
-        if isinstance(command.args, str):
-            return command.func(session, command.args)
-        else:
-            return command.func(session, *command.args)
+        return command.func(session, *command.args)
 
 
 # Commands
@@ -161,8 +160,12 @@ def do_plug_list(session: engine.Session, socket: str) -> str:
     Arguments:
         - Socket name [str]
     """
-    plugins = "; ".join(session.plug_list(socket))
-    return f"Plugins available locally for {socket}:\n{plugins}"
+    try:
+        plugins = "; ".join(session.plug_list(socket))
+    except engine.EngineError as e:
+        return str(e)
+    else:
+        return f"Plugins available locally for {socket}:\n{plugins}"
 
 
 def do_plug_list_all(session: engine.Session) -> str:
@@ -227,18 +230,6 @@ def do_prove(session: engine.Session, sentence: str) -> str:
     else:
         return "Sentence tokenized successfully \nProof initialized"
 
-
-def do_auto(session: engine.Session):
-    """Not reliable, do not use yet"""
-    try:
-        out = session.auto()
-    except engine.EngineError as e:
-        return str(e)
-    if out:
-        return "\n".join(out)
-    else:
-        return "Nothing more can be done"
-
 def do_use(session: engine.Session, command) -> str:
     """Uses a rule in the proof
 
@@ -266,7 +257,7 @@ def do_use(session: engine.Session, command) -> str:
         if i == len(c_values):
             return "More arguments needed: {}".format(", ".join((i.official for i in context_info[i:])))
 
-        vartype = engine.type_translator(c.type_)
+        vartype = engine.contextdef_translate(c.type_)
         try:
             new = vartype(c_values[i])
         except ValueError:
@@ -302,7 +293,16 @@ def do_use(session: engine.Session, command) -> str:
     return "\n".join(out)
 
 
-def do_contra(session, branch: str):
+def do_undo(session: engine.Session, amount: int) -> str:
+    """Undos last [arg] actions"""
+    try:
+        rules = session.undo(amount)
+        return "\n".join(f'Undid rule: {i.rule}' for i in rules)
+    except engine.EngineError as e:
+        return str(e)
+
+
+def do_contra(session: engine.Session, branch: str) -> str:
     """Detects contradictions and handles them by closing their branches"""
     cont = session.deal_closure(branch)
     if cont:
@@ -316,6 +316,25 @@ def do_leave(session) -> str:
     session.reset_proof()
     return "Proof was deleted"
 
+
+def do_check(session: engine.Session) -> str:
+    """Checks the proof"""
+    try:
+        problems = session.check()
+    except engine.EngineError as e:
+        return str(e)
+    
+    if problems:
+        return "\n".join(problems)
+    else:
+        return "Dowód jest poprawny"
+    
+def do_solve(session: engine.Session) -> str:
+    """Solves the proof"""
+    try:
+        return "\n".join(session.solve())
+    except engine.EngineError as e:
+        return str(e)
 
 # Proof navigation
 
@@ -343,7 +362,7 @@ def do_next(session: engine.Session):
         return str(e)
 
 
-def do_get_rules(session):
+def do_get_rules_docs(session):
     """Returns all of the rules that can be used in this proof system"""
     try:
         return "\n\n".join(("\n---\n".join(i) for i in session.getrules().items()))
@@ -353,13 +372,21 @@ def do_get_rules(session):
 
 def do_get_tree(session: engine.Session) -> str:
     """Returns the proof in the form of a tree"""
-    return "\n".join(session.gettree())
+    try:
+        return "\n".join(session.gettree())
+    except engine.EngineError as e:
+            return str(e)
+
+
+def do_debug_get_methods(session: engine.Session) -> str:
+    """Returns all methods of the session object"""
+    return "\n".join(session.get_methods())
 
 
 command_dict = OrderedDict({
     # Navigation
     'exit': {'comm': do_exit, 'args': []},
-    'get rules': {'comm': do_get_rules, 'args': []},
+    'get rules': {'comm': do_get_rules_docs, 'args': []},
     'get tree': {'comm': do_get_tree, 'args': []},
     'jump': {'comm': do_jump, 'args': [str]},
     'next': {'comm': do_next, 'args': []},
@@ -367,15 +394,18 @@ command_dict = OrderedDict({
     # Czy zrobić oddzielne save i write? save serializowałoby tylko do wczytania, a write drukowałoby input
     'write': {'comm': do_write, 'args': [str]},
     'use': {'comm': do_use, 'args': 'multiple_strings'},
+    'undo': {'comm': do_undo, 'args': [int]},
     'leave': {'comm': do_leave, 'args': []},
     'prove': {'comm': do_prove, 'args': 'multiple_strings'},
-    'auto': {'comm': do_auto, 'args': []},
+    'solve': {'comm': do_solve, 'args': []},
+    'check': {'comm': do_check, 'args': []},
     # Program interaction
     'plugin switch': {'comm': do_plug_switch, 'args': [str, str]},
     'plugin list all': {'comm': do_plug_list_all, 'args': []},
     'plugin list': {'comm': do_plug_list, 'args': [str]},
     'plugin gen': {'comm': do_plug_gen, 'args': [str, str]},
     'clear': {'comm': do_clear, 'args': []},
+    'debug get methods': {'comm': do_debug_get_methods, 'args': []}
 })
 
 
@@ -388,7 +418,7 @@ command_dict['?'] = {'comm': do_help, 'args': []}
 
 # Front-end setup
 
-def get_rprompt(session, colors):
+def get_rprompt(session: engine.Session, colors):
     """
     Generuje podgląd gałęzi po prawej
     """
@@ -397,7 +427,7 @@ def get_rprompt(session, colors):
 
     # Proof retrieval
     if session.proof:
-        prompt, closed = session.getbranch()
+        prompt, closed = session.getbranch_strings()
         background = colors.get(session.branch, colors['Grey']) 
     else:
         prompt = DEF_PROMPT
@@ -478,7 +508,7 @@ def run() -> int:
     session = engine.Session('main', 'config.json')
     ptk.print_formatted_text(ptk.HTML(
         '<b>Logika -> Psychika</b>\nType ? to get command list; type [command]? to get help'))
-    console = ptk.PromptSession(message=lambda: f"{session.branch+bool(session.branch)*' '}# ", rprompt=lambda: get_rprompt(
+    console = ptk.PromptSession(message=lambda: f"{session.get_current_branch()+bool(session.get_current_branch())*' '}# ", rprompt=lambda: get_rprompt(
         session, getcolors()), complete_in_thread=True, complete_while_typing=True, completer=Autocomplete(session))
     while True:
         command = console.prompt().strip()
@@ -501,11 +531,29 @@ def run() -> int:
             ptk.print_formatted_text(performer(procedure, session))
 
 
+def inAppDir(func):
+    def wrapper(*args, **kwargs):
+        assert os.getcwd().endswith(("/tests", "\\tests")), "cwd musi być folderem `tests` położonym równolegle do `app`"
+        os.chdir('../app')
+        if not os.path.exists('config/config_copy.json'):
+            from shutil import copy
+            copy('config/config.json', 'config/config_copy.json')
+            
+        ret = func(*args, **kwargs)
+
+        os.chdir('../tests')
+        return ret
+    return wrapper
+
+
 class Runner(object):
+
+    @inAppDir
     def __init__(self) -> None:
         super().__init__()
-        self.session = engine.Session('main', 'config.json')
+        self.session = engine.Session('main', 'config_copy.json')
 
+    @inAppDir
     def __call__(self, command: str) -> str:
         try:
             procedure = parser(command, command_dict)[0]

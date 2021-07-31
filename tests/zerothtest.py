@@ -5,7 +5,7 @@ import sys
 
 sys.path.append('../app')
 from sentence import Sentence
-from plugins.FormalSystem import zeroth_order_logic as zol
+from plugins.Formal import analytic_freedom as zol
 
 def join_to_string(sentence) -> str:
     """Writes the sentence as a string, where tokens are written as `<[token type]_[lexem]>`"""
@@ -19,7 +19,7 @@ def join_to_string(sentence) -> str:
 
 
 class _SessionDummy(object):
-    config = {'chosen_plugins':{'FormalSystem':zol}}
+    config = {'chosen_plugins':{'Formal':zol}}
     
     def acc(self, arg):
         return zol
@@ -51,7 +51,7 @@ def new_notation(func):
 class Test_true_and(test.TestCase):
 
     def setUp(self):
-        self.rule = new_notation(zol.RULES['true and'].func)
+        self.rule = new_notation(zol.RULES['true and'].strict)
 
     def test_basic(self):
         self.assertEqual(self.rule('<sentvar_p><and_^><sentvar_q>'),
@@ -81,7 +81,7 @@ class Test_true_and(test.TestCase):
 class Test_true_or(test.TestCase):
 
     def setUp(self):
-        self.rule = new_notation(zol.RULES['true or'].func)
+        self.rule = new_notation(zol.RULES['true or'].strict)
 
     def test_basic(self):
         self.assertEqual(self.rule('<sentvar_p><or_or><sentvar_q>'),
@@ -111,7 +111,7 @@ class Test_true_or(test.TestCase):
 class Test_false_and(test.TestCase):
 
     def setUp(self):
-        self.rule = new_notation(zol.RULES['false and'].func)
+        self.rule = new_notation(zol.RULES['false and'].strict)
 
     def test_basic(self):
         self.assertEqual(self.rule('<not_~>(<sentvar_p><and_^><sentvar_q>)'), ((
@@ -146,7 +146,7 @@ class Test_false_and(test.TestCase):
 class Test_false_or(test.TestCase):
 
     def setUp(self):
-        self.rule = new_notation(zol.RULES['false or'].func)
+        self.rule = new_notation(zol.RULES['false or'].strict)
 
     def test_basic(self):
         self.assertEqual(self.rule('<not_~>(<sentvar_p><or_or><sentvar_q>)'),
@@ -164,7 +164,7 @@ class Test_false_or(test.TestCase):
         self.assertEqual(
             self.rule('<not_~>(<sentvar_p><and_^><sentvar_q>)'), None)
 
-    def test_fist_negated(self):
+    def test_first_negated(self):
         self.assertEqual(
             self.rule('<not_~><sentvar_p><or_or><sentvar_q>'), None)
 
@@ -181,7 +181,7 @@ class Test_false_or(test.TestCase):
 class Test_true_imp(test.TestCase):
 
     def setUp(self):
-        self.rule = new_notation(zol.RULES['true imp'].func)
+        self.rule = new_notation(zol.RULES['true imp'].strict)
 
     def test_basic(self):
         self.assertEqual(self.rule('<sentvar_p><imp_imp><sentvar_q>'),
@@ -211,7 +211,7 @@ class Test_true_imp(test.TestCase):
 class Test_false_imp(test.TestCase):
 
     def setUp(self):
-        self.rule = new_notation(zol.RULES['false imp'].func)
+        self.rule = new_notation(zol.RULES['false imp'].strict)
 
     def test_basic(self):
         self.assertEqual(self.rule('<not_~>(<sentvar_p><imp_imp><sentvar_q>)'),
@@ -229,7 +229,7 @@ class Test_false_imp(test.TestCase):
         self.assertEqual(
             self.rule('<not_~>(<sentvar_p><and_^><sentvar_q>)'), None)
 
-    def test_fist_negated(self):
+    def test_first_negated(self):
         self.assertEqual(
             self.rule('<not_~><sentvar_p><imp_imp><sentvar_q>'), None)
 
@@ -246,7 +246,7 @@ class Test_false_imp(test.TestCase):
 class Test_double_neg(test.TestCase):
 
     def setUp(self):
-        self.rule = new_notation(zol.RULES['double not'].func)
+        self.rule = new_notation(zol.RULES['double not'].strict)
 
     def test_basic(self):
         self.assertEqual(self.rule(

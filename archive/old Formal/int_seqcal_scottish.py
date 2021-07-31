@@ -8,9 +8,9 @@ Implementacja opisana w:
 https://github.com/PogromcaPapai/Larch/blob/24e1391c183d08842aa0cf7df971eeb01a1a9885/media/int_seqcal%20-%20implementacja.pdf
 """
 import typing as tp
-import plugins.FormalSystem.__utils__ as utils
+import plugins.Formal.__utils__ as utils
 
-SOCKET = 'FormalSystem'
+SOCKET = 'Formal'
 VERSION = '0.0.1'
 
 def get_tags() -> tuple[str]:
@@ -77,16 +77,16 @@ def stoup_add(tree: tuple[tuple[utils.Sentence]], rule_name: str, new: bool = Fa
 
 
 def stoupManager(func):
-    def wrapped(auto: bool, left, right, num, *args):
-        if not auto:
-            return func(left, right, num, *args)
+    def wrapped(left, right, num, *args):
+        # if not auto:
+        #     return func(left, right, num, *args)
         if (priority := stoup_find(left)) is not None:
             if priority == num-1:
                 res_left, res_right = func([i for i in left if i != "^"], right, num, *args)
                 if res_left is not None:
                     return stoup_add(res_left, func.__name__), res_right
             else:
-                raise utils.FormalSystemError("There is a sequent that is prioritized")
+                raise utils.FormalError("There is a sequent that is prioritized")
         else:
             res_left, res_right = func([i for i in left if i != "^"], right, num, *args)
             if res_left is not None:
@@ -99,7 +99,7 @@ def stoupBlock(func):
         if not auto:
             return func(left, *args)
         if stoup_find(left) is not None:
-            raise utils.FormalSystemError("Rule can't be performed on sequents with an established priority")
+            raise utils.FormalError("Rule can't be performed on sequents with an established priority")
         else:
             return func(left, *args)
     return wrapped
@@ -163,11 +163,13 @@ def rule_left_or(left: utils.Sentence, right: utils.Sentence, num: int):
 
 @stoupBlock
 def rule_right_or(left: utils.Sentence, right: utils.Sentence, side: str, used: list[tuple[str]]):
+    # sourcery skip: merge-duplicate-blocks
     """ ... => (A,B)[side]
         ______________
         ... => AvB
     """
-    if not right or side not in ('l', 'r','find'):
+    # Usunięto find bo trochę przesadne chwilowo
+    if not right or side not in ('l', 'r'):
         return (None, None)
 
     split = utils.strip_around(right, 'or', False, PRECEDENCE)
@@ -175,22 +177,21 @@ def rule_right_or(left: utils.Sentence, right: utils.Sentence, side: str, used: 
         return (None, None)
     left_split, right_split = split[0]
 
-
     if side=='l':
-        ret = left_split
+            return ((left,),), ((left_split,),)
     elif side=='r':
-        ret = right_split
+        return ((left,),), ((right_split,),)
     else:
         if is_sequent(left, left_split):
-            ret = left_split
+            return ((left,),), ((left_split,),)
         elif is_sequent(left, right_split):
-            ret = right_split
+            return ((left,),), ((right_split,),)
         else:
             # Default case
-            ret = max(split[0], key=len)
+            return ((left,),), ((max(split[0], key=len),),)
 
     if ret in used:
-        raise utils.FormalSystemError("Operation prohibited by loop detection algorithm")
+        raise utils.FormalError("Operation prohibited by loop detection algorithm")
     utils.pop_part(right, 'sep', 0)
     return ((left,),), ((debrac(ret),),)
 
@@ -300,7 +301,7 @@ RULES = {
         utils.ContextDef(
             variable='conn_side',
             official='Side of the or operation',
-            docs='l/r/find; `find` option searches for the best possible fit',
+            docs='l/r',
             type_=str
         )]
     ),
@@ -356,7 +357,7 @@ def prepare_for_proving(statement: utils.Sentence) -> utils.Sentence:
     """Przygotowuje zdanie do dowodzenia - czyszczenie, dodawanie elementów"""
     statement = utils.reduce_brackets(statement)
     if 'turnstile_=>' not in statement:
-        return ['turnstile_=>']+statement
+        return utils.add_prefix(statement, 'turnstile', '=>')
     else:
         return statement
 
@@ -396,7 +397,7 @@ def check_syntax(tokenized_statement: utils.Sentence) -> tp.Union[str, None]:
     return None
 
 
-def get_rules() -> dict[str, str]:
+def get_rules_docs() -> dict[str, str]:
     """Zwraca reguły rachunku z opisem"""
     return {
         name: "\n".join((rule.symbolic, rule.docs))
@@ -416,18 +417,18 @@ def get_used_types() -> tuple[str]:
     return USED_TYPES
 
 
-def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, context: dict[str, tp.Any], auto: bool) -> tuple[tp.Union[tuple[tuple[utils.Sentence]], None], tp.Union[tuple[tuple[tp.Union[int, callable, utils.Sentence]]], None]]:
+def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, context: dict[str, tp.Any], decisions: dict[str, tp.Any]) -> tuple[utils.SentenceTupleStructure, utils.HistoryTupleStructure, dict[str, tp.Any]]:
     """
     Używa określonej reguły na podanej gałęzi.
     Więcej: https://www.notion.so/szymanski/Gniazda-w-Larchu-637a500c36304ee28d3abe11297bfdb2#98e96d34d3c54077834bc0384020ff38
 
-    :param name: Nazwa używanej reguły, listę można uzyskać z pomocą FormalSystem.get_rules()
+    :param name: Nazwa używanej reguły, listę można uzyskać z pomocą Formal.get_rules_docs()
     :type name: str
     :param branch: Lista zdań w gałęzi, na której została użyta reguła
     :type branch: list[utils.Sentence]
     :param used: Obiekt historii przechowujący informacje o już rozłożonych zdaniach
     :type used: utils.History
-    :param context: kontekst wymagany do zastosowania reguły, listę można uzyskać z pomocą FormalSystem.get_needed_context(rule)
+    :param context: kontekst wymagany do zastosowania reguły, listę można uzyskać z pomocą Formal.get_needed_context(rule)
         Kontekst reguł: https://www.notion.so/szymanski/Zarz-dzanie-kontekstem-regu-2a5abea2a1bc492e8fa3f8b1c046ad3a
     :type context: dict[str, tp.Any]
     :param auto: , defaults to False
@@ -435,7 +436,7 @@ def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, conte
     :return: Struktura krotek, reprezentująca wynik reguły oraz strukturę reprezentującą operacje do wykonania na zbiorze zamknięcia.
         Struktury krotek: https://www.notion.so/szymanski/Reprezentacja-dowod-w-w-Larchu-cd36457b437e456a87b4e0c2c2e38bd5#014dccf44246407380c4e30b2ea598a9
         Zamykanie gałęzi: https://www.notion.so/szymanski/Zamykanie-ga-zi-53249279f1884ab4b6f58bbd6346ec8d
-    :rtype: tuple[tp.Union[tuple[tuple[utils.Sentence]], None], tp.Union[tuple[tuple[tp.Union[int, callable, utils.Sentence]]], None]]
+    :rtype: tuple[tp.Union[tuple[tuple[utils.Sentence]], None], tp.Union[tuple[tuple[tp.Union[int, Callable, utils.Sentence]]], None]]
     """
     rule = RULES[name]
 
@@ -444,7 +445,7 @@ def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, conte
     
     # Check sequent number
     if context.get('partID', -1) > sum(i.startswith('sep') for i in start_left)+1:
-        raise utils.FormalSystemError("Sequent number is too big")
+        raise utils.FormalError("Sequent number is too big")
 
     # Loop detection
     history = None
@@ -452,7 +453,7 @@ def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, conte
         p = utils.pop_part(start_left[:], 'sep', context['partID']-1)
         l, r = utils.strip_around(p, "imp", False, PRECEDENCE)[0]
         if tuple(l) in used:
-            raise utils.FormalSystemError("Operation prohibited by loop detection algorithm")
+            raise utils.FormalError("Operation prohibited by loop detection algorithm")
         else:
             history = [[l], [0]]
 
@@ -461,20 +462,20 @@ def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, conte
         p = utils.pop_part(start_left[:], 'sep', context['partID']-1)
         l, r = utils.strip_around(p, "or", False, PRECEDENCE)[0]
         if is_sequent(start_left, l) or is_sequent(start_left, r):
-            raise utils.FormalSystemError("Operation prohibited by loop detection algorithm")
+            raise utils.FormalError("Operation prohibited by loop detection algorithm")
         else:
             history = [[-1, start_right], [-1, start_right]]
 
 
     elif name == 'right imp':
         if (stripped := utils.strip_around(start_right, "imp", False, PRECEDENCE)) is None:
-            return None, None
+            return None, None, None
         l, r = stripped[0]
         if is_sequent(start_left, l):
             if tuple(r) not in used:
                 history = [[r]]
             else:
-                raise utils.FormalSystemError("Operation prohibited by loop detection algorithm")
+                raise utils.FormalError("Operation prohibited by loop detection algorithm")
         else:
             history = [[-1, r]]
 
@@ -482,7 +483,7 @@ def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, conte
     elif name == 'right and':
         l, r = utils.strip_around(start_right, "and", False, PRECEDENCE)[0]
         if tuple(l) in used or tuple(r) in used:
-            raise utils.FormalSystemError("Operation prohibited by loop detection algorithm")
+            raise utils.FormalError("Operation prohibited by loop detection algorithm")
         else:
             history = [[l], [r]]
 
@@ -490,9 +491,9 @@ def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, conte
         context['used'] = used
 
     # Rule usage
-    usage = rule.func(auto, start_left[:], start_right[:], *context.values())
+    usage = rule.func(start_left[:], start_right[:], *context.values())
     if not usage:
-        return None, None
+        return None, None, None
     left, right = usage
 
 
@@ -501,9 +502,9 @@ def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, conte
         # History length multiplication
         if not history:
             history = [[0]]*len(left)
-        return utils.merge_tupstruct(left, right, "turnstile_=>"), history
+        return utils.merge_tupstruct(left, right, "turnstile_=>"), history, None
     else:
-        return None, None
+        return None, None, None
 
 def get_operator_precedence() -> dict[str, int]:
     """Zwraca siłę wiązania danych spójników, im wyższa, tym mocniej wiąże (negacja ma najwyższą przykładowo)"""

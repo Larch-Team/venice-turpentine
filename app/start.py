@@ -1,7 +1,7 @@
 import json
 import os
 import sys
-from datetime import date, datetime
+from datetime import datetime
 
 import pop_engine as pop
 
@@ -32,18 +32,15 @@ if __name__ == "__main__":
             UI.plug(config['chosen_plugins']['UserInterface'])
             exit_code = UI().run()
 
-    # Crash report generator
-
     except BaseException as e:
-        if not DEBUG:
-            with open('log.log', 'r') as l:
-                logs = l.read()
-            with open(f'crashes/crash-{datetime.now().strftime("%d-%m-%Y-%H-%M")}.txt', 'w') as f:
-                f.write(logs)
-                f.write('\nEXCEPTION:\n')
-                f.write(str(e))
-        else:
+        if DEBUG:
             raise e
-    
+
+        with open('log.log', 'r') as l:
+            logs = l.read()
+        with open(f'crashes/crash-{datetime.now().strftime("%d-%m-%Y-%H-%M")}.txt', 'w') as f:
+            f.write(logs)
+            f.write('\nEXCEPTION:\n')
+            f.write(str(e))
     else:
         sys.exit(exit_code)

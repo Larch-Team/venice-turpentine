@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from collections import namedtuple, Counter
-from re import escape as resc, compile
 from typing import Any, Iterable, Union, NewType
 from sentence import Sentence
 from exrex import generate, getone
