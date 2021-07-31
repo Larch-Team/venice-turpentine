@@ -32,7 +32,7 @@ if __name__ == "__main__":
             UI.plug(config['chosen_plugins']['UserInterface'])
             exit_code = UI().run()
 
-    except BaseException as e:
+    except Exception as e:
         if DEBUG:
             raise e
 
