@@ -2,7 +2,7 @@ import sys
 import time
 
 sys.path.append('../app')
-from UserInterface import CLI as c
+from plugins.UserInterface import CLI as c
 
 with open('tautologies_20_5-1.txt') as t:
     TAUTOLOGIES = t.readlines()

@@ -5,7 +5,7 @@ import os
 import sys
 
 sys.path.append('../app')
-from UserInterface import CLI as cmd
+from plugins.UserInterface import CLI as cmd
 
 class TestParser(test.TestCase):
 

@@ -6,9 +6,8 @@ Autorzy:
     Michał Gajdziszewski - autor skryptu wzorcowego
     Jakub Dakowski (@PogromcaPapai) - autor implementacji
 """
-import typing as tp
-import Output.__utils__ as utils
-from anytree import Node, RenderTree
+import plugins.Output.__utils__ as utils
+from anytree import RenderTree, Node
 
 SOCKET = 'Output'
 VERSION = '0.0.1'

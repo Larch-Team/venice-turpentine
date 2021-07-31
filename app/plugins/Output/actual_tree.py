@@ -5,8 +5,7 @@ Autorzy:
     Michał Gajdziszewski - autor skryptu wzorcowego
     Jakub Dakowski (@PogromcaPapai) - autor implementacji
 """
-from typing import Callable
-import Output.__utils__ as utils
+import plugins.Output.__utils__ as utils
 from anytree import Node, RenderTree
 
 SOCKET = 'Output'

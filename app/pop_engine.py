@@ -67,6 +67,7 @@ class Socket(object):
         assert len(self.version) == 3, "Wrong version format"
 
         self.name = socket_name
+        self.plugin_name = None
         self.read_template(template)
 
         # Plugging
@@ -92,7 +93,7 @@ class Socket(object):
     # Get functions
 
     def get_plugin_name(self):
-        return self.__call__().__name__
+        return self.plugin_name
 
     def isplugged(self):
         return bool(self.plug)
@@ -125,13 +126,13 @@ class Socket(object):
         Returns:
             list[str]: List of all plugins in the socket's directory
         """
-        return [
-            file[:-3]
-            for file in os.listdir(self.dir)
-            if file.endswith(".py")
-            and file
-            not in {f"{self.template}.py", "__utils__.py", "__init__.py"}
-        ]
+        l = []
+        for name in os.listdir(self.dir):
+            if name.endswith(".py") and name not in {f"{self.template}.py", "__utils__.py", "__init__.py"}:
+                l.append(name[:-3])
+            elif os.path.isdir(f'{self.dir}/{name}') and name not in {'__pycache__'}:
+                l.append(name)
+        return l
 
     def unplug(self) -> None:
         """Unplugs the current plugin, not recommended"""
@@ -172,7 +173,9 @@ class Socket(object):
 
         # Connecting to the system
         self.plugin = plug_obj
+        self.plugin_name = plugin_name
         logger.warning(f"{plugin_name} connected to {self.name}")
+
 
     def _import(self, plugin_name: str) -> Module:
         """Imports a module named `plugin_name` from `self.dir`; USE PLUG INSTEAD"""
@@ -180,19 +183,32 @@ class Socket(object):
         if module:
             self.cache.move_to_end((self.name, plugin_name))
         else:
-            module = self._only_import(plugin_name)
+            module = self._package_import(plugin_name)
+            if plugin_name != self.template:
+                self.cache[(self.name, plugin_name)] = module
         return module
 
-    def _only_import(self, plugin_name):
-        sys.path.insert(0, self.dir)
+
+    def _package_import(self, plugin_name: str) -> Module:
+        if os.path.isfile(f'{self.dir}/{plugin_name}/__init__.py'):
+            return self._only_import(f'{plugin_name}/__init__.py', [f"{self.dir}/{plugin_name}"])
+        else:
+            return self._only_import(f'{plugin_name}.py', [self.dir])
+
+
+    def _only_import(self, plugin_name, paths: tp.Iterable[str] = []):
+        sys.path = paths + sys.path
+        
         spec = importlib.util.spec_from_file_location(
-            plugin_name, f"{self.dir}/{plugin_name}.py")
+            plugin_name, f"{self.dir}/{plugin_name}")
         result = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(result)
-        sys.path.pop(0)
-        if plugin_name != self.template:
-            self.cache[(self.name, plugin_name)] = result
+        
+        for _ in paths:
+            sys.path.pop(0)
+
         return result
+
 
     # Verification
 

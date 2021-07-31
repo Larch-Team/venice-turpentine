@@ -2,7 +2,7 @@ import sys
 import random
 from termcolor import colored
 sys.path.append('../app')
-from UserInterface import CLI as c
+from plugins.UserInterface import CLI as c
 
 
 runner = c.Runner()

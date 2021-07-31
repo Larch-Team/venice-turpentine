@@ -174,8 +174,8 @@ class BranchCentric(Proof):
         """Przeskakuje do następnej otwartej gałęzi"""
         nodes = self.nodes.getopen()
         if nodes:
-            self.branch = next(nodes).branch
-            return f"Branch changed to {nodes.branch}"
+            self.branch = nodes[0].branch
+            return f"Branch changed to {nodes[0].branch}"
         else:
             raise EngineError("All branches are closed")
 

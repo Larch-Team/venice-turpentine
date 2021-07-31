@@ -12,8 +12,7 @@ from sentence import Sentence
 from tree import ProofNode
 from usedrule import UsedRule
 
-import Formal.__utils__ as utils
-from Formal.__template__ import check_closure
+import plugins.Formal.__utils__ as utils
 
 SOCKET = 'Formal'
 VERSION = '0.2.0'

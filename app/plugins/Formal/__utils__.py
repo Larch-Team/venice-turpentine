@@ -4,10 +4,18 @@ import close
 from history import History
 from proof import Proof
 from sentence import Sentence
+from misc import get_plugin_path
 from exceptions import FormalError
 from rule import Rule, ParameterContext, SentenceID, TokenID, ContextDef
 from tree import HistoryTupleStructure, ProofNode, SentenceTupleStructure
 from usedrule import UsedRule
+
+ContextDef = namedtuple(
+    'ContextDef', ('variable', 'official', 'docs', 'type_'))
+
+
+class FormalSystemError(Exception):
+    pass
 
 
 # Rule decorators

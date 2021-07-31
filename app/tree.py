@@ -3,8 +3,7 @@ from __future__ import annotations
 import json
 import random
 import typing as tp
-from collections import OrderedDict, namedtuple
-from math import inf as INFINITY
+from collections import namedtuple
 
 from anytree import NodeMixin, util
 

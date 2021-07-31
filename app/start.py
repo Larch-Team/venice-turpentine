@@ -20,7 +20,7 @@ if __name__ == "__main__":
 
         # UserInterface socket generation
         UI = pop.Socket('UserInterface', os.path.abspath(
-            'UserInterface'), '0.0.1', '__template__')
+            'plugins/UserInterface'), '0.0.1', '__template__')
 
         # return exit code -1 to initiate a restart (useful for UI plugin switching)
         exit_code = -1  # Not implemented in cmd plugin

@@ -1,9 +1,11 @@
 import sys
-# TODO: dostosować do reguł naiwnych
 
 from multiprocessing import Pool
 sys.path.append('../app')
-from UserInterface import CLI as c
+from plugins.UserInterface import CLI as c
+
+# TODO: dostosować do reguł naiwnych
+raise NotImplementedError()
 
 with open('tautologies_20_5-1.txt') as t:
     TAUTOLOGIES = [f"~({i[:-1]})" for i in t.readlines()]

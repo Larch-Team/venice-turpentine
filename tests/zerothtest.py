@@ -5,7 +5,7 @@ import sys
 
 sys.path.append('../app')
 from sentence import Sentence
-from Formal import analytic_freedom as zol
+from plugins.Formal import analytic_freedom as zol
 
 def join_to_string(sentence) -> str:
     """Writes the sentence as a string, where tokens are written as `<[token type]_[lexem]>`"""

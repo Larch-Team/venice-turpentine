@@ -8,7 +8,7 @@ Implementacja opisana w:
 https://github.com/PogromcaPapai/Larch/blob/24e1391c183d08842aa0cf7df971eeb01a1a9885/media/int_seqcal%20-%20implementacja.pdf
 """
 import typing as tp
-import Formal.__utils__ as utils
+import plugins.Formal.__utils__ as utils
 
 SOCKET = 'Formal'
 VERSION = '0.0.1'

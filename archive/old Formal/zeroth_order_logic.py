@@ -2,7 +2,7 @@
 Tabele analityczne KRZ w stylizacji Smullyana bez formuł sygnowanych.
 """
 import typing as tp
-import Formal.__utils__ as utils
+import plugins.Formal.__utils__ as utils
 
 SOCKET = 'Formal'
 VERSION = '0.0.1'
