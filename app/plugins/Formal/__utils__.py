@@ -14,10 +14,6 @@ ContextDef = namedtuple(
     'ContextDef', ('variable', 'official', 'docs', 'type_'))
 
 
-class FormalSystemError(Exception):
-    pass
-
-
 # Rule decorators
 
 def transform_to_sentences(converted, session):

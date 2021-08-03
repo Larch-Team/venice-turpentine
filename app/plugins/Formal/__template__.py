@@ -2,6 +2,7 @@
 Tutaj umieść dokumentację swojego pluginu
 """
 import typing as tp
+from exceptions import UserMistake
 import plugins.Formal.__utils__ as utils
 from history import History
 from proof import Proof
@@ -29,7 +30,7 @@ def check_closure(branch: list[Sentence], used: History) -> tp.Union[None, tuple
     pass
 
 
-def check_syntax(tokenized_statement: Sentence) -> tp.Union[str, None]:
+def check_syntax(tokenized_statement: Sentence) -> tp.Union[UserMistake, None]:
     """Sprawdza poprawność zapisu tokenizowanego zdania, zwraca informacje o błędach w formule"""
     pass
 
@@ -63,7 +64,7 @@ def find_rule(sentence: Sentence) -> str:
     else:
         return f"{negated} {main.split('_')[0]}"
 
-def checker(rule: UsedRule, conclusion: Sentence) -> tp.Union[str, None]:
+def checker(rule: UsedRule, conclusion: Sentence) -> tp.Union[UserMistake, None]:
     """
     Na podstawie informacji o użytych regułach i podanym wyniku zwraca informacje o błędach. None wskazuje na poprawność wyprowadzenia wniosku z reguły.
     Konceptualnie przypomina zbiory Hintikki bez reguły o niesprzeczności.

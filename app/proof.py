@@ -1,12 +1,13 @@
+from math import inf
 import random
 from typing import Any, Callable, Iterable, OrderedDict, Union
 
 from anytree.iterators.preorderiter import PreOrderIter
 
 from close import Close
-from exceptions import EngineError, FormalError
+from exceptions import EngineError, FormalError, UserMistake
 from history import History
-from pop_engine import Socket
+from pop_engine import Module
 from sentence import Sentence
 from tree import ProofNode
 from usedrule import UsedRule
@@ -37,7 +38,7 @@ class Proof(object):
 
     # Proof manipulation
 
-    def deal_closure(self, FormalSystem: Socket, branch_name: str) -> tuple[Close, str]:
+    def deal_closure(self, FormalSystem: Module, branch_name: str) -> tuple[Close, str]:
         """Wywołuje proces sprawdzenia zamykalności gałęzi oraz (jeśli można) zamyka ją; Zwraca informacje o zamknięciu"""
         return self.deal_closure_func(FormalSystem.check_closure, branch_name)
 
@@ -63,7 +64,7 @@ class Proof(object):
         else:
             return None, None
 
-    def use_rule(self, FormalSystem: Socket, branch: str, rule: str, context: dict[str, Any], decisions: dict = None) -> tuple[str]:
+    def use_rule(self, FormalSystem: Module, branch: str, rule: str, context: dict[str, Any], decisions: dict = None) -> None:
         """
         Wykorzystuje regułę dowodzenia systemu FormalSystem na określonej gałęzi z określonym kontekstem.
 
@@ -102,12 +103,19 @@ class Proof(object):
         self.nodes.insert_history(used_extention, children)
 
         self.metadata['usedrules'].append(UsedRule(layer, self.branch, rule, self, context, decisions))
-        return tuple(i.branch for i in children)
+        return None
 
     
     def get_histories(self) -> dict[str, History]:
         leaves = self.nodes.leaves
         return {leaf.branch:leaf.gethistory() for leaf in leaves}       
+    
+    
+    def get_last_modified_branches(self) -> list[str]:
+        if not self.metadata['usedrules']:
+            return ['Green']
+        max_layer = self.metadata['usedrules'][-1].layer
+        return [i.branch for i in self.nodes.leaves if i.layer==max_layer]
     
     
     def _group_by_layers(self) -> list[tuple[UsedRule, list[Sentence]]]:
@@ -118,20 +126,25 @@ class Proof(object):
             d[node.layer].append(node.sentence)
         return [(i,d[i.layer]) for i in self.metadata['usedrules']]
     
-    def check(self, checker: Callable[[UsedRule, Sentence], str]) -> tuple[str]:
+    def check(self) -> list[UserMistake]:
         if not self.nodes.is_closed():
-            return ("Nie możesz sprawdzić nieskończonego dowodu",)
+            raise EngineError("Nie możesz sprawdzić nieskończonego dowodu")
         if not self.metadata['usedrules']:
-            return ("Nie wykonano żadnej operacji")
+            raise EngineError("Nie wykonano żadnej operacji")
         
-        problems = OrderedDict()
+        checker = self.S.acc('Formal').checker
+        
+        problems = []
         for used, sentences in self._group_by_layers():
             for i in sentences:
-                if (info := checker(used, i)):
-                    problems[info] = None
-        return tuple(problems.keys())
-        
-                    
+                if (info := checker(used, i)) and info not in problems:
+                    problems.append(info)
+        return problems
+    
+    def solve(self) -> tuple[str]:
+        l = len(self.metadata['usedrules'])
+        self.S.solve(proof=self)
+        return self.metadata['usedrules'][l:]
 
 
 class BranchCentric(Proof):
@@ -179,5 +192,5 @@ class BranchCentric(Proof):
         else:
             raise EngineError("All branches are closed")
 
-    def use_rule(self, FormalSystem: Socket, rule: str, context: dict[str, Any], decisions: dict):
+    def use_rule(self, FormalSystem: Module, rule: str, context: dict[str, Any], decisions: dict):
         return super().use_rule(FormalSystem, self.branch, rule, context, decisions=decisions)

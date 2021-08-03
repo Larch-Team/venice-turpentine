@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from collections import namedtuple, Counter
 from typing import Any, Iterable, Union, NewType
 from sentence import Sentence
+from exceptions import LrchLexerError
 from exrex import generate, getone
 import re
 
@@ -11,10 +12,6 @@ from ply.lex import LexError
 token_type = NewType('Token', str)
 
 LexerRule = namedtuple('LexerRule', ('constraints', 'type_', 'lexems'))
-
-
-class LrchLexerError(Exception):
-    pass
 
 
 def join_items(tuples):

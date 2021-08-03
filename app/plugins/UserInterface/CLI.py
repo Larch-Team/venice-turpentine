@@ -224,11 +224,15 @@ def do_prove(session: engine.Session, sentence: str) -> str:
     if session.proof:
         return "A proof would be deleted"
     try:
-        session.new_proof(sentence)
+        text = session.new_proof(sentence)
     except engine.EngineError as e:
         return str(e)
     else:
-        return "Sentence tokenized successfully \nProof initialized"
+        if text:
+            return "\n".join(text)
+        else:
+            return "Sentence tokenized successfully \nProof initialized"
+
 
 def do_use(session: engine.Session, command) -> str:
     """Uses a rule in the proof
@@ -271,14 +275,15 @@ def do_use(session: engine.Session, command) -> str:
 
     # Rule usage
     try:
-        val = session.use_rule(name, context)
+        info = session.use_rule(name, context)
     except engine.EngineError as e:
         return str(e)
-    if val:
+    if info is None:
         out.append(f"Used '{name}' successfully")
 
         # Contradiction handling
-        for i in val:
+        branches = session.proof.get_last_modified_branches()
+        for i in branches:
             out.append(do_contra(session, i))
         
         ended, closed = session.proof_finished()
@@ -288,7 +293,7 @@ def do_use(session: engine.Session, command) -> str:
             out.append("All branches are closed")
 
     else:
-        out.append("Rule couldn't be used")
+        out.extend(info)
 
     return "\n".join(out)
 
@@ -328,6 +333,19 @@ def do_check(session: engine.Session) -> str:
         return "\n".join(problems)
     else:
         return "Dowód jest poprawny"
+    
+
+def do_hint(session: engine.Session) -> str:
+    """Gives you a hint"""
+    try:
+        hints = session.hint()
+    except engine.EngineError as e:
+        return str(e)
+    if hints is not None:
+        return "\n\n".join(hints)
+    else:
+        return "Podpowiedzi nie ma, trzymaj się tam"
+    
     
 def do_solve(session: engine.Session) -> str:
     """Solves the proof"""
@@ -397,6 +415,7 @@ command_dict = OrderedDict({
     'undo': {'comm': do_undo, 'args': [int]},
     'leave': {'comm': do_leave, 'args': []},
     'prove': {'comm': do_prove, 'args': 'multiple_strings'},
+    'hint': {'comm': do_hint, 'args': []},
     'solve': {'comm': do_solve, 'args': []},
     'check': {'comm': do_check, 'args': []},
     # Program interaction
@@ -507,7 +526,7 @@ def run() -> int:
     """
     session = engine.Session('main', 'config.json')
     ptk.print_formatted_text(ptk.HTML(
-        '<b>Logika -> Psychika</b>\nType ? to get command list; type [command]? to get help'))
+        "\n".join(session.start_help()+['Type ? to get command list; type [command]? to get help'])))
     console = ptk.PromptSession(message=lambda: f"{session.get_current_branch()+bool(session.get_current_branch())*' '}# ", rprompt=lambda: get_rprompt(
         session, getcolors()), complete_in_thread=True, complete_while_typing=True, completer=Autocomplete(session))
     while True:

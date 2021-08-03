@@ -2,17 +2,15 @@
 Zastępstwo zeroth_order_logic z zaimplementowanym checkerem opartych na intuicjach zbiorów Hintikki oraz prostym solverem. Korzysta z nowo wprowadzonych drzew regułowych. Reguły działają na bazie tablic Smullyana. Po raz pierwszy zaimplementowany został system naiwny.
 """
 import typing as tp
-from collections import namedtuple
-from exceptions import FormalError
 
+import plugins.Formal.__utils__ as utils
+from exceptions import UserMistake, RaisedUserMistake
 from history import History
 from proof import Proof
 from rule import Rule, SentenceID, SentenceTupleStructure
 from sentence import Sentence
 from tree import ProofNode
 from usedrule import UsedRule
-
-import plugins.Formal.__utils__ as utils
 
 SOCKET = 'Formal'
 VERSION = '0.2.0'
@@ -88,37 +86,37 @@ def find_all(a_str, sub):
         start += len(sub)
 
 
-def check_syntax(sentence: utils.Sentence) -> tp.Union[str, None]:
+def check_syntax(sentence: utils.Sentence) -> tp.Union[UserMistake, None]:
     """Sprawdza poprawność zapisu tokenizowanego zdania, zwraca informacje o błędach w formule"""
     reduced, indexes = reduce_(sentence)
     if reduced == 's':
         # ok
         return None
     if 's' not in reduced:
-        return 'Zdanie nie zawiera żadnych zmiennych'
+        return UserMistake('no variables', 'Zdanie nie zawiera żadnych zmiennych')
 
     if 'ss' in reduced:
-        return 'W zdaniu znajdują się dwie zmienne lub formuły niepołączone spójnikiem'
+        return UserMistake('nothing between formulas', 'W zdaniu znajdują się dwie zmienne lub formuły niepołączone spójnikiem')
 
     if '(' in reduced:
         errors = find_all(reduced, '(')
         for er in errors:
-            return f'Otwarcie nawiasu na pozycji {indexes[er]+1} nie ma zamknięcia'
+            return UserMistake('bracket left open', f'Otwarcie nawiasu na pozycji {indexes[er]+1} nie ma zamknięcia', {'pos': indexes[er]})
 
     if ')' in reduced:
         errors = find_all(reduced, '(')
         for er in errors:
-            return f'Zamknięcie nawiasu na pozycji {indexes[er]+1} nie ma otwarcia'
+            return UserMistake('bracket not opened', f'Zamknięcie nawiasu na pozycji {indexes[er]+1} nie ma otwarcia', {'pos': indexes[er]})
 
     if 's2' in reduced:
         errors = find_all(reduced, 's2')
         for er in errors:
-            return f'Spójnik dwuargumentowy na pozycji {indexes[er]+2} nie ma prawego argumentu'
+            return UserMistake('no right', f'Spójnik dwuargumentowy na pozycji {indexes[er]+2} nie ma prawego argumentu', {'pos': indexes[er]})
 
     if '2s' in reduced:
         errors = find_all(reduced, '2s')
         for er in errors:
-            return f'Spójnik dwuargumentowy na pozycji {indexes[er]+1} nie ma lewego argumentu'
+            return UserMistake('no left', f'Spójnik dwuargumentowy na pozycji {indexes[er]+1} nie ma lewego argumentu', {'pos': indexes[er]})
     raise Exception('Zdanie nie jest poprawne')
 
 
@@ -193,7 +191,7 @@ def naive_doublenot(branch: list[Sentence], sentenceID: SentenceID):
 # CHECKER
 
 
-def checker(rule: UsedRule, conclusion: Sentence) -> tp.Union[str, None]:
+def checker(rule: UsedRule, conclusion: Sentence) -> tp.Union[UserMistake, None]:
     """
     Na podstawie informacji o użytych regułach i podanym wyniku zwraca informacje o błędach. None wskazuje na poprawność wyprowadzenia wniosku z reguły.
     Konceptualnie przypomina zbiory Hintikki bez reguły o niesprzeczności.
@@ -201,11 +199,11 @@ def checker(rule: UsedRule, conclusion: Sentence) -> tp.Union[str, None]:
     premiss = rule.get_premisses()['sentenceID']  # Istnieje tylko jedna
     entailed = RULES[rule.rule].strict(premiss)
     if not entailed:
-        return f"'{rule.rule}' can't be used on '{premiss.getReadable()}'"
+        return UserMistake('wrong rule', f"'{rule.rule}' can't be used on '{premiss.getReadable()}'", {'rule':rule.rule, 'premiss':premiss})
     elif conclusion in sum(entailed, ()) and find_rule(premiss) == rule.rule:
         return None
     else:
-        return f"Check which connective is the main one in '{premiss.getReadable()}'"
+        return UserMistake('wrong precedence', f"Check which connective is the main one in '{premiss.getReadable()}'", {'rule':rule.rule, 'premiss':premiss})
 
 
 # SOLVER
@@ -431,11 +429,11 @@ def use_rule(name: str, branch: list[utils.Sentence], used: utils.History, conte
     sentenceID = context['sentenceID']
 
     if sentenceID < 0 or sentenceID >= len(branch):
-        raise utils.FormalError("No such sentence")
+        raise RaisedUserMistake("No such sentence")
     sentence = branch[sentenceID]
 
     if not rule.reusable and sentence in used:  # Used sentence filtering
-        raise utils.FormalError(
+        raise RaisedUserMistake(
             "This sentence was already used in a non-reusable rule")
 
     # Rule usage

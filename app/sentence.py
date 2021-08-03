@@ -1,12 +1,9 @@
 from collections import OrderedDict
 from typing import Callable, Union, NewType
+from exceptions import SentenceError
 
 _Sentence = NewType('Sentence', list[str])
 Session = NewType('Session', object)
-
-
-class SentenceError(Exception):
-    pass
 
 def _operate_on_keys(dictionary: dict, op: Callable) -> dict:
     return {op(i):j for i, j in dictionary.items()}
