@@ -1,6 +1,6 @@
 import os.path as osp
 
-def get_plugin_path(file: str, additional: str = None) -> str:
+def get_plugin_path(file: str, additional: str = '') -> str:
     """
     Zwraca ścieżkę absolutną do pliku wewnątrz pluginu.
 

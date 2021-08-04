@@ -1,6 +1,6 @@
 from math import inf
 import random
-from typing import Any, Callable, Iterable, OrderedDict, Union
+from typing import Any, Callable, Iterable, NewType, OrderedDict, Union
 
 from anytree.iterators.preorderiter import PreOrderIter
 
@@ -12,6 +12,7 @@ from sentence import Sentence
 from tree import ProofNode
 from usedrule import UsedRule
 
+_Proof = NewType('_Proof', object)
 
 class Proof(object):
     START_BRANCH = 'Green'
@@ -20,6 +21,7 @@ class Proof(object):
         super().__init__()
         self.S = sentence.S # Session
         self.config = config or self.S.get_config()
+        self.sentence = sentence
         self.nodes = ProofNode(sentence, self.START_BRANCH)
         self.metadata = dict(
             usedrules = [],
@@ -64,7 +66,7 @@ class Proof(object):
         else:
             return None, None
 
-    def use_rule(self, FormalSystem: Module, branch: str, rule: str, context: dict[str, Any], decisions: dict = None) -> None:
+    def use_rule(self, branch_name: str, rule: str, context: dict[str, Any], decisions: dict = None) -> None:
         """
         Wykorzystuje regułę dowodzenia systemu FormalSystem na określonej gałęzi z określonym kontekstem.
 
@@ -82,9 +84,10 @@ class Proof(object):
         :return: Lista nowych gałęzi
         :rtype: tuple[str]
         """
+        FormalSystem = self.S.acc('Formal')
 
         # Statement and used retrieving
-        old = self.nodes.getleaf(branch)
+        old = self.nodes.getleaf(branch_name)
         branch = old.getbranch_sentences()[0][:]
         used = old.gethistory()
 
@@ -96,15 +99,23 @@ class Proof(object):
 
         # Adding to used rules and returning
         if out is None:
-            return None
+            return
 
         layer = old.append(out, self.namegen)
         children = old.children
         self.nodes.insert_history(used_extention, children)
 
-        self.metadata['usedrules'].append(UsedRule(layer, self.branch, rule, self, context, decisions))
-        return None
+        self.metadata['usedrules'].append(UsedRule(layer, branch_name, rule, self, context, decisions))
 
+
+    def perform_usedrule(self, usedrule: UsedRule):
+        self.use_rule(
+            branch_name=usedrule.branch,
+            rule=usedrule.rule,
+            context=usedrule.context,
+            decisions=usedrule.decisions
+        )
+        
     
     def get_histories(self) -> dict[str, History]:
         leaves = self.nodes.leaves
@@ -118,6 +129,13 @@ class Proof(object):
         return [i.branch for i in self.nodes.leaves if i.layer==max_layer]
     
     
+    def copy(self) -> _Proof:
+        p = Proof(self.sentence.copy(), self.config.copy(), self.name_seed)
+        for used in self.metadata['usedrules']:
+            p.perform_usedrule(used)
+        return p
+    
+    
     def _group_by_layers(self) -> list[tuple[UsedRule, list[Sentence]]]:
         d = {i.layer:[] for i in self.metadata['usedrules']}
         for node in PreOrderIter(self.nodes):
@@ -127,8 +145,6 @@ class Proof(object):
         return [(i,d[i.layer]) for i in self.metadata['usedrules']]
     
     def check(self) -> list[UserMistake]:
-        if not self.nodes.is_closed():
-            raise EngineError("Nie możesz sprawdzić nieskończonego dowodu")
         if not self.metadata['usedrules']:
             raise EngineError("Nie wykonano żadnej operacji")
         
@@ -141,7 +157,7 @@ class Proof(object):
                     problems.append(info)
         return problems
     
-    def solve(self) -> tuple[str]:
+    def solve(self) -> tuple[UsedRule]:
         l = len(self.metadata['usedrules'])
         self.S.solve(proof=self)
         return self.metadata['usedrules'][l:]
@@ -192,5 +208,5 @@ class BranchCentric(Proof):
         else:
             raise EngineError("All branches are closed")
 
-    def use_rule(self, FormalSystem: Module, rule: str, context: dict[str, Any], decisions: dict):
-        return super().use_rule(FormalSystem, self.branch, rule, context, decisions=decisions)
+    def use_rule(self, rule: str, context: dict[str, Any], decisions: dict):
+        return super().use_rule(self.branch, rule, context, decisions=decisions)

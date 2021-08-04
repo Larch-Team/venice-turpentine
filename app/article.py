@@ -48,6 +48,7 @@ class Article(object):
     @staticmethod
     def read(directory: str, *files: str) -> dict[str, _Article]:
         d = {}
+        files = list(files)
         while files:
             f_name = files.pop(0)
             file = f'{directory}/{f_name}'
@@ -66,7 +67,7 @@ class Article(object):
         
     def read_parts(self) -> dict[str, tuple[tuple[int, int], tuple[int, int]]]:
         parser = _Parser()
-        with open(self.file) as f:
+        with open(self.file, encoding='utf8') as f:
             parser.feed(f.read())
         return parser.ranges
     
@@ -77,7 +78,7 @@ class Article(object):
         start_line, start_pos = start
         end_line, end_pos = end
         
-        with open(self.file) as f:
+        with open(self.file, encoding='utf8') as f:
             lines = f.readlines()[start_line-1:end_line]
         lines[0] = lines[0][start_pos:]
         lines[-1] = lines[-1][:end_pos]

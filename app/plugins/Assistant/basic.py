@@ -21,7 +21,7 @@ def get_articles() -> dict[str, Article]:
 def hint_command(proof: Union[Proof, None]) -> Union[list[str], None]:
     """
     Wykonywana przy wywołaniu przez użytkownika pomocy.
-    Proof to faktyczna kopia dowodu, zachowaj ostrożność.
+    Proof to faktyczny dowód, zachowaj ostrożność.
 
     :param proof: Aktualny obiekt dowodu
     :type proof: Proof | None

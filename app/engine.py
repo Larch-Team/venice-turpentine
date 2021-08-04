@@ -287,7 +287,7 @@ class Session(object):
             raise EngineError("Wrong context")
 
         try:
-            branch_names = self.proof.use_rule(self.acc('Formal'), rule, context, None)
+            self.proof.use_rule(rule, context, None)
         except RaisedUserMistake as e:
             if self.SOCKETS['Assistant'].isplugged():
                 return self.acc('Assistant').mistake_userule(e) or [e.default]
@@ -329,8 +329,10 @@ class Session(object):
     @EngineLog
     def check(self) -> list[str]:
         if not self.proof:
-            raise EngineError(
-                "There is no proof started")
+            raise EngineError("There is no proof started")
+        if not self.proof.nodes.is_closed():
+            raise EngineError("Nie możesz sprawdzić nieskończonego dowodu")
+        
         mistakes = self.proof.check()
         l = []
         for i in mistakes:

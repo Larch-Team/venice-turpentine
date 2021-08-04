@@ -547,7 +547,7 @@ def run() -> int:
             continue
 
         for procedure in to_perform:
-            ptk.print_formatted_text(performer(procedure, session))
+            ptk.print_formatted_text(ptk.HTML(performer(procedure, session)))
 
 
 def inAppDir(func):

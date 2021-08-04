@@ -24,3 +24,11 @@ class UsedRule(object):
         context_defs = self._proof.S.acc('Formal').get_needed_context(self.rule)
         sentids = [i.variable for i in context_defs if i.type_ == 'sentenceID']
         return {i: branch[j] for i, j in self.context.items() if i in sentids}
+    
+    
+    def copy(self, new_proof: _BranchCentric):
+        return UsedRule(self.layer, self.branch, self.rule, new_proof, self.context.copy(), self.decisions.copy(), self.auto)
+        
+    
+    def __repr__(self) -> str:
+        return f'{self.layer}. On {self.branch} do {self.rule}'
