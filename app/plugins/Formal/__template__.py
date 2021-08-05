@@ -48,6 +48,7 @@ def get_needed_context(rule_name: str) -> tuple[utils.ContextDef]:
 def solver(proof: Proof) -> bool:
     pass
 
+
 def checker(rule: UsedRule, conclusion: Sentence) -> tp.Union[UserMistake, None]:
     """
     Na podstawie informacji o użytych regułach i podanym wyniku zwraca informacje o błędach. None wskazuje na poprawność wyprowadzenia wniosku z reguły.

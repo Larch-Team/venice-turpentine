@@ -220,7 +220,7 @@ def get_needed_context(rule_name: str) -> tuple[utils.ContextDef]:
     return RULES[rule_name].context if RULES.get(rule_name) else None
 
 
-def use_rule(name: str, branch: list[Sentence], used: utils.History, context: dict[str, tp.Any], decisions: dict[str, tp.Any]) -> tuple[SentenceTupleStructure, utils.HistoryTupleStructure, dict[str, tp.Any]]:
+def use_rule(name: str, branch: list[Sentence], used: utils.History, context: dict[str, tp.Any], decisions: dict[str, tp.Any]) -> tuple[utils.SentenceTupleStructure, utils.HistoryTupleStructure, dict[str, tp.Any]]:
     """
     Używa określonej reguły na podanej gałęzi.
     Więcej: https://www.notion.so/szymanski/Gniazda-w-Larchu-637a500c36304ee28d3abe11297bfdb2#98e96d34d3c54077834bc0384020ff38
@@ -245,11 +245,11 @@ def use_rule(name: str, branch: list[Sentence], used: utils.History, context: di
     sentenceID = context['sentenceID']
 
     if sentenceID < 0 or sentenceID >= len(branch):
-        raise RaisedUserMistake("No such sentence")
+        raise RaisedUserMistake("no such sentence", "No such sentence")
     sentence = branch[sentenceID]
 
     if not rule.reusable and sentence in used:  # Used sentence filtering
-        raise RaisedUserMistake(
+        raise RaisedUserMistake("already used",
             "This sentence was already used in a non-reusable rule")
 
     # Rule usage

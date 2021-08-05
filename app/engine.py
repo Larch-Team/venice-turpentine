@@ -85,7 +85,7 @@ class Session(object):
         self.proof = None
         self.branch = ""
 
-        self.compileLexer()
+        self.compile_lexer()
 
 
     def __repr__(self):
@@ -138,7 +138,7 @@ class Session(object):
 
         # Deal with lexer
         if socket_name == 'Lexicon':
-            self.compileLexer()
+            self.compile_lexer()
 
     def plug_list(self, socket: str) -> list[str]:
         """Zwraca listę wszystkich pluginów dla danej nazwy.
@@ -173,7 +173,11 @@ class Session(object):
 
     # Lexer
 
-    def compileLexer(self) -> None:
+    def compile_lexer(self) -> None:
+        """
+        Kompiluje lexer na bazie pluginu Lexiconu
+        Raczej zbędne poza zastosowaniami technicznymi
+        """
         self.lexer = lexer.BuiltLexer(self.acc('Lexicon').get_lexicon(),
             use_language = self.acc('Formal').get_tags()
         ) 
@@ -221,10 +225,6 @@ class Session(object):
             
             self.proof = BranchCentric(tokenized, self.config)
             self.deal_closure('Green')
-
-
-    def start_help(self) -> tp.Union[None, list[str]]:
-        return self.acc('Assistant').hint_start() or [""]
 
 
     @EngineLog
@@ -289,7 +289,7 @@ class Session(object):
         try:
             self.proof.use_rule(rule, context, None)
         except RaisedUserMistake as e:
-            if self.SOCKETS['Assistant'].isplugged():
+            if self.sockets['Assistant'].isplugged():
                 return self.acc('Assistant').mistake_userule(e) or [e.default]
             else:
                 return [e.default]
@@ -298,6 +298,7 @@ class Session(object):
 
     @EngineLog
     def undo(self, actions_amount: int) -> tuple[str]:
+        """Wycofuje `actions_amount` operacji zwracając informacje o nich"""
         if not self.proof:
             raise EngineError(
                 "There is no proof started")
@@ -317,8 +318,16 @@ class Session(object):
         return rules
 
 
+    # Proof assist
+
+    def start_help(self) -> list[str]:
+        """Zwraca listę podpowiedzi do wyświetlenia użytkownikowi"""
+        return self.acc('Assistant').hint_start() or []
+
+
     @EngineLog
     def hint(self) -> list[str]:
+        """Zwraca listę podpowiedzi w formacie HTML"""
         if not self.proof:
             raise EngineError(
                 "There is no proof started")
@@ -327,13 +336,15 @@ class Session(object):
 
 
     @EngineLog
-    def check(self) -> list[str]:
-        if not self.proof:
+    def check(self, proof: Proof = None) -> list[str]:
+        """Sprawdza dowód i zwraca listę błędów w formacie HTML"""
+        proof = proof or self.proof 
+        if not proof:
             raise EngineError("There is no proof started")
-        if not self.proof.nodes.is_closed():
+        if not proof.nodes.is_closed():
             raise EngineError("Nie możesz sprawdzić nieskończonego dowodu")
         
-        mistakes = self.proof.check()
+        mistakes = proof.check()
         l = []
         for i in mistakes:
             if v := self.acc('Assistant').mistake_check(i) is not None:
@@ -345,20 +356,21 @@ class Session(object):
         
     @EngineLog
     def solve(self, proof: Proof = None) -> tuple[str]:
+        """Dokańcza podany, lub aktualny dowód, zwraca informację o sukcesie procedury"""
         proof = proof or self.proof
         if not proof:
             raise EngineError(
                 "There is no proof started")
         
         if self.acc('Formal').solver(proof):
-            return ("Udało się zakończyć dowód", f"Formuła {'nie '*(not self.proof.nodes.is_successful())}jest tautologią")
+            return ("Udało się zakończyć dowód", f"Formuła {'nie '*(not proof.nodes.is_successful())}jest tautologią")
         else:
             return ("Nie udało się zakończyć dowodu",)
     
     
     # Proof navigation
 
-    def getbranch_strings(self) -> list[list[str], str]:
+    def getbranch_strings(self) -> tuple[list[str], tp.Optional[str]]:
         """Zwraca gałąź oraz stan zamknięcia w formie czytelnej dla użytkownika"""
         try:
             branch, closed = self.proof.get_node().getbranch_sentences()

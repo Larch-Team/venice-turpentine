@@ -1,6 +1,6 @@
 from math import inf
 import random
-from typing import Any, Callable, Iterable, NewType, OrderedDict, Union
+from typing import Any, Callable, Iterable, NewType, Union
 
 from anytree.iterators.preorderiter import PreOrderIter
 
@@ -109,6 +109,7 @@ class Proof(object):
 
 
     def perform_usedrule(self, usedrule: UsedRule):
+        """Wykonuje na dowodzie regułę na podstawie obiektu UsedRules"""
         self.use_rule(
             branch_name=usedrule.branch,
             rule=usedrule.rule,
@@ -118,11 +119,13 @@ class Proof(object):
         
     
     def get_histories(self) -> dict[str, History]:
+        """Zwraca historie wszystkich gałęzi"""
         leaves = self.nodes.leaves
         return {leaf.branch:leaf.gethistory() for leaf in leaves}       
     
     
     def get_last_modified_branches(self) -> list[str]:
+        """Zwraca gałęzie zmodyfikowane w ostatnim ruchu"""
         if not self.metadata['usedrules']:
             return ['Green']
         max_layer = self.metadata['usedrules'][-1].layer
@@ -130,6 +133,7 @@ class Proof(object):
     
     
     def copy(self) -> _Proof:
+        """Kopiuje dowód"""
         p = Proof(self.sentence.copy(), self.config.copy(), self.name_seed)
         for used in self.metadata['usedrules']:
             p.perform_usedrule(used)
@@ -137,6 +141,7 @@ class Proof(object):
     
     
     def _group_by_layers(self) -> list[tuple[UsedRule, list[Sentence]]]:
+        """Grupuje zdania na podstawie reguł użytych do ich utworzenia"""
         d = {i.layer:[] for i in self.metadata['usedrules']}
         for node in PreOrderIter(self.nodes):
             if node.layer == 0:
@@ -145,6 +150,7 @@ class Proof(object):
         return [(i,d[i.layer]) for i in self.metadata['usedrules']]
     
     def check(self) -> list[UserMistake]:
+        """Sprawdza poprawność dowodu"""
         if not self.metadata['usedrules']:
             raise EngineError("Nie wykonano żadnej operacji")
         
@@ -158,6 +164,7 @@ class Proof(object):
         return problems
     
     def solve(self) -> tuple[UsedRule]:
+        """Dokańcza dowód, jest to wrapper przywołujący `Session.solve`"""
         l = len(self.metadata['usedrules'])
         self.S.solve(proof=self)
         return self.metadata['usedrules'][l:]
