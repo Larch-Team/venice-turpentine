@@ -93,7 +93,7 @@ def _pop_default(l: list, index: int = -1, default: Any = None) -> Any:
 
 def propagate_rule(proof: Proof, rule: Rule, containers: dict[str, list[utils.SignedSentence]], check_closure: Callable) -> dict[str, list[utils.SignedSentence]]:
     """
-    Przypominająca operację konsekwencji funkcja, która stosuje daną funkcję i wszystkie jej poprzedniki na całości dowodu.
+    Przypominająca operację konsekwencji funkcja, która stosuje daną regułę, dopóki da się ją zastosować na formułach w dowodzie.
     Zwraca kontenery z nierozwiązanymi zdaniami
     """
     if not containers[rule.name]:
