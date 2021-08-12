@@ -2,7 +2,7 @@ import unittest as test
 import sys
 
 
-sys.path.append('../app')
+sys.path.extend(['../app/appdata', '../app/core'])
 import lexer, plugins.Lexicon.classic as classic
 
 class TestTokenize(test.TestCase):

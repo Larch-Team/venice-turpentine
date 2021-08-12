@@ -1,7 +1,7 @@
 import unittest
 import sys
 
-sys.path.append('../app')
+sys.path.extend(['../app/appdata', '../app/core'])
 from article import Article
 
 class ArticleTest(unittest.TestCase):

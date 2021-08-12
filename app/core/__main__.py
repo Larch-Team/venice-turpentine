@@ -2,6 +2,7 @@ import json
 import os
 import sys
 from datetime import datetime
+from manager import FileManager
 
 import pop_engine as pop
 
@@ -12,7 +13,7 @@ DEBUG = True
 
 if __name__ == "__main__":
     try:
-        os.chdir(os.path.dirname(os.path.abspath(__file__)))
+        FileManager(DEBUG)
 
         # Log clearing
         if os.path.exists('log.log'):

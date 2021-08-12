@@ -1,7 +1,7 @@
 import sys
 
 from multiprocessing import Pool
-sys.path.append('../app')
+sys.path.extend(['../app/appdata', '../app/core'])
 from plugins.UserInterface import CLI as c
 
 # TODO: dostosować do reguł naiwnych
