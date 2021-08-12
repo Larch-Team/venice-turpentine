@@ -2,6 +2,7 @@
 Tutaj umieść dokumentację swojego pluginu
 """
 import typing as tp
+from exceptions import UserMistake
 import plugins.Formal.__utils__ as utils
 from history import History
 from proof import Proof
@@ -29,7 +30,7 @@ def check_closure(branch: list[Sentence], used: History) -> tp.Union[None, tuple
     pass
 
 
-def check_syntax(tokenized_statement: Sentence) -> tp.Union[str, None]:
+def check_syntax(tokenized_statement: Sentence) -> tp.Union[UserMistake, None]:
     """Sprawdza poprawność zapisu tokenizowanego zdania, zwraca informacje o błędach w formule"""
     pass
 
@@ -48,26 +49,27 @@ def solver(proof: Proof) -> bool:
     pass
 
 
-def find_rule(sentence: Sentence) -> str:
-    main, other = sentence.getComponents()
-    if main is None:
-        return None
-    if main.startswith('not_'):
-        negated = 'false'
-        main, _ = other.getComponents()
-    else:
-        negated = 'true'
-
-    if main.startswith('not_'):
-        return 'double not'
-    else:
-        return f"{negated} {main.split('_')[0]}"
-
-def checker(rule: UsedRule, conclusion: Sentence) -> tp.Union[str, None]:
+def checker(rule: UsedRule, conclusion: Sentence) -> tp.Union[UserMistake, None]:
     """
     Na podstawie informacji o użytych regułach i podanym wyniku zwraca informacje o błędach. None wskazuje na poprawność wyprowadzenia wniosku z reguły.
     Konceptualnie przypomina zbiory Hintikki bez reguły o niesprzeczności.
     """
+    # Przenieś poniższą funkcję poza checker, tutaj jest umieszczona tylko po to, aby nie naruszać wzorca.
+    def find_rule(sentence: Sentence) -> str:
+        main, other = sentence.getComponents()
+        if main is None:
+            return None
+        if main.startswith('not_'):
+            negated = 'false'
+            main, _ = other.getComponents()
+        else:
+            negated = 'true'
+
+        if main.startswith('not_'):
+            return 'double not'
+        else:
+            return f"{negated} {main.split('_')[0]}"
+        
     premiss = rule.get_premisses()['sentenceID']  # Istnieje tylko jedna
     entailed = None #RULES[rule.rule].strict(premiss) # You need to define a rule dictionary
     if conclusion in sum(entailed, []) and find_rule(premiss) == rule.rule:

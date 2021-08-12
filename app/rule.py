@@ -11,12 +11,6 @@ _Rule = NewType('_Rule', NodeMixin)
 ContextDef = namedtuple(
     'ContextDef', ('variable', 'official', 'docs', 'type_'))
 
-class _SentenceID(int):
-    pass
-
-class _TokenID(int):
-    pass
-
 def ParameterContext(parent: Type, type_: str, variable: str = '', official: str = '', docs: str = ''):
     """
     Używane do definiowania elementów kontekstu reguł - dodatkowych przesłanek pochodzących od użytkownika
@@ -43,10 +37,10 @@ def ParameterContext(parent: Type, type_: str, variable: str = '', official: str
     context_type.official = official
     context_type.__doc__ = docs
     return context_type
-    
-        
-SentenceID = ParameterContext(_SentenceID, 'sentenceID', official='Sentence Number', docs='The number of the sentence in this branch')
-TokenID = ParameterContext(_TokenID, 'tokenID', official='Token Number', docs='The number of the symbol in the sentence')
+
+
+SentenceID = ParameterContext(int, 'sentenceID', official='Sentence Number', docs='The number of the sentence in this branch')
+TokenID = ParameterContext(int, 'tokenID', official='Token Number', docs='The number of the symbol in the sentence')
 
 class RuleBase(object):
     def __init__(self, name: str, symbolic: str, docs: str, reusable: bool, context: Iterable[ContextDef] = None) -> None:

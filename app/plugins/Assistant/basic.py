@@ -1,7 +1,7 @@
 from article import Article
 from exceptions import UserMistake
 from proof import Proof
-import typing as tp
+from typing import Union
 
 SOCKET = 'Assistant'
 VERSION = '0.0.1'
@@ -13,12 +13,12 @@ def get_articles() -> dict[str, Article]:
     """
     Return all of the articles with their names as keys
     """
-    pass
+    return {}
 
 
 # Hints
 
-def hint_command(proof: tp.Union[Proof, None]) -> tp.Union[list[str], None]:
+def hint_command(proof: Union[Proof, None]) -> Union[list[str], None]:
     """
     Wykonywana przy wywołaniu przez użytkownika pomocy.
     Proof to faktyczny dowód, zachowaj ostrożność.
@@ -31,19 +31,19 @@ def hint_command(proof: tp.Union[Proof, None]) -> tp.Union[list[str], None]:
     pass
 
 
-def hint_start() -> tp.Union[list[str], None]:
+def hint_start() -> Union[list[str], None]:
     """
     Wykonywana przy rozpoczęciu nowego dowodu
 
     :return: Lista podpowiedzi, jeden str na odpowiedź
     :rtype: list[str] | None
     """
-    pass
+    return ["<b>Logika -> Psychika</b>", "Powodzenia!"]
 
 
 # Mistake correction
 
-def mistake_userule(mistake: UserMistake) -> tp.Union[list[str], None]:
+def mistake_userule(mistake: UserMistake) -> Union[list[str], None]:
     """
     Wykonywana przy wywołaniu przez użytkownika pomocy
 
@@ -55,7 +55,7 @@ def mistake_userule(mistake: UserMistake) -> tp.Union[list[str], None]:
     pass
 
 
-def mistake_check(mistake: UserMistake) -> tp.Union[list[str], None]:
+def mistake_check(mistake: UserMistake) -> Union[list[str], None]:
     """
     Wywoływany do interpretacji błędu zwróconego przez socket Formal podczas sprawdzania dowodu
 
@@ -67,7 +67,7 @@ def mistake_check(mistake: UserMistake) -> tp.Union[list[str], None]:
     pass
 
 
-def mistake_syntax(mistake: UserMistake) -> tp.Union[list[str], None]:
+def mistake_syntax(mistake: UserMistake) -> Union[list[str], None]:
     """
     Wywoływany do interpretacji błędu zwróconego przez socket Formal podczas sprawdzania syntaksu
 
