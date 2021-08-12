@@ -6,14 +6,14 @@ from manager import FileManager
 
 import pop_engine as pop
 
-DEBUG = True
+DEBUG = False
 
 # Wyjaśnienie sensu istnienia pliku:
 # https://www.notion.so/szymanski/The-curious-case-of-the-UserInterface-socket-ab76cfc810d9486bb8ce9199f0cc7efc
 
 if __name__ == "__main__":
     try:
-        FileManager(DEBUG)
+        manager = FileManager(DEBUG)
 
         # Log clearing
         if os.path.exists('log.log'):
@@ -37,8 +37,12 @@ if __name__ == "__main__":
         if DEBUG:
             raise e
 
-        with open('log.log', 'r') as l:
-            logs = l.read()
+        if os.path.isfile('log.log'):
+            with open('log.log', 'r') as l:
+                logs = l.read()
+        else:
+            logs = 'no logs'
+        manager.prepare_dirs('crashes')
         with open(f'crashes/crash-{datetime.now().strftime("%d-%m-%Y-%H-%M")}.txt', 'w') as f:
             f.write(logs)
             f.write('\nEXCEPTION:\n')
