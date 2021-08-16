@@ -188,6 +188,9 @@ class Session(object):
 
     def read_config(self):
         logger.debug("Config loading")
+        if not os.path.isfile(f"config/{self.config_name}"):
+            with open(f"config/{self.config_name}", 'w') as target:
+                target.write(r'{"chosen_plugins": {"Assistant": "pan","UserInterface": "CLI","Lexicon": "classic","Formal": "analytic_freedom","Output":"actual_tree"}}')
         with open(f"config/{self.config_name}", 'r') as target:
             self.config = json.load(target)
 

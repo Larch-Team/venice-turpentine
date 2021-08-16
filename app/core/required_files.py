@@ -1,7 +1,4 @@
-NEED = [
-        'config/config.json',
-        'colors.json',
-    
+NEED = [    
         # Assistant
         'plugins/Assistant/__template__.py',
         

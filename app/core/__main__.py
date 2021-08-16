@@ -3,6 +3,7 @@ import os
 import sys
 from datetime import datetime
 from manager import FileManager
+from engine import Session
 
 import pop_engine as pop
 
@@ -13,7 +14,7 @@ DEBUG = False
 
 if __name__ == "__main__":
     try:
-        manager = FileManager(DEBUG)
+        manager = FileManager(DEBUG, Session.ENGINE_VERSION)
 
         # Log clearing
         if os.path.exists('log.log'):
@@ -28,24 +29,21 @@ if __name__ == "__main__":
         while exit_code == -1:
 
             # App run
-            with open('config/config.json', 'r') as file:
-                config = json.load(file)
-            UI.plug(config['chosen_plugins']['UserInterface'])
+            try:
+                configs = os.listdir(os.path.abspath('config'))
+            except FileNotFoundError:
+                os.mkdir('config')
+                configs = []
+            if not configs:
+                UI.plug('CLI')
+            else:
+                p = 'config/config.json' if 'config.json' in configs else config[0]
+                with open(p, 'r') as file:
+                    config = json.load(file)
+                UI.plug(config['chosen_plugins']['UserInterface'])
             exit_code = UI().run()
 
     except Exception as e:
-        if DEBUG:
-            raise e
-
-        if os.path.isfile('log.log'):
-            with open('log.log', 'r') as l:
-                logs = l.read()
-        else:
-            logs = 'no logs'
-        manager.prepare_dirs('crashes')
-        with open(f'crashes/crash-{datetime.now().strftime("%d-%m-%Y-%H-%M")}.txt', 'w') as f:
-            f.write(logs)
-            f.write('\nEXCEPTION:\n')
-            f.write(str(e))
+        raise e
     else:
         sys.exit(exit_code)

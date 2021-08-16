@@ -8,6 +8,7 @@ from collections import namedtuple
 from anytree import NodeMixin, util
 
 from close import *
+from colors import COLORS
 from sentence import Sentence
 from history import *
 
@@ -15,14 +16,6 @@ PrintedProofNode = namedtuple('PrintedProofNode', ('sentence', 'children', 'clos
 
 SentenceTupleStructure = tp.NewType('SentenceTupleStructure', tuple[tuple[Sentence]])
 HistoryTupleStructure = tp.NewType('HistoryTupleStructure', tuple[tuple[tp.Union[Sentence, int, tp.Callable]]])
-
-def getcolors():
-    """
-    Zwraca słownik kolorów wraz z ich kodami RGB
-    """
-    with open('colors.json') as f:
-        c = json.load(f)
-    return c
 
 class ProofNodeError(Exception):
     def __init__(self, msg: str, *args, **kwargs):
@@ -108,7 +101,7 @@ class ProofNode(ProofBase, NodeMixin):
     def gen_name(self, namegen: random.Random, am=2) -> tuple[str]:
         """Zwraca `am` nazw dla gałęzi z czego jedną jest nazwa aktualnej"""
         branch_names = self.getbranchnames()
-        possible = [i for i in getcolors() if not i in branch_names]
+        possible = [i for i in COLORS if not i in branch_names]
         if len(possible)<am-1:
             if len(self.leaves) == 1000:
                 raise ProofNodeError("No names exist")

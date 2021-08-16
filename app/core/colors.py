@@ -1,4 +1,4 @@
-{"Aqua":"#00FFFF",
+COLORS = {"Aqua":"#00FFFF",
 "Azure":"#F0FFFF",
 "Beige":"#F5F5DC",
 "Bisque":"#FFE4C4",

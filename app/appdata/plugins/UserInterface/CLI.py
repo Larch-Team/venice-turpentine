@@ -9,20 +9,13 @@ import typing as tp
 from collections import OrderedDict, namedtuple
 from math import log10
 from xml.sax.saxutils import escape
+from colors import COLORS
 
 import engine
 import prompt_toolkit as ptk
 
 SOCKET = 'UserInterface'
 VERSION = '0.0.1'
-
-def getcolors():
-    """
-    Zwraca słownik kolorów wraz z ich kodami RGB
-    """
-    with open('colors.json') as f:
-        c = json.load(f)
-    return c
 
 # Logging config
 
@@ -528,7 +521,7 @@ def run() -> int:
     ptk.print_formatted_text(ptk.HTML(
         "\n".join(session.start_help()+['Type ? to get command list; type [command]? to get help'])))
     console = ptk.PromptSession(message=lambda: f"{session.get_current_branch()+bool(session.get_current_branch())*' '}# ", rprompt=lambda: get_rprompt(
-        session, getcolors()), complete_in_thread=True, complete_while_typing=True, completer=Autocomplete(session))
+        session, COLORS), complete_in_thread=True, complete_while_typing=True, completer=Autocomplete(session))
     while True:
         command = console.prompt().strip()
         logger.info(f"Got a command: {command}")
