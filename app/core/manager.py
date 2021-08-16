@@ -12,16 +12,17 @@ from time import sleep
 class FileManager(object):
     
     BRANCH = "dist-lab"
-    REPO_URL = f"https://raw.githubusercontent.com/Larch-Team/Larch/{BRANCH}"
+    REPO_URL = f"https://raw.githubusercontent.com/Larch-Team/larch-plugins/{BRANCH}"
+    DIRECTORY = None
     
-    
-    def __init__(self, debug: bool, larch_version: str) -> None:
+    def __init__(self, debug: bool = None, larch_version: str = None) -> None:
         super().__init__()
-        self.select_dir(debug, larch_version)
-        
-        
-        self.download_required()
-        os.system('cls')
+        assert self.DIRECTORY or (debug and larch_version), "Jedno trzeba dostarczyć"
+        if larch_version and debug:
+            self.select_dir(debug, larch_version)
+            self.DIRECTORY = self.directory
+        else:
+            self.directory = self.DIRECTORY
         
         
     def select_dir(self, debug: bool, larch_version: str):
@@ -55,21 +56,22 @@ class FileManager(object):
         
         
     def download_required(self):
-        pbar = tqdm(NEED, desc='Please wait while we download required plugins...', unit='file(s)')
+        desc='Please wait while we download required plugins'
+        pbar = tqdm(NEED, desc, unit='file(s)', position=0, leave=True)
         for i in pbar:
-            pbar.set_postfix_str(f"Downloading {i}")
+            pbar.write(f"Downloading {i}")
             if not isfile(f'{self.directory}/{i}'):
                 for error in self.try_download(i, required=True):
-                    pbar.set_description(error)
-                
+                    pbar.write(error)
+        os.system('cls')
+
 
     def try_download(self, file: str, required: bool = False):
         tries = 0
         while not self.download(file, required):
             tries += 1
-            for i in range(5, 0, -1):
-                yield f'Couldn\'t download {file}, retrying in {i} seconds (retried {tries} time(s))'
-                sleep(1)
+            yield f'Couldn\'t download {file}, retrying in 5 seconds (retried {tries} time(s))'
+            sleep(5)
         
 
     def download(self, file: str, required: bool = False) -> bool:
@@ -87,7 +89,7 @@ class FileManager(object):
                 man['additional'].append(file)
                 self.write_manifest(man)
         return True
-
+    
     
     @staticmethod
     def read_manifest():

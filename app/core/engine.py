@@ -171,6 +171,9 @@ class Session(object):
             sock.generate_template(name)
 
 
+    def download_plugin(self, socket: str, name: str):
+
+
     # Lexer
 
     def compile_lexer(self) -> None:
