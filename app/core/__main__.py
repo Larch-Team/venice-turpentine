@@ -7,7 +7,7 @@ from engine import Session
 
 import pop_engine as pop
 
-DEBUG = False
+DEBUG = True
 
 # Wyjaśnienie sensu istnienia pliku:
 # https://www.notion.so/szymanski/The-curious-case-of-the-UserInterface-socket-ab76cfc810d9486bb8ce9199f0cc7efc

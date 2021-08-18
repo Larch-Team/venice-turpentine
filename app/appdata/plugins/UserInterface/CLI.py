@@ -104,7 +104,7 @@ def parse_args(func, args):
 
 
 @UIlogged
-def performer(command: Command, session: engine.Session) -> str:
+def performer(command: Command, session: engine.Session) -> tp.Union[str, tp.Iterator[str]]:
     """Wykonuje funkcję na obiekcie sesji"""
     if command.docs:
         return command.docs
@@ -184,25 +184,22 @@ def do_plug_gen(session: engine.Session, socket: str, name: str) -> str:
         return e
     else:
         return f"Generated plugin {name} from template"
-
-
-def do_write(session: engine.Session, filename: str):
-    """
-    Writes a whole proof to a file with the provided name; if the file already exists program will append to it.
+    
+    
+def do_plug_get(session: engine.Session, socket_or_name: str, new: str) -> tp.Iterator[str]:
+    """Downloads a plugin from the <code>Larch-Team/larch-plugins</code> repository 
 
     Arguments:
-        - filename [str]
+        - Socket/current plugin name [str]
+        - Plugin name [str]
     """
-    proof = session.gettree()
-    if os.path.exists(filename):
-        with open(filename, 'ab') as f:
-            f.write('\n---\n')
-            f.writelines([(i+'\n').encode('utf-8') for i in proof])
-        return f"Proof appended to {filename}"
+    try:
+        yield from session.plug_download(socket_or_name, new)
+    except engine.EngineError as e:
+        logger.error(e)
+        yield str(e)
     else:
-        with open(filename, 'wb') as f:
-            f.writelines([(i+'\n').encode('utf-8') for i in proof])
-        return f"Proof saved as {filename}"
+        yield f"Plugin succesfully downloaded: {new}"
 
 
 # Proof manipulation
@@ -347,6 +344,26 @@ def do_solve(session: engine.Session) -> str:
     except engine.EngineError as e:
         return str(e)
 
+
+def do_write(session: engine.Session, filename: str):
+    """
+    Writes a whole proof to a file with the provided name; if the file already exists program will append to it.
+
+    Arguments:
+        - filename [str]
+    """
+    proof = session.gettree()
+    if os.path.exists(filename):
+        with open(filename, 'ab') as f:
+            f.write('\n---\n')
+            f.writelines([(i+'\n').encode('utf-8') for i in proof])
+        return f"Proof appended to {filename}"
+    else:
+        with open(filename, 'wb') as f:
+            f.writelines([(i+'\n').encode('utf-8') for i in proof])
+        return f"Proof saved as {filename}"
+
+
 # Proof navigation
 
 
@@ -413,6 +430,7 @@ command_dict = OrderedDict({
     'check': {'comm': do_check, 'args': []},
     # Program interaction
     'plugin switch': {'comm': do_plug_switch, 'args': [str, str]},
+    'plugin get': {'comm': do_plug_get, 'args': [str, str]},
     'plugin list all': {'comm': do_plug_list_all, 'args': []},
     'plugin list': {'comm': do_plug_list, 'args': [str]},
     'plugin gen': {'comm': do_plug_gen, 'args': [str, str]},
@@ -540,7 +558,12 @@ def run() -> int:
             continue
 
         for procedure in to_perform:
-            ptk.print_formatted_text(ptk.HTML(performer(procedure, session)))
+            performed = performer(procedure, session)
+            if isinstance(performed, tp.Generator):
+                for i in performed:
+                    ptk.print_formatted_text(ptk.HTML(i))
+            else:
+                ptk.print_formatted_text(ptk.HTML(performed))
 
 
 def inAppDir(func):

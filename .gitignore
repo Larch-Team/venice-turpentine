@@ -133,3 +133,4 @@ dmypy.json
 app/appdata/crashes
 app/core_temp
 app/larch.pyz
+app/appdata/manifest.json

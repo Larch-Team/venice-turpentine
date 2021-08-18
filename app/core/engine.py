@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import typing as tp
+from manager import FileManager
 
 import pop_engine as pop
 from exceptions import EngineError, RaisedUserMistake
@@ -95,6 +96,19 @@ class Session(object):
     # Plugin manpiulation
 
 
+    def _find_socket(self, name: str) -> pop.Socket:
+        socket = self.sockets.get(name, None)
+        if socket:
+            return socket
+
+        for i in self.config['chosen_plugins'].items():
+            if i[1] == name:
+                socket_name = i[0]
+                return self.sockets[socket_name]
+        else:
+            raise EngineError(f"Socket/plugin {name} not found in the program")
+
+
     def acc(self, socket: str) -> Module:
         """Zwraca plugin aktualnie podłączony do gniazda o podanej nazwie"""
         if (sock := self.sockets.get(socket, None)) is None:
@@ -113,18 +127,8 @@ class Session(object):
         :type new: str
         :raises EngineError: Nie znaleziono pluginu
         """
-        # Socket name searching
-        socket = self.sockets.get(socket_or_old, None)
-        if socket:
-            socket_name = socket_or_old
+        socket = self._find_socket(socket_or_old)
 
-        else:
-            for i in self.config['chosen_plugins'].items():
-                if i[1] == socket_or_old:
-                    socket_name = i[0]
-                    socket = self.sockets[socket_name]
-        if not socket:
-            raise EngineError(f"Socket/plugin {socket_or_old} not found in the program")
         # Plugging
         try:
             socket.plug(new)
@@ -132,12 +136,12 @@ class Session(object):
             raise EngineError(str(e))
 
         # Config editing
-        if socket_name not in self.SOCKETS_NOT_IN_CONFIG:
-            self.config['chosen_plugins'][socket_name] = new
+        if socket.name not in self.SOCKETS_NOT_IN_CONFIG:
+            self.config['chosen_plugins'][socket.name] = new
         self.write_config()
 
         # Deal with lexer
-        if socket_name == 'Lexicon':
+        if socket.name == 'Lexicon':
             self.compile_lexer()
 
     def plug_list(self, socket: str) -> list[str]:
@@ -171,7 +175,16 @@ class Session(object):
             sock.generate_template(name)
 
 
-    def download_plugin(self, socket: str, name: str):
+    def plug_download(self, socket_or_old: str, name: str) -> tp.Iterator[str]:
+        """Pobiera plugin
+
+        :param socket_or_old: Nazwa aktualnie podłączonego pluginu, lub gniazda
+        :type socket_or_old: str
+        :param new: Nazwa pluginu
+        :type new: str
+        """
+        socket = self._find_socket(socket_or_old)
+        return FileManager().download_plugin(socket.name, name)
 
 
     # Lexer
