@@ -78,3 +78,6 @@ class UserMistake:
     
 class RaisedUserMistake(UserMistake, Exception):
     pass
+
+class FileManagerError(Exception):
+    pass

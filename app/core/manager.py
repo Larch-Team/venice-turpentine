@@ -4,6 +4,7 @@ import sys
 from typing import Callable, Iterator, Union
 from urllib import request as web_request
 from urllib.error import URLError
+from exceptions import FileManagerError
 from misc import setup_iter
 from required_files import NEED
 from json import loads
@@ -77,6 +78,7 @@ class FileManager(object):
             self.debug = debug
             self.select_dir(larch_version)
 
+
     def select_dir(self, larch_version: str):
         # MANIFEST = {
         #     'larch_version':larch_version,
@@ -126,14 +128,16 @@ class FileManager(object):
         return None
 
     def download_required(self):
+        self.prepare_dirs('plugins')
+        self.prepare_dirs('setups')
         desc = 'Please wait while we download required plugins'
         pbar = tqdm(NEED, desc, unit='file(s)', position=0, leave=True)
         for i in pbar:
             pbar.write(f"Downloading {i}")
             if not isfile(f'{self.directory}/{i}'):
-                for error in self.try_download(i, required=True):
+                for error in self.download_file(i, required=True):
                     pbar.write(error)
-        os.system('self')
+        os.system('cls')
 
     def download_plugin(self, socket: str, plugin: str) -> Iterator[str]:
         yield "Checking the required files"
@@ -141,11 +145,9 @@ class FileManager(object):
         try:
             files = self.plugins.get(socket, None)[plugin]
         except TypeError:
-            yield "No such socket"
-            return
+            raise FileManagerError("No such socket")
         except KeyError:
-            yield "No such plugin"
-            return
+            raise FileManagerError("No such plugin")
         for n, file in enumerate(files):
             yield f"({n+1}/{len(files)}) Downloading {file}"
             if isfile(f'{self.directory}/{file}'):
@@ -166,8 +168,7 @@ class FileManager(object):
         try:
             file = self.setups[setup_name]
         except KeyError:
-            yield "No such setup exists"
-            return
+            raise FileManagerError("No such setup exists")
         else:
             yield "\tSetup was found"
         yield f"Downloading {file}"

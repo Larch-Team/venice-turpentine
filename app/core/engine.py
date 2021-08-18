@@ -9,7 +9,7 @@ from manager import FileManager
 from misc import setup_iter
 
 import pop_engine as pop
-from exceptions import EngineError, RaisedUserMistake
+from exceptions import EngineError, FileManagerError, RaisedUserMistake
 from proof import BranchCentric, Proof
 from rule import ContextDef
 from sentence import Sentence
@@ -184,7 +184,11 @@ class Session(object):
         :type new: str
         """
         socket = self._find_socket(socket_or_old)
-        return FileManager().download_plugin(socket.name, name)
+        try:
+            yield from FileManager().download_plugin(socket.name, name)
+        except FileManagerError as e:
+            yield str(e)
+            return
 
     # Setups
 
@@ -206,7 +210,10 @@ class Session(object):
 
     def setup_open(self, name: str) -> tp.Iterable[str]:
         p = f'setups/{name}.json'
-        yield from FileManager().download_setup_plugins(name)
+        try:
+            yield from FileManager().download_setup_plugins(name)
+        except FileManagerError as e:
+            raise EngineError(str(e))
         yield "Activating the setup"
         for socket, plugin in setup_iter(p):
             yield f"\tPlugging {plugin} into {socket} socket"
