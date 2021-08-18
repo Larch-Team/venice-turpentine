@@ -14,6 +14,8 @@ from colors import COLORS
 import engine
 import prompt_toolkit as ptk
 
+from exceptions import EngineError
+
 SOCKET = 'UserInterface'
 VERSION = '0.0.1'
 
@@ -201,6 +203,59 @@ def do_plug_get(session: engine.Session, socket_or_name: str, new: str) -> tp.It
     else:
         yield f"Plugin succesfully downloaded: {new}"
 
+
+# Setups
+
+
+def do_setup_save(session: engine.Session, name: str) -> str:
+    """Saves a setup
+
+    Arguments:
+        - Setup name [str]    
+    """
+    try:
+        session.setup_save(name)
+    except EngineError as e:
+        return str(e)
+    else:
+        return "The setup was saved"
+    
+def do_setup_delete(session: engine.Session, name: str) -> str:
+    """Deletes a setup
+
+    Arguments:
+        - Setup name [str]    
+    """
+    try:
+        session.setup_delete(name)
+    except EngineError as e:
+        return str(e)
+    else:
+        return "The setup was deleted"
+    
+    
+def do_setup_open(session: engine.Session, name: str) -> tp.Iterator[str]:
+    """Initiates a given setup
+
+    Arguments:
+        - Setup name [str]    
+    """
+    try:
+        yield from session.setup_open(name)
+    except EngineError as e:
+        yield str(e)
+        raise
+    else:
+        yield f"You are now using {name}"
+    
+
+def do_setup_list(session: engine.Session) -> str:
+    """Lists all local setups"""
+    try:
+        return session.setup_list()
+    except EngineError as e:
+        return str(e)
+    
 
 # Proof manipulation
 
@@ -434,6 +489,13 @@ command_dict = OrderedDict({
     'plugin list all': {'comm': do_plug_list_all, 'args': []},
     'plugin list': {'comm': do_plug_list, 'args': [str]},
     'plugin gen': {'comm': do_plug_gen, 'args': [str, str]},
+    # Setup usage
+    'setup save':{'comm': do_setup_save, 'args': [str]},
+    'setup delete':{'comm': do_setup_delete, 'args': [str]},
+    'setup open':{'comm': do_setup_open, 'args': [str]},
+    'setup list':{'comm': do_setup_list, 'args': []},
+    
+    # Other
     'clear': {'comm': do_clear, 'args': []},
     'debug get methods': {'comm': do_debug_get_methods, 'args': []}
 })
