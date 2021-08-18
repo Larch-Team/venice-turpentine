@@ -15,6 +15,7 @@ DEBUG = True
 if __name__ == "__main__":
     try:
         manager = FileManager(DEBUG, Session.ENGINE_VERSION)
+        manager.download_required()
 
         # Log clearing
         if os.path.exists('log.log'):
