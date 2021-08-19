@@ -176,7 +176,7 @@ class Session(object):
         else:
             sock.generate_template(name)
 
-    def plug_download(self, socket_or_old: str, name: str) -> tp.Iterator[str]:
+    def plug_download(self, socket_or_old: str, name: str, force: bool = False) -> tp.Iterator[str]:
         """Pobiera plugin
 
         :param socket_or_old: Nazwa aktualnie podłączonego pluginu, lub gniazda
@@ -186,7 +186,7 @@ class Session(object):
         """
         socket = self._find_socket(socket_or_old)
         try:
-            yield from FileManager().download_plugin(socket.name, name)
+            yield from FileManager().download_plugin(socket.name, name, force)
         except FileManagerError as e:
             yield str(e)
             return
@@ -214,14 +214,6 @@ class Session(object):
         installed = socket.find_plugins()
         return None if plugins is None else [i for i in plugins if i not in installed]
 
-    def setup_search(self) -> list[str]:
-        """Zwraca możliwe do zainstalowania setupy"""
-        fm = FileManager()
-        try:
-            return fm.setup_search()
-        except FileManagerError as e:
-            raise EngineError(str(e))
-
     # Setups
 
     def setup_save(self, name: str) -> None:
@@ -240,10 +232,19 @@ class Session(object):
     def setup_list(self) -> list[str]:
         return FileManager.setup_list()
 
-    def setup_open(self, name: str) -> tp.Iterable[str]:
+
+    def setup_search(self) -> list[str]:
+        """Zwraca możliwe do zainstalowania setupy"""
+        fm = FileManager()
+        try:
+            return fm.setup_search()
+        except FileManagerError as e:
+            raise EngineError(str(e))
+
+    def setup_open(self, name: str, force: bool = False) -> tp.Iterable[str]:
         p = f'setups/{name}.json'
         try:
-            yield from FileManager().download_setup_plugins(name)
+            yield from FileManager().download_setup_plugins(name, force)
         except FileManagerError as e:
             raise EngineError(str(e))
         yield "Activating the setup"

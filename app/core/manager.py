@@ -118,7 +118,7 @@ class FileManager(object):
         return None
 
     @try_gen
-    def download_file(self, file: str, required: bool = False) -> Union[None, str]:
+    def download_file(self, file: str) -> Union[None, str]:
         """Downloads a given file and saves it at the given location"""
         self.prepare_dirs(file)
         url = f"{self.REPO_URL}/{file}"
@@ -151,7 +151,7 @@ class FileManager(object):
 
     # Plugin downloading
 
-    def download_plugin(self, socket: str, plugin: str) -> Iterator[str]:
+    def download_plugin(self, socket: str, plugin: str, force: bool) -> Iterator[str]:
         """Downloads a plugin from the `Larch-Team/larch-plugins`"""
         yield "Checking the required files"
         yield from (f"\t{i}" for i in self.get_files())
@@ -163,7 +163,7 @@ class FileManager(object):
             raise FileManagerError("No such plugin")
         for n, file in enumerate(files):
             yield f"({n+1}/{len(files)}) Downloading {file}"
-            if isfile(f'{self.directory}/{file}'):
+            if isfile(f'{self.directory}/{file}') and not force:
                 yield "\tThis file already exists"
             else:
                 yield from (f"\t{i}" for i in self.download_file(file))
@@ -180,9 +180,9 @@ class FileManager(object):
         self.get_files()
         return [i for i in self.setups.keys() if i not in self.setup_list()]
 
-    def download_setup(self, setup_name: str) -> Iterator[str]:
+    def download_setup(self, setup_name: str, force: bool) -> Iterator[str]:
         """Downloads a setup file"""
-        if setup_name in self.setup_list():
+        if setup_name in self.setup_list() and not force:
             yield "This setup exists locally"
             return
         yield "Checking if the setup exists"
@@ -196,18 +196,18 @@ class FileManager(object):
         yield f"Downloading {file}"
         yield from (f"\t{i}" for i in self.download_file(file))
 
-    def download_setup_plugins(self, setup_name: str) -> Iterator[str]:
+    def download_setup_plugins(self, setup_name: str, force: bool) -> Iterator[str]:
         """Downloads a setup file and automatically downloads all the required files"""
         SOCKET_AMOUNT = 5
 
-        yield from self.download_setup(setup_name)
+        yield from self.download_setup(setup_name, force)
         if setup_name in self.setup_list():
             file = f'setups/{setup_name}.json'
         else:
             file = self.setups[setup_name]
         for n, (socket, plugin) in enumerate(setup_iter(file)):
             yield f"({n+1}/{SOCKET_AMOUNT}) Downloading {plugin} for the {socket} socket"
-            yield from (f"\t{i}" for i in self.download_plugin(socket, plugin))
+            yield from (f"\t{i}" for i in self.download_plugin(socket, plugin, force))
 
     # @staticmethod
     # def read_manifest():
