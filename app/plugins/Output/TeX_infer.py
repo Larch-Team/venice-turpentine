@@ -57,4 +57,4 @@ def _write_tree(sentence, children) -> str:
     if children is None:
         return _gen_infer(_translate(sentence), "")
     else:
-        return _gen_infer(_translate(sentence), " & ".join((_write_tree(i.sentences, i.children) for i in children)))
+        return _gen_infer(_translate(sentence), " & ".join((_write_tree(i.sentence, i.children) for i in children)))
