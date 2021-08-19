@@ -17,6 +17,8 @@ def try_gen(func: Callable[..., Union[str, None]]) -> Iterator[str]:
         tries = 0
         while (info := func(*args, **kwargs)):
             tries += 1
+            if tries > 6:
+                raise FileManagerError("Couldn't download the file")
             yield f'{info}, retrying in 5 seconds (retried {tries} time(s))'
             sleep(5)
         if tries > 0:
@@ -28,6 +30,9 @@ class FileManager(object):
 
     BRANCH = "dist-lab"
     REPO_URL = f"https://raw.githubusercontent.com/Larch-Team/larch-plugins/{BRANCH}"
+
+    # Class properties
+
     _directory = None
 
     @property
@@ -58,17 +63,7 @@ class FileManager(object):
     def setups(self, val):
         type(self)._setups = val
 
-    @try_gen
-    def get_files(self) -> Union[None, str]:
-        if self.plugins is None or self.setups is None:
-            try:
-                response = web_request.urlopen(f"{self.REPO_URL}/files.json")
-            except URLError as e:
-                return f'Couldn\'t download the file list'
-            files = loads(response.read())
-            self.plugins = files['plugins']
-            self.setups = files['setups']
-        return None
+    # Methods
 
     def __init__(self, debug: bool = None, larch_version: str = None) -> None:
         super().__init__()
@@ -78,8 +73,8 @@ class FileManager(object):
             self.debug = debug
             self.select_dir(larch_version)
 
-
     def select_dir(self, larch_version: str):
+        """Creates a folder for storing the software data and chooses it as the cwd"""
         # MANIFEST = {
         #     'larch_version':larch_version,
         #     'additional':[]
@@ -96,11 +91,11 @@ class FileManager(object):
         # if not os.path.isfile(f'{self.directory}/manifest.json'):
         #     with open(f'{self.directory}/manifest.json', 'w') as f:
         #         dump(MANIFEST, f)
-
         os.chdir(self.directory)
         sys.path = [self.directory] + sys.path
 
     def prepare_dirs(self, folder: str):
+        """Creates the missing directories"""
         path = self.directory[:]
         for i in folder.split('/'):
             path = path + '/' + i
@@ -110,7 +105,21 @@ class FileManager(object):
                 os.mkdir(path)
 
     @try_gen
+    def get_files(self) -> Union[None, str]:
+        """Downloads the file list"""
+        if self.plugins is None or self.setups is None:
+            try:
+                response = web_request.urlopen(f"{self.REPO_URL}/files.json")
+            except URLError as e:
+                return f'Couldn\'t download the file list'
+            files = loads(response.read())
+            self.plugins = files['plugins']
+            self.setups = files['setups']
+        return None
+
+    @try_gen
     def download_file(self, file: str, required: bool = False) -> Union[None, str]:
+        """Downloads a given file and saves it at the given location"""
         self.prepare_dirs(file)
         url = f"{self.REPO_URL}/{file}"
         try:
@@ -128,6 +137,7 @@ class FileManager(object):
         return None
 
     def download_required(self):
+        """Downloads all the required files according to `required_files.py`"""
         self.prepare_dirs('plugins')
         self.prepare_dirs('setups')
         desc = 'Please wait while we download required plugins'
@@ -139,7 +149,10 @@ class FileManager(object):
                     pbar.write(error)
         os.system('cls')
 
+    # Plugin downloading
+
     def download_plugin(self, socket: str, plugin: str) -> Iterator[str]:
+        """Downloads a plugin from the `Larch-Team/larch-plugins`"""
         yield "Checking the required files"
         yield from (f"\t{i}" for i in self.get_files())
         try:
@@ -155,11 +168,20 @@ class FileManager(object):
             else:
                 yield from (f"\t{i}" for i in self.download_file(file))
 
+    # Setups
+
     @staticmethod
     def setup_list() -> list[str]:
+        """Returns installed setups"""
         return [name.removesuffix('.json') for name in os.listdir('setups')]
 
+    def setup_search(self) -> list[str]:
+        """Returns available setups"""
+        self.get_files()
+        return [i for i in self.setups.keys() if i not in self.setup_list()]
+
     def download_setup(self, setup_name: str) -> Iterator[str]:
+        """Downloads a setup file"""
         if setup_name in self.setup_list():
             yield "This setup exists locally"
             return
@@ -175,8 +197,9 @@ class FileManager(object):
         yield from (f"\t{i}" for i in self.download_file(file))
 
     def download_setup_plugins(self, setup_name: str) -> Iterator[str]:
+        """Downloads a setup file and automatically downloads all the required files"""
         SOCKET_AMOUNT = 5
-        
+
         yield from self.download_setup(setup_name)
         if setup_name in self.setup_list():
             file = f'setups/{setup_name}.json'

@@ -129,7 +129,8 @@ class Session(object):
         """
         socket = self._find_socket(socket_or_old)
         if socket.name in ('Formal', 'Lexicon') and self.proof:
-            raise EngineError(f"Finish your proof before changing the {socket.name} plugin")
+            raise EngineError(
+                f"Finish your proof before changing the {socket.name} plugin")
 
         # Plugging
         try:
@@ -189,6 +190,37 @@ class Session(object):
         except FileManagerError as e:
             yield str(e)
             return
+
+    def plug_search(self, socket_or_old: str = None) -> tp.Union[list[str], None, dict[str, list[str]]]:
+        """
+        Zwraca możliwe do zainstalowania pluginy
+
+        :param socket_or_old: Nazwa socketu, lub pluginu do niego podłączonego, defaults to None
+        :type socket_or_old: str, optional
+        :return: Jeżeli podano socket_or_old, to zwraca listę dla danego pluginu, jeśli nie podano zwraca listę dla wszystkich socketów
+        :rtype: tp.Union[list[str], None, dict[str, list[str]]]
+        """
+        if socket_or_old is None:
+            for i in self.SOCKETS.keys():
+                return {i: self.plug_search(i)}
+
+        fm = FileManager()
+        try:
+            fm.get_files()
+        except FileManagerError as e:
+            raise EngineError(str(e))
+        socket = self._find_socket(socket_or_old)
+        plugins = fm.plugins.get(socket.name, None)
+        installed = socket.find_plugins()
+        return None if plugins is None else [i for i in plugins if i not in installed]
+
+    def setup_search(self) -> list[str]:
+        """Zwraca możliwe do zainstalowania setupy"""
+        fm = FileManager()
+        try:
+            return fm.setup_search()
+        except FileManagerError as e:
+            raise EngineError(str(e))
 
     # Setups
 
