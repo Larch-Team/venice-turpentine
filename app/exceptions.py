@@ -1,5 +1,6 @@
+from dataclasses import dataclass
 import logging
-from typing import Any, Callable
+from typing import Any, Callable, Union
 
 
 logger = logging.getLogger('engine')
@@ -11,6 +12,11 @@ class EngineError(Exception):
         logger.error(msg)
         super().__init__(msg, *args, **kwargs)
 
+class LrchLexerError(Exception):
+    pass
+
+class SentenceError(Exception):
+    pass
 
 # pop_engine
 
@@ -52,4 +58,23 @@ class VersionError(PluginError):
 # Formal
 
 class FormalError(Exception):
+    pass
+
+
+@dataclass(init=True, repr=True, frozen=True)
+class UserMistake:
+    name: str
+    default: str
+    additional: Union[dict[str, Any], None] = None
+    
+    def __eq__(self, o: object) -> bool:
+        if isinstance(o, UserMistake):
+            return self.name == o.name and self.additional == o.additional
+        else:
+            return False
+    
+    def __str__(self) -> str:
+        return self.default
+    
+class RaisedUserMistake(UserMistake, Exception):
     pass

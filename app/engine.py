@@ -6,8 +6,8 @@ import os
 import typing as tp
 
 import pop_engine as pop
-from exceptions import EngineError
-from proof import BranchCentric
+from exceptions import EngineError, RaisedUserMistake
+from proof import BranchCentric, Proof
 from rule import ContextDef
 from sentence import Sentence
 from tree import ProofNode
@@ -36,16 +36,6 @@ def EngineChangeLog(func):
         logger.info(
             f"{func.__name__} with args={str(args)} and kwargs={str(kwargs)}")
         return func(*args, **kwargs)
-    return new
-
-
-def DealWithPOP(func):
-    """Converts all PluginErrors to EngineErrors for simpler handling in the UI socket"""
-    def new(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except pop.PluginError as e:
-            raise EngineError(str(e))
     return new
 
 # Input type handling
@@ -95,7 +85,7 @@ class Session(object):
         self.proof = None
         self.branch = ""
 
-        self.compileLexer()
+        self.compile_lexer()
 
 
     def __repr__(self):
@@ -148,7 +138,7 @@ class Session(object):
 
         # Deal with lexer
         if socket_name == 'Lexicon':
-            self.compileLexer()
+            self.compile_lexer()
 
     def plug_list(self, socket: str) -> list[str]:
         """Zwraca listę wszystkich pluginów dla danej nazwy.
@@ -183,7 +173,11 @@ class Session(object):
 
     # Lexer
 
-    def compileLexer(self) -> None:
+    def compile_lexer(self) -> None:
+        """
+        Kompiluje lexer na bazie pluginu Lexiconu
+        Raczej zbędne poza zastosowaniami technicznymi
+        """
         self.lexer = lexer.BuiltLexer(self.acc('Lexicon').get_lexicon(),
             use_language = self.acc('Formal').get_tags()
         ) 
@@ -208,8 +202,7 @@ class Session(object):
 
 
     @EngineLog
-    @DealWithPOP
-    def new_proof(self, statement: str) -> None:
+    def new_proof(self, statement: str) -> tp.Union[None, list[str]]:
         """Parsuje zdanie, testuje poprawność i tworzy z nim dowód
 
         :param statement: Zdanie
@@ -221,16 +214,17 @@ class Session(object):
         try:
             tokenized = self.lexer.tokenize(statement)
         except lexer.LrchLexerError as e:
-            raise EngineError(str(e))
+            raise [EngineError(str(e))]
         tokenized = Sentence(tokenized, self)
         problem = self.acc('Formal').check_syntax(tokenized)
         if problem:
-            logger.warning(f"{statement} is not a valid statement \n{problem}")
-            raise EngineError(problem)
+            logger.warning(f"{statement} is not a valid statement \n{problem.name}")
+            return self.acc('Assistant').mistake_syntax(problem)
         else:
             tokenized = self.acc('Formal').prepare_for_proving(tokenized)
             
             self.proof = BranchCentric(tokenized, self.config)
+            self.deal_closure('Green')
 
 
     @EngineLog
@@ -239,7 +233,6 @@ class Session(object):
 
 
     @EngineLog
-    @DealWithPOP
     def deal_closure(self, branch_name: str) -> tp.Union[None, str]:
         """Wywołuje proces sprawdzenia zamykalności gałęzi oraz (jeśli można) zamyka ją; Zwraca informacje o podjętych akcjach"""
         # Tests
@@ -269,8 +262,7 @@ class Session(object):
 
 
     @EngineLog
-    @DealWithPOP
-    def use_rule(self, rule: str, context: dict[str, tp.Any]) -> tp.Union[None, tuple[str]]:
+    def use_rule(self, rule: str, context: dict[str, tp.Any]) -> tp.Union[None, list[str]]:
         """Uses a rule of the given name on the current branch of the proof.
         Context allows to give the Formal additional arguments 
         Use `self.acc('Formal').get_needed_context(rule)` to check for needed context
@@ -279,8 +271,8 @@ class Session(object):
         :type rule: str
         :param context: Arguments for rule usage
         :type context: dict[str, tp.Any]
-        :return: Names of new branches
-        :rtype: tp.Union[None, tuple[str]]
+        :return: Readable information about the proof state, None if everything's good
+        :rtype: tp.Union[None, list[str]]
         """
         # Tests
         if not self.proof:
@@ -294,11 +286,19 @@ class Session(object):
         if {i.variable for i in context_info} != set(context.keys()):
             raise EngineError("Wrong context")
 
-        return self.proof.use_rule(self.acc('Formal'), rule, context, None)
+        try:
+            self.proof.use_rule(rule, context, None)
+        except RaisedUserMistake as e:
+            if self.sockets['Assistant'].isplugged():
+                return self.acc('Assistant').mistake_userule(e) or [e.default]
+            else:
+                return [e.default]
+        return None
 
 
     @EngineLog
     def undo(self, actions_amount: int) -> tuple[str]:
+        """Wycofuje `actions_amount` operacji zwracając informacje o nich"""
         if not self.proof:
             raise EngineError(
                 "There is no proof started")
@@ -318,28 +318,59 @@ class Session(object):
         return rules
 
 
-    def check(self) -> tuple[str]:
-        if not self.proof:
-            raise EngineError(
-                "There is no proof started")
-        return self.proof.check(self.acc('Formal').checker)
-        
+    # Proof assist
 
-    def solve(self) -> tuple[str]:
+    def start_help(self) -> list[str]:
+        """Zwraca listę podpowiedzi do wyświetlenia użytkownikowi"""
+        return self.acc('Assistant').hint_start() or []
+
+
+    @EngineLog
+    def hint(self) -> list[str]:
+        """Zwraca listę podpowiedzi w formacie HTML"""
         if not self.proof:
             raise EngineError(
                 "There is no proof started")
         
-        if self.acc('Formal').solver(self.proof):
-            return ("Udało się zakończyć dowód", f"Formuła {'nie '*(not self.proof.nodes.is_successful())}jest tautologią")
+        return self.acc('Assistant').hint_command(self.proof)
+
+
+    @EngineLog
+    def check(self, proof: Proof = None) -> list[str]:
+        """Sprawdza dowód i zwraca listę błędów w formacie HTML"""
+        proof = proof or self.proof 
+        if not proof:
+            raise EngineError("There is no proof started")
+        if not proof.nodes.is_closed():
+            raise EngineError("Nie możesz sprawdzić nieskończonego dowodu")
+        
+        mistakes = proof.check()
+        l = []
+        for i in mistakes:
+            if v := self.acc('Assistant').mistake_check(i) is not None:
+                l.extend(v)
+            else:
+                l.append(i.default)
+        return l
+        
+        
+    @EngineLog
+    def solve(self, proof: Proof = None) -> tuple[str]:
+        """Dokańcza podany, lub aktualny dowód, zwraca informację o sukcesie procedury"""
+        proof = proof or self.proof
+        if not proof:
+            raise EngineError(
+                "There is no proof started")
+        
+        if self.acc('Formal').solver(proof):
+            return ("Udało się zakończyć dowód", f"Formuła {'nie '*(not proof.nodes.is_successful())}jest tautologią")
         else:
             return ("Nie udało się zakończyć dowodu",)
     
+    
     # Proof navigation
 
-
-    @DealWithPOP
-    def getbranch_strings(self) -> list[list[str], str]:
+    def getbranch_strings(self) -> tuple[list[str], tp.Optional[str]]:
         """Zwraca gałąź oraz stan zamknięcia w formie czytelnej dla użytkownika"""
         try:
             branch, closed = self.proof.get_node().getbranch_sentences()
@@ -364,13 +395,11 @@ class Session(object):
         return self.proof.nodes.getbranchnames()
 
 
-    @DealWithPOP
     def getrules(self) -> dict[str, str]:
         """Zwraca nazwy reguł wraz z dokumentacją"""
         return self.acc('Formal').get_rules_docs()
 
 
-    @DealWithPOP
     def gettree(self) -> list[str]:
         """Zwraca całość drzewa jako listę ciągów znaków"""
         if not self.proof:
@@ -380,14 +409,14 @@ class Session(object):
         printed = self.proof.nodes.gettree()
         return self.acc('Output').write_tree(printed)
 
-
+    @EngineLog
     def next(self) -> None:
         """Przeskakuje do następnej otwartej gałęzi"""
         if not self.proof:
             raise EngineError("There is no proof started")
         return self.proof.next()
  
-
+    @EngineLog
     def jump(self, new: str) -> None:
         """Skacze do gałęzi o nazwie new, albo na prawego/lewego sąsiadu, jeżeli podamy "left/right"
 
