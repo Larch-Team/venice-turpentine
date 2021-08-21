@@ -131,6 +131,7 @@ dmypy.json
 
 .vscode
 app/appdata/crashes
+app/appdata/config
 app/core_temp
 app/larch.pyz
 app/appdata/manifest.json
