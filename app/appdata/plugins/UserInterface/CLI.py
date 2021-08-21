@@ -9,7 +9,7 @@ import typing as tp
 from collections import OrderedDict, namedtuple
 from math import log10
 from xml.sax.saxutils import escape
-from colors import COLORS
+from colors import COLORS, DEFAULT_COLOR
 
 import engine
 import prompt_toolkit as ptk
@@ -202,6 +202,21 @@ def do_plug_get(session: engine.Session, socket_or_name: str, new: str) -> tp.It
         yield str(e)
     else:
         yield f"Plugin succesfully downloaded: {new}"
+        
+def do_plug_update(session: engine.Session, socket_or_name: str, new: str) -> tp.Iterator[str]:
+    """Updates a plugin using the <code>Larch-Team/larch-plugins</code> repository 
+
+    Arguments:
+        - Socket/current plugin name [str]
+        - Plugin name [str]
+    """
+    try:
+        yield from session.plug_download(socket_or_name, new, True)
+    except engine.EngineError as e:
+        logger.error(e)
+        yield str(e)
+    else:
+        yield f"Plugin succesfully downloaded: {new}"
 
 
 # Setups
@@ -242,6 +257,21 @@ def do_setup_open(session: engine.Session, name: str) -> tp.Iterator[str]:
     """
     try:
         yield from session.setup_open(name)
+    except EngineError as e:
+        yield str(e)
+        raise
+    else:
+        yield f"You are now using {name}"
+        
+
+def do_setup_update(session: engine.Session, name: str) -> tp.Iterator[str]:
+    """Updates a given setup and initiates it
+
+    Arguments:
+        - Setup name [str]    
+    """
+    try:
+        yield from session.setup_open(name, True)
     except EngineError as e:
         yield str(e)
         raise
@@ -465,13 +495,16 @@ def do_debug_get_methods(session: engine.Session) -> str:
     """Returns all methods of the session object"""
     return "\n".join(session.get_methods())
 
+def do_access_colors(session: engine.Session, val: int) -> str:
+    session.change_accessibility(val)
+    return "Color accessibility changed"
 
 command_dict = OrderedDict({
     # Navigation
     'exit': {'comm': do_exit, 'args': []},
     'get rules': {'comm': do_get_rules_docs, 'args': []},
     'get tree': {'comm': do_get_tree, 'args': []},
-    'jump': {'comm': do_jump, 'args': [str]},
+    'jump': {'comm': do_jump, 'args': 'multiple_strings'},
     'next': {'comm': do_next, 'args': []},
     # Proof manipulation
     # Czy zrobić oddzielne save i write? save serializowałoby tylko do wczytania, a write drukowałoby input
@@ -486,6 +519,7 @@ command_dict = OrderedDict({
     # Program interaction
     'plugin switch': {'comm': do_plug_switch, 'args': [str, str]},
     'plugin get': {'comm': do_plug_get, 'args': [str, str]},
+    'plugin update': {'comm': do_plug_update, 'args': [str, str]},
     'plugin list all': {'comm': do_plug_list_all, 'args': []},
     'plugin list': {'comm': do_plug_list, 'args': [str]},
     'plugin gen': {'comm': do_plug_gen, 'args': [str, str]},
@@ -493,11 +527,13 @@ command_dict = OrderedDict({
     'setup save':{'comm': do_setup_save, 'args': [str]},
     'setup delete':{'comm': do_setup_delete, 'args': [str]},
     'setup open':{'comm': do_setup_open, 'args': [str]},
+    'setup update':{'comm': do_setup_update, 'args': [str]},
     'setup list':{'comm': do_setup_list, 'args': []},
     
     # Other
     'clear': {'comm': do_clear, 'args': []},
-    'debug get methods': {'comm': do_debug_get_methods, 'args': []}
+    'debug get methods': {'comm': do_debug_get_methods, 'args': []},
+    'access colors': {'comm': do_access_colors, 'args':[int]}
 })
 
 
@@ -510,7 +546,7 @@ command_dict['?'] = {'comm': do_help, 'args': []}
 
 # Front-end setup
 
-def get_rprompt(session: engine.Session, colors):
+def get_rprompt(session: engine.Session):
     """
     Generuje podgląd gałęzi po prawej
     """
@@ -520,11 +556,11 @@ def get_rprompt(session: engine.Session, colors):
     # Proof retrieval
     if session.proof:
         prompt, closed = session.getbranch_strings()
-        background = colors.get(session.branch, colors['Grey']) 
+        color =  COLORS.get(session.proof.branch, DEFAULT_COLOR)
     else:
         prompt = DEF_PROMPT
         closed = None
-        background = colors['Grey']
+        color = DEFAULT_COLOR
 
     # Formatting
     to_show = []
@@ -540,19 +576,9 @@ def get_rprompt(session: engine.Session, colors):
         to_show.append(s+spaces*" ")
 
     # Foreground color calculating
-    foreground = "#000000" if max_color(background) > THRESHOLD else "#FFFFFF"
+    foreground = "#FFFFFF" if color.text_bright else "#000000" 
     new = " \n ".join(to_show)
-    return ptk.HTML(f'\n<style fg="{foreground}" bg="{background}"> {escape(new)} </style>')
-
-
-def max_color(rgb_color: str) -> int:
-    """Zwraca najwyższą wartość w kolorze"""
-    assert len(rgb_color) == 7
-    red = int(rgb_color[1:3], 16)
-    green = int(rgb_color[3:5], 16)
-    blue = int(rgb_color[5:], 16)
-    return max((red, green, blue))
-
+    return ptk.HTML(f'\n<style fg="{foreground}" bg="{color.rgb}"> {escape(new)} </style>')
 
 def get_toolbar():
     return ptk.HTML('This is a <b><style bg="ansired">Toolbar</style></b>!')
@@ -601,7 +627,7 @@ def run() -> int:
     ptk.print_formatted_text(ptk.HTML(
         "\n".join(session.start_help()+['Type ? to get command list; type [command]? to get help'])))
     console = ptk.PromptSession(message=lambda: f"{session.get_current_branch()+bool(session.get_current_branch())*' '}# ", rprompt=lambda: get_rprompt(
-        session, COLORS), complete_in_thread=True, complete_while_typing=True, completer=Autocomplete(session))
+        session), complete_in_thread=True, complete_while_typing=True, completer=Autocomplete(session))
     while True:
         command = console.prompt().strip()
         logger.info(f"Got a command: {command}")
@@ -631,14 +657,14 @@ def run() -> int:
 def inAppDir(func):
     def wrapper(*args, **kwargs):
         assert os.getcwd().endswith(("/tests", "\\tests")), "cwd musi być folderem `tests` położonym równolegle do `app`"
-        os.chdir('../app')
+        os.chdir('../app/appdata')
         if not os.path.exists('config/config_copy.json'):
             from shutil import copy
             copy('config/config.json', 'config/config_copy.json')
             
         ret = func(*args, **kwargs)
 
-        os.chdir('../tests')
+        os.chdir('../../tests')
         return ret
     return wrapper
 

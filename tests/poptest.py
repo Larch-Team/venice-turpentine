@@ -3,7 +3,7 @@ from importlib import import_module
 import os
 import sys
 
-sys.path.extend(['../app/appdata', '../app/core'])
+sys.path.extend([os.path.abspath(i) for i in ['../app/appdata', '../app/core']])
 import pop_engine
 import example1
 

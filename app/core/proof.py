@@ -11,31 +11,29 @@ from pop_engine import Module
 from sentence import Sentence
 from tree import ProofNode
 from usedrule import UsedRule
+from colors import get_branch_name
 
 _Proof = NewType('_Proof', object)
 
 class Proof(object):
-    START_BRANCH = 'Green'
 
-    def __init__(self, sentence: Sentence, config: dict = None, name_seed: int = None) -> None:
+    def __init__(self, sentence: Sentence, config: dict = None) -> None:
         super().__init__()
         self.S = sentence.S # Session
         self.config = config or self.S.get_config()
         self.sentence = sentence
-        self.nodes = ProofNode(sentence, self.START_BRANCH)
+        self.nodes = ProofNode(sentence, next(get_branch_name(self.config['accessibility'], [])))
         self.metadata = dict(
             usedrules = [],
             decision_points = [],
             used_solver = False
         )
-        self.name_seed = name_seed or random.random()*10**7
-        self.namegen = random.Random(self.name_seed)
 
     # Tree methods
 
     def append(self, sentences: Iterable[tuple[Sentence]], branch: str) -> int:
         leaf = self.nodes.getleaf(branch)
-        return leaf.append(sentences, self.namegen)
+        return leaf.append(sentences, self.config['accessibility'])
 
 
     # Proof manipulation
@@ -101,7 +99,7 @@ class Proof(object):
         if out is None:
             return
 
-        layer = old.append(out, self.namegen)
+        layer = old.append(out, self.config['accessibility'])
         children = old.children
         self.nodes.insert_history(used_extention, children)
 
@@ -127,14 +125,15 @@ class Proof(object):
     def get_last_modified_branches(self) -> list[str]:
         """Zwraca gałęzie zmodyfikowane w ostatnim ruchu"""
         if not self.metadata['usedrules']:
-            return ['Green']
+            assert len(self.nodes.getbranchnames()) == 1
+            return self.nodes.getbranchnames()
         max_layer = self.metadata['usedrules'][-1].layer
         return [i.branch for i in self.nodes.leaves if i.layer==max_layer]
     
     
     def copy(self) -> _Proof:
         """Kopiuje dowód"""
-        p = Proof(self.sentence.copy(), self.config.copy(), self.name_seed)
+        p = Proof(self.sentence.copy(), self.config.copy())
         for used in self.metadata['usedrules']:
             p.perform_usedrule(used)
         return p
@@ -172,9 +171,9 @@ class Proof(object):
 
 class BranchCentric(Proof):
 
-    def __init__(self, sentence: Sentence, config: dict, name_seed: int = None) -> None:
-        super().__init__(sentence, config, name_seed=name_seed)
-        self.branch = self.START_BRANCH
+    def __init__(self, sentence: Sentence, config: dict) -> None:
+        super().__init__(sentence, config)
+        self.branch = self.nodes.branch
 
     def append(self, sentences: Iterable[tuple[Sentence]], branch: str = None) -> int:
         branch = branch or self.branch
@@ -199,10 +198,10 @@ class BranchCentric(Proof):
             else:
                 self.branch = changed.branch
         else:
-            changed = self.nodes.getleaf(new.capitalize())
+            changed = self.nodes.getleaf(new)
             if not changed:
                 raise EngineError(
-                    f"Branch '{new.lower()}' doesn't exist in this proof")
+                    f"Branch '{new}' doesn't exist in this proof")
             else:
                 self.branch = changed.branch
     

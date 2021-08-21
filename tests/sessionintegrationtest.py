@@ -1,7 +1,8 @@
+import os
 import sys
 import random
 from termcolor import colored
-sys.path.extend(['../app/appdata', '../app/core'])
+sys.path.extend([os.path.abspath(i) for i in ['../app/appdata', '../app/core']])
 from plugins.UserInterface import CLI as c
 
 
@@ -13,8 +14,8 @@ for x in ['plugin gen','write','exit']:
 args = {'prove' : ['(p -> q) ^ p -> q'],
         'jump': [' left',' right',' <',' >'],
         'use': ['true and', 'false and', 'false or', 'true or', 'false imp', 'true imp', 'double not'],
-        'plugin switch': ['UserInterface','Lexicon','Auto','FormalSystem','Output'],
-        'plugin list': ['UserInterface','Lexicon','Auto','FormalSystem','Output']}
+        'plugin switch': ['UserInterface','Lexicon','Auto','Formal','Output'],
+        'plugin list': ['UserInterface','Lexicon','Auto','Formal','Output']}
 
 
 list_acc = []

@@ -9,7 +9,7 @@ from manager import FileManager
 from misc import setup_iter
 
 import pop_engine as pop
-from exceptions import EngineError, FileManagerError, RaisedUserMistake
+from exceptions import EngineError, FileManagerError, PluginError, RaisedUserMistake
 from proof import BranchCentric, Proof
 from rule import ContextDef
 from sentence import Sentence
@@ -115,7 +115,10 @@ class Session(object):
         if (sock := self.sockets.get(socket, None)) is None:
             raise EngineError(f"There is no socket named {socket}")
         else:
-            return sock()
+            try:
+                return sock()
+            except PluginError as e:
+                raise EngineError(str(e))
 
     @EngineChangeLog
     def plug_switch(self, socket_or_old: str, new: str) -> None:
@@ -183,6 +186,8 @@ class Session(object):
         :type socket_or_old: str
         :param new: Nazwa pluginu
         :type new: str
+        :param force: Czy wymusić pobieranie (pozwala na updatowanie pluginów), defaults to None
+        :type force: bool
         """
         socket = self._find_socket(socket_or_old)
         try:
@@ -217,6 +222,7 @@ class Session(object):
     # Setups
 
     def setup_save(self, name: str) -> None:
+        """Zapisuje setup pod wskazaną nazwą"""
         p = f'setups/{name}.json'
         if isfile(p):
             raise EngineError("This setup already exists")
@@ -224,12 +230,14 @@ class Session(object):
             json.dump(self.config['chosen_plugins'], f)
 
     def setup_delete(self, name: str) -> None:
+        """Usuwa setup o podanej nazwie, jeśli nie znajdzie uruchamia wyjątek EngineError"""
         p = f'setups/{name}.json'
         if not isfile(p):
             raise EngineError("This setup doesn't exists")
         os.remove(p)
 
     def setup_list(self) -> list[str]:
+        """Wyświetla listę zainstalowanych setupów"""
         return FileManager.setup_list()
 
 
@@ -242,6 +250,17 @@ class Session(object):
             raise EngineError(str(e))
 
     def setup_open(self, name: str, force: bool = False) -> tp.Iterable[str]:
+        """
+        Uruchamia setup o podanej nazwie, w razie potrzeby go pobiera
+
+        :param name: Nazwa setupu
+        :type name: str
+        :param force: Czy wymusić pobieranie (pozwala na aktualizowanie setupów), defaults to False
+        :type force: bool, optional
+        :raises EngineError: Błędy pobierania
+        :yield: Informacje o statusie pobierania
+        :rtype: Iterable[str]
+        """
         p = f'setups/{name}.json'
         try:
             yield from FileManager().download_setup_plugins(name, force)
@@ -268,6 +287,10 @@ class Session(object):
                                       )
 
     # Config reading and writing
+
+    def change_accessibility(self, level: int):
+        self.config['accessibility'] = level
+        self.write_config()
 
     def read_config(self):
         logger.debug("Config loading")
@@ -309,7 +332,7 @@ class Session(object):
             tokenized = self.acc('Formal').prepare_for_proving(tokenized)
 
             self.proof = BranchCentric(tokenized, self.config)
-            self.deal_closure('Green')
+            self.deal_closure(self.proof.nodes.getbranchnames()[0])
 
     @EngineLog
     def reset_proof(self) -> None:
@@ -395,7 +418,7 @@ class Session(object):
         if self.proof.metadata['usedrules']:
             self.proof.branch = self.proof.metadata['usedrules'][-1].branch
         else:
-            self.proof.branch = self.proof.START_BRANCH
+            self.proof.branch = self.proof.nodes.branch
 
         return rules
 

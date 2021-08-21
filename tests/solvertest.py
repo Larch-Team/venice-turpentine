@@ -1,7 +1,8 @@
+import os
 import sys
 import time
 
-sys.path.extend(['../app/appdata', '../app/core'])
+sys.path.extend([os.path.abspath(i) for i in ['../app/appdata', '../app/core']])
 from plugins.UserInterface import CLI as c
 
 with open('tautologies_20_5-1.txt') as t:

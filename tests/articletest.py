@@ -1,7 +1,8 @@
 import unittest
 import sys
+import os
 
-sys.path.extend(['../app/appdata', '../app/core'])
+sys.path.extend([os.path.abspath(i) for i in ['../app/appdata', '../app/core']])
 from article import Article
 
 class ArticleTest(unittest.TestCase):

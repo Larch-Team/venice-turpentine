@@ -8,7 +8,7 @@ from collections import namedtuple
 from anytree import NodeMixin, util
 
 from close import *
-from colors import COLORS
+from colors import get_branch_name
 from sentence import Sentence
 from history import *
 
@@ -98,15 +98,14 @@ class ProofNode(ProofBase, NodeMixin):
         return f"{self.branch}:{len(self.ancestors)}{' (closed)' if self.closed else ''} - {self.sentence.getReadable()}"
 
 
-    def gen_name(self, namegen: random.Random, am=2) -> tuple[str]:
-        """Zwraca `am` nazw dla gałęzi z czego jedną jest nazwa aktualnej"""
-        branch_names = self.getbranchnames()
-        possible = [i for i in COLORS if not i in branch_names]
-        if len(possible)<am-1:
-            if len(self.leaves) == 1000:
-                raise ProofNodeError("No names exist")
-            return self.branch, *[str(namegen.randint(0, 1000)) for i in range(am-1)]
-        return self.branch, *namegen.choices(possible, k=am-1)
+    def gen_name(self, accessibility: int, am=2) -> tuple[str]:
+        """Zwraca `am` nazw dla gałęzi z czego pierwsza jest nazwą aktualnej"""
+        names = []
+        for i in get_branch_name(accessibility, self.getbranchnames()):
+            if len(names) >= am-1:
+                break
+            names.append(i)
+        return self.branch, *names
     
     
     # Static
@@ -210,9 +209,9 @@ class ProofNode(ProofBase, NodeMixin):
 
     # Modyfikacja
 
-    def append(self, sentences: SentenceTupleStructure, namegen: random.Random) -> int:
+    def append(self, sentences: SentenceTupleStructure, accessibility: int) -> int:
         """Dodaje zdania do drzewa, zwraca warstwę"""
-        names = self.gen_name(namegen, am=len(sentences))
+        names = self.gen_name(accessibility, am=len(sentences))
         layer = max((i.layer for i in self.getleaves()))+1
         for i, branch in enumerate(sentences):
             par = self
