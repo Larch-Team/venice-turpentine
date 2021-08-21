@@ -259,7 +259,7 @@ def do_setup_open(session: engine.Session, name: str) -> tp.Iterator[str]:
         yield from session.setup_open(name)
     except EngineError as e:
         yield str(e)
-        raise
+        return
     else:
         yield f"You are now using {name}"
         
@@ -274,7 +274,7 @@ def do_setup_update(session: engine.Session, name: str) -> tp.Iterator[str]:
         yield from session.setup_open(name, True)
     except EngineError as e:
         yield str(e)
-        raise
+        return
     else:
         yield f"You are now using {name}"
     

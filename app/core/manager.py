@@ -29,7 +29,7 @@ def try_gen(func: Callable[..., Union[str, None]]) -> Iterator[str]:
 
 class FileManager(object):
 
-    BRANCH = "dist-lab"
+    BRANCH = "development"
     REPO_URL = f"https://raw.githubusercontent.com/Larch-Team/larch-plugins/{BRANCH}"
 
     # Class properties
