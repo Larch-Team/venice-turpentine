@@ -5,3 +5,4 @@ prompt-toolkit==3.0.18
 six==1.15.0
 wcwidth==0.2.5
 tqdm==4.62.1
+appdirs==1.4.4

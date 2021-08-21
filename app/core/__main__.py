@@ -45,6 +45,18 @@ if __name__ == "__main__":
             exit_code = UI().run()
 
     except Exception as e:
-        raise e
+        if DEBUG:
+            raise e
+    
+        manager.prepare_dirs('crashes')
+        if os.path.isfile('log.log'):
+            with open('log.log', 'r') as l:
+                logs = l.read()
+        else:
+            logs = ''
+        with open(f'crashes/crash-{datetime.now().strftime("%d-%m-%Y-%H-%M")}.txt', 'w') as f:
+            f.write(logs)
+            f.write('\nEXCEPTION:\n')
+            f.write(str(e))
     else:
         sys.exit(exit_code)

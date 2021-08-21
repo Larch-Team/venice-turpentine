@@ -10,6 +10,7 @@ from required_files import NEED
 from json import loads
 from tqdm import tqdm
 from time import sleep
+from appdirs import user_data_dir
 
 
 def try_gen(func: Callable[..., Union[str, None]]) -> Iterator[str]:
@@ -84,25 +85,27 @@ class FileManager(object):
             self.directory = os.path.abspath(
                 __file__).removesuffix('manager.py')+'../appdata'
         else:
-            self.directory = os.getenv('appdata')+'/Larch'
-            if not os.path.isdir(self.directory):
-                os.mkdir(self.directory)
+            self.directory = user_data_dir(appname='Larch', appauthor=False, version=larch_version)
+            self.prepare_dirs('plugins')
+            self.prepare_dirs('setups')
 
         # if not os.path.isfile(f'{self.directory}/manifest.json'):
         #     with open(f'{self.directory}/manifest.json', 'w') as f:
         #         dump(MANIFEST, f)
         os.chdir(self.directory)
         sys.path = [self.directory] + sys.path
+        
 
-    def prepare_dirs(self, folder: str):
+    def prepare_dirs(self, folder: str, absolute: bool = False):
         """Creates the missing directories"""
-        path = self.directory[:]
-        for i in folder.split('/'):
-            path = path + '/' + i
-            if '.' in i:
-                break
-            if not os.path.isdir(path):
-                os.mkdir(path)
+        full_folder = f'{self.directory}/{folder}' if not absolute else folder 
+        osp = os.path
+        assert osp.isabs(full_folder)
+        if osp.isdir(full_folder):
+            return
+        self.prepare_dirs(osp.dirname(full_folder), True)
+        os.mkdir(full_folder)
+    
 
     @try_gen
     def get_files(self) -> Union[None, str]:
@@ -118,9 +121,9 @@ class FileManager(object):
         return None
 
     @try_gen
-    def download_file(self, file: str) -> Union[None, str]:
+    def download_file(self, file: str, required: bool = False) -> Union[None, str]:
         """Downloads a given file and saves it at the given location"""
-        self.prepare_dirs(file)
+        self.prepare_dirs(os.path.dirname(file))
         url = f"{self.REPO_URL}/{file}"
         try:
             response = web_request.urlopen(url)
@@ -138,8 +141,6 @@ class FileManager(object):
 
     def download_required(self):
         """Downloads all the required files according to `required_files.py`"""
-        self.prepare_dirs('plugins')
-        self.prepare_dirs('setups')
         desc = 'Please wait while we download required plugins'
         pbar = tqdm(NEED, desc, unit='file(s)', position=0, leave=True)
         for i in pbar:
