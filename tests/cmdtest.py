@@ -4,7 +4,7 @@ from importlib import import_module
 import os
 import sys
 
-sys.path.append('../app')
+sys.path.extend(['../app/appdata', '../app/core'])
 from plugins.UserInterface import CLI as cmd
 
 class TestParser(test.TestCase):

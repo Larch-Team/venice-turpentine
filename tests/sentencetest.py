@@ -1,7 +1,7 @@
 import unittest
 import sys
 
-sys.path.append('../app')
+sys.path.extend(['../app/appdata', '../app/core'])
 from sentence import Sentence
 
 class TestgetComponents(unittest.TestCase):

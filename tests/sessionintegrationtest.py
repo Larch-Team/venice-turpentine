@@ -1,7 +1,7 @@
 import sys
 import random
 from termcolor import colored
-sys.path.append('../app')
+sys.path.extend(['../app/appdata', '../app/core'])
 from plugins.UserInterface import CLI as c
 
 

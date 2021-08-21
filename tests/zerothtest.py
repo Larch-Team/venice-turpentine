@@ -3,7 +3,7 @@ from importlib import import_module
 import os
 import sys
 
-sys.path.append('../app')
+sys.path.extend(['../app/appdata', '../app/core'])
 from sentence import Sentence
 from plugins.Formal import analytic_freedom as zol
 

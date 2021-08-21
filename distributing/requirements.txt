@@ -1,0 +1,8 @@
+anytree==2.8.0
+exrex==0.10.5
+ply==3.11
+prompt-toolkit==3.0.18
+six==1.15.0
+wcwidth==0.2.5
+tqdm==4.62.1
+appdirs==1.4.4
