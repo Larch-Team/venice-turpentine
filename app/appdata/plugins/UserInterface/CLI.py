@@ -496,6 +496,16 @@ def do_debug_get_methods(session: engine.Session) -> str:
     return "\n".join(session.get_methods())
 
 def do_access_colors(session: engine.Session, val: int) -> str:
+    """Changes the color palette of branches to a given set
+    Based on https://sashamaps.net/docs/resources/20-colors/
+    
+    Possible values:
+        - 0 - No colors, instead only animal names will be used for the branches
+        - 1 - Yellow, Blue, Black, White, Grey
+        - 2 - Everything in 1 + Orange, Lavender, Maroon, Navy
+        - 3 - Everything in 2 + Red, Green, Cyan, Magenta, Pink, Teal, Brown, Beige, Mint
+        - 4 - Everything in 3 + Purple, Lime, Olive, Apricot
+    """
     session.change_accessibility(val)
     return "Color accessibility changed"
 
