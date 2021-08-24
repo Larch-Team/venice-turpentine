@@ -6,8 +6,8 @@ import typing as tp
 import plugins.Formal.__utils__ as utils
 from exceptions import UserMistake, RaisedUserMistake
 from history import History
-from solver import find_rule, _solver
-from syntax_check import reduce_, find_all
+from analytic_freedom.solver import find_rule, _solver
+from analytic_freedom.syntax_check import reduce_, find_all
 from proof import Proof
 from rule import SentenceID
 from sentence import Sentence

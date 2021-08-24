@@ -191,7 +191,7 @@ class Socket(object):
 
     def _package_import(self, plugin_name: str) -> Module:
         if os.path.isfile(f'{self.dir}/{plugin_name}/__init__.py'):
-            return self._only_import(f'{plugin_name}/__init__.py', [f"{self.dir}/{plugin_name}"])
+            return self._only_import(f'{plugin_name}/__init__.py', [self.dir])
         else:
             return self._only_import(f'{plugin_name}.py', [self.dir])
 
