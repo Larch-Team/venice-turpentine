@@ -1,4 +1,5 @@
 import sys
+import os
 
 from multiprocessing import Pool
 sys.path.extend([os.path.abspath(i) for i in ['../app/appdata', '../app/core']])

@@ -10,7 +10,6 @@ from collections import OrderedDict, namedtuple
 from math import log10
 from xml.sax.saxutils import escape
 from colors import COLORS, DEFAULT_COLOR
-
 import engine
 import prompt_toolkit as ptk
 
@@ -449,6 +448,16 @@ def do_write(session: engine.Session, filename: str):
         return f"Proof saved as {filename}"
 
 
+def do_save(session: engine.Session):
+    """
+    Saves current state of proof if needed
+    """
+    try:
+        session.save_proof()
+    except engine.EngineError as e:
+        return e
+
+
 # Proof navigation
 
 
@@ -526,6 +535,7 @@ command_dict = OrderedDict({
     'hint': {'comm': do_hint, 'args': []},
     'solve': {'comm': do_solve, 'args': []},
     'check': {'comm': do_check, 'args': []},
+    'save proof': {'comm': do_save, 'args': []},
     # Program interaction
     'plugin switch': {'comm': do_plug_switch, 'args': [str, str]},
     'plugin get': {'comm': do_plug_get, 'args': [str, str]},

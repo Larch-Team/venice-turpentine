@@ -4,6 +4,7 @@ from genericpath import isfile
 import json
 import logging
 import os
+import sys
 import typing as tp
 from manager import FileManager
 from misc import setup_iter
@@ -17,6 +18,8 @@ from tree import ProofNode
 from close import Close
 import lexer
 from usedrule import *
+
+sys.path.extend([os.path.abspath(i) for i in ['../app/appdata/config', '../app/appdata/saved_proofs']])
 
 Module = pop.Module
 
@@ -90,6 +93,7 @@ class Session(object):
         self.defined = {}
         self.proof = None
         self.branch = ""
+        self.undo_counter = 0
 
         self.compile_lexer()
 
@@ -409,6 +413,7 @@ class Session(object):
         if len(self.proof.metadata['usedrules']) < actions_amount:
             raise EngineError("Nothing to undo")
 
+        self.undo_counter += actions_amount
         rules = [self.proof.metadata['usedrules'].pop()
                  for _ in range(actions_amount)]
         min_layer = min((r.layer for r in rules))
@@ -421,6 +426,36 @@ class Session(object):
             self.proof.branch = self.proof.nodes.branch
 
         return rules
+
+    # @EngineLog
+    # def redo(self, actions_amount: int):
+    #     if not self.proof:
+    #         raise EngineError('There is no proof started')
+    #     if self.undo_counter < actions_amount:
+    #         raise EngineError('Not enough actions to redo')
+
+    @EngineLog
+    def save_proof(self) -> dict:
+        if not self.proof:
+            raise EngineError('There is no proof to save')
+        
+        saved = False
+        with open('config.json') as config:
+            setup = json.load(config)
+            state = {
+                'sentence': self.proof.sentence,
+                'used rules': self.proof.metadata['usedrules'],
+                'setup': setup
+            }
+        while not saved:
+            i=1
+            try:
+                with open(f'../app/appdata/saved_proofs/save{i}.json', 'w') as save_file:
+                    json.dump(state, save_file)
+                    saved = True
+            except FileExistsError:
+                i+=1
+
 
     # Proof assist
 
