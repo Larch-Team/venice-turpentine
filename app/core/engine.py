@@ -94,6 +94,7 @@ class Session(object):
         self.proof = None
         self.branch = ""
         self.undo_counter = 0
+        self.undone_rules = None
 
         self.compile_lexer()
 
@@ -414,9 +415,9 @@ class Session(object):
             raise EngineError("Nothing to undo")
 
         self.undo_counter += actions_amount
-        rules = [self.proof.metadata['usedrules'].pop()
+        self.undone_rules = [self.proof.metadata['usedrules'].pop()
                  for _ in range(actions_amount)]
-        min_layer = min((r.layer for r in rules))
+        min_layer = min((r.layer for r in self.undone_rules))
         self.proof.nodes.pop(min_layer)
 
         # Poprawianie gałęzi
@@ -425,14 +426,18 @@ class Session(object):
         else:
             self.proof.branch = self.proof.nodes.branch
 
-        return rules
+        return self.undone_rules
 
-    # @EngineLog
-    # def redo(self, actions_amount: int):
-    #     if not self.proof:
-    #         raise EngineError('There is no proof started')
-    #     if self.undo_counter < actions_amount:
-    #         raise EngineError('Not enough actions to redo')
+    @EngineLog
+    def redo(self, actions_amount: int):
+        if not self.proof:
+            raise EngineError('There is no proof started')
+        if self.undo_counter < actions_amount:
+            raise EngineError('Not enough actions to redo')
+        else:
+            for i in range(actions_amount):
+                self.proof.perform_usedrule(self.proof.metadata['usedrules'][-1-i])
+
 
     @EngineLog
     def save_proof(self) -> dict:

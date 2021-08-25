@@ -380,6 +380,12 @@ def do_undo(session: engine.Session, amount: int) -> str:
     except engine.EngineError as e:
         return str(e)
 
+def do_redo(session: engine.Session, amount: int) -> str:
+    """Redoes last [arg] undone actions"""
+    try:
+        session.redo(amount)
+    except engine.EngineError as e:
+        return str(e)
 
 def do_contra(session: engine.Session, branch: str) -> str:
     """Detects contradictions and handles them by closing their branches"""
@@ -530,6 +536,7 @@ command_dict = OrderedDict({
     'write': {'comm': do_write, 'args': [str]},
     'use': {'comm': do_use, 'args': 'multiple_strings'},
     'undo': {'comm': do_undo, 'args': [int]},
+    'redo': {'comm': do_redo, 'args': [int]},
     'leave': {'comm': do_leave, 'args': []},
     'prove': {'comm': do_prove, 'args': 'multiple_strings'},
     'hint': {'comm': do_hint, 'args': []},
