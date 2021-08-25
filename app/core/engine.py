@@ -448,14 +448,14 @@ class Session(object):
             'used rules': used_rules,
             'setup': self.config
         }
+        i=1
         while not saved:
-            i=1
-            try:
-                with open(f'saved_proofs/save{i}.json', 'w') as save_file:
+            if not os.path.isfile(f'./saved_proofs/save_{i}.json'):
+                with open(f'saved_proofs/save_{i}.json', 'w') as save_file:
                     json.dump(state, save_file)
                     saved = True
                 return('Proof saved successfully')
-            except FileExistsError:
+            else:
                 i+=1
 
 
