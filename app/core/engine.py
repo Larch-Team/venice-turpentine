@@ -439,20 +439,22 @@ class Session(object):
         if not self.proof:
             raise EngineError('There is no proof to save')
         
+
         saved = False
-        with open('config.json') as config:
-            setup = json.load(config)
-            state = {
-                'sentence': self.proof.sentence,
-                'used rules': self.proof.metadata['usedrules'],
-                'setup': setup
-            }
+        used_rules = [{'layer': obj.layer, 'branch': obj.branch, 'rule': obj.rule, 'context': obj.context, 'decisions': obj.decisions, 'auto': obj.auto} for obj in self.proof.metadata['usedrules']]
+        
+        state = {
+            'sentence': self.proof.sentence,
+            'used rules': used_rules,
+            'setup': self.config
+        }
         while not saved:
             i=1
             try:
-                with open(f'../app/appdata/saved_proofs/save{i}.json', 'w') as save_file:
+                with open(f'saved_proofs/save{i}.json', 'w') as save_file:
                     json.dump(state, save_file)
                     saved = True
+                return('Proof saved successfully')
             except FileExistsError:
                 i+=1
 
