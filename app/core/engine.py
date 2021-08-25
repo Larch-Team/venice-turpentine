@@ -327,7 +327,8 @@ class Session(object):
         if problem:
             logger.warning(
                 f"{statement} is not a valid statement \n{problem.name}")
-            return self.acc('Assistant').mistake_syntax(problem)
+            p = self.acc('Assistant').mistake_syntax(problem)
+            return p or [problem.default]
         else:
             tokenized = self.acc('Formal').prepare_for_proving(tokenized)
 
