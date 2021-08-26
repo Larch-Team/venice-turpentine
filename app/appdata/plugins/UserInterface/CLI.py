@@ -454,13 +454,20 @@ def do_write(session: engine.Session, filename: str):
         return f"Proof saved as {filename}"
 
 
-def do_save(session: engine.Session):
+def do_save(session: engine.Session, filename: str):
     """
     Saves current state of proof if needed
     """
     try:
-        session.save_proof()
+        session.save_proof(filename)
     except engine.EngineError as e:
+        return e
+
+def do_load(session: engine.Session, filename: str):
+    """ Loads a saved proof """
+    try:
+        session.load_proof(filename)
+    except EngineError as e:
         return e
 
 
@@ -542,7 +549,8 @@ command_dict = OrderedDict({
     'hint': {'comm': do_hint, 'args': []},
     'solve': {'comm': do_solve, 'args': []},
     'check': {'comm': do_check, 'args': []},
-    'save proof': {'comm': do_save, 'args': []},
+    'save proof': {'comm': do_save, 'args': [str]},
+    'load proof': {'comm': do_load, 'args': [str]},
     # Program interaction
     'plugin switch': {'comm': do_plug_switch, 'args': [str, str]},
     'plugin get': {'comm': do_plug_get, 'args': [str, str]},

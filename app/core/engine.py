@@ -438,12 +438,10 @@ class Session(object):
             for i in range(actions_amount):
                 self.proof.perform_usedrule(self.proof.metadata['usedrules'][-1-i])
 
-
     @EngineLog
-    def save_proof(self) -> dict:
+    def save_proof(self, filename: str):
         if not self.proof:
             raise EngineError('There is no proof to save')
-        
 
         saved = False
         used_rules = [{'layer': obj.layer, 'branch': obj.branch, 'rule': obj.rule, 'context': obj.context, 'decisions': obj.decisions, 'auto': obj.auto} for obj in self.proof.metadata['usedrules']]
@@ -453,15 +451,34 @@ class Session(object):
             'used rules': used_rules,
             'setup': self.config
         }
-        i=1
-        while not saved:
-            if not os.path.isfile(f'./saved_proofs/save_{i}.json'):
-                with open(f'saved_proofs/save_{i}.json', 'w') as save_file:
-                    json.dump(state, save_file)
-                    saved = True
+        
+        if not os.path.isfile(f'./saved_proofs/{filename}.json'):
+            with open(f'saved_proofs/{filename}.json', 'w') as save_file:
+                json.dump(state, save_file)
                 return('Proof saved successfully')
-            else:
-                i+=1
+        else:
+            raise EngineError('Plik o podanej nazwie juz istnieje')
+
+    @EngineLog
+    def load_proof(self, filename: str):
+        if self.proof != None:
+            raise EngineError('There is already a proof started. Save or finish it and leave the current proof to load a saved one.')
+        if not os.path.isfile(f'./saved_proofs/{filename}'):
+            raise EngineError('There is no such save file')
+        
+        with open(f'saved_proofs/{filename}') as save_file:
+            state = json.load(save_file)
+            self.config = state['setup']
+
+            tokenized = Sentence(state['sentence'], self)
+            self.proof = BranchCentric(tokenized, self.config)
+            self.deal_closure(self.proof.nodes.getbranchnames()[0])
+            rules_to_perform = []
+            for rule in state['used rules']:
+                rules_to_perform.append(UsedRule(branch=rule['branch'], rule=rule['rule'], context=rule['context'], decisions=rule['decisions'], layer=rule['layer'], _proof=self.proof, auto=rule['auto']))
+            for rule in rules_to_perform:
+                self.proof.perform_usedrule(rule)
+            return('Proof loaded successfully')            
 
 
     # Proof assist
