@@ -109,7 +109,7 @@ class Proof(object):
     def perform_usedrule(self, usedrule: UsedRule):
         """Wykonuje na dowodzie regułę na podstawie obiektu UsedRules"""
         self.use_rule(
-            branch_name=usedrule.branch,
+            # branch_name=usedrule.branch,
             rule=usedrule.rule,
             context=usedrule.context,
             decisions=usedrule.decisions

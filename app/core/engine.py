@@ -427,16 +427,16 @@ class Session(object):
             self.proof.branch = self.proof.nodes.branch
 
         return self.undone_rules
-
-    @EngineLog
-    def redo(self, actions_amount: int):
-        if not self.proof:
-            raise EngineError('There is no proof started')
-        if self.undo_counter < actions_amount:
-            raise EngineError('Not enough actions to redo')
-        else:
-            for i in range(actions_amount):
-                self.proof.perform_usedrule(self.proof.metadata['usedrules'][-1-i])
+ 
+    # @EngineLog -> '''nie dziala XD'''
+    # def redo(self, actions_amount: int):
+    #     if not self.proof:
+    #         raise EngineError('There is no proof started')
+    #     if self.undo_counter < actions_amount:
+    #         raise EngineError('Not enough actions to redo')
+    #     else:
+    #         for i in range(actions_amount):
+    #             self.proof.perform_usedrule(self.proof.metadata['usedrules'][-1-i])
 
     @EngineLog
     def save_proof(self, filename: str):
@@ -452,8 +452,8 @@ class Session(object):
             'setup': self.config
         }
         
-        if not os.path.isfile(f'./saved_proofs/{filename}.json'):
-            with open(f'saved_proofs/{filename}.json', 'w') as save_file:
+        if not os.path.isfile(f'./saved_proofs/{filename}'):
+            with open(f'saved_proofs/{filename}', 'w') as save_file:
                 json.dump(state, save_file)
                 return('Proof saved successfully')
         else:
