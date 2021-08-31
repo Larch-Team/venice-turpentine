@@ -68,7 +68,7 @@ class Session(object):
     SOCKETS = {'Assistant': '0.0.1',
                'Formal': '0.2.0',
                'Lexicon': '0.0.1',
-               'Output': '0.0.1'}
+               'Output': '0.2.0'}
     SOCKETS_NOT_IN_CONFIG = ()
 
     def __init__(self, session_ID: str, config_file: str):
