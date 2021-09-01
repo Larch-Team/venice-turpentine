@@ -9,7 +9,7 @@ import webbrowser
 from engine import Session
 from exceptions import EngineError
 from collections import namedtuple
-from flask_local.libs import JSONResponse
+from flask_local.libs import JSONResponse, get_clickable
 
 SOCKET = 'UserInterface'
 VERSION = '0.0.1'
@@ -20,6 +20,7 @@ session = Session('main', 'config.json')
 
 @app.route('/', methods=['GET'])
 def index():
+    session.reset_proof()
     return render_template('index.html')
 
 @app.route('/run', methods=['GET'])
@@ -30,18 +31,29 @@ def larch():
 
 @app.route('/API/new_proof', methods=['POST'])
 def do_new_proof():
-    sentence = request.form.get()
+    sentence = request.data.decode()
     if session.proof:
         return JSONResponse(type_='error', content="A proof would be deleted")
     try:
         text = session.new_proof(sentence)
     except EngineError as e:
+        print(str(e))
         return JSONResponse(type_='error', content=str(e))
     else:
         if text:
+            print("error")
             return JSONResponse(type_='error', content="\n".join(text))
         else:
+            print("New proof")
             return JSONResponse('success')
+        
+@app.route('/API/worktree', methods=['GET'])
+def do_get_worktree():
+    return get_clickable(session.proof.nodes.sentence, 0, session.proof.nodes.branch)
+
+@app.route('/API/rules', methods=['GET'])
+def do_get_rules():
+    return session.getrules()
 
 def run() -> int:
     """

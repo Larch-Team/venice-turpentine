@@ -25,12 +25,11 @@
                         </p>
                     </li>
                     <li>
-                        <a href="#" id="leave">Wyjdź</a>
+                        <a href="/" id="leave">Wyjdź</a>
                     </li>
                 </ul>
             </div>
         </nav>
-        <form>
             <div class="container" id="progressbar">
                 <div class="progress-container">
                     <div class="progress" id="progress"></div>
@@ -54,10 +53,12 @@
                 </h1>
             </div>
             <div class="button-container">
-                <a href="#" class="btn">Zaczynamy</a>
+                <a href="#" class="btn", id='start'>Zaczynamy</a>
             </div>
         </div>
+        
         <div class="larch-container">
+        <form>
             <div class="main-larch">
                 <div class="larch-subcontainer">
                     <h2>
@@ -77,13 +78,15 @@
                     <a href="#">Kliknij aby dowiedzieć się więcej</a>
                 </div>
                 <div class="button-container btn-main">
-                    <a href="#" class="btn">Dalej: Rozłóż formuły</a>
+                    <button type="button" class="btn" id="new_proof">Dalej: Rozłóż formuły</button>
                 </div>
             </div>
-            </div>
+        </form>
+        </div>
 
 
         <div class="larch-container">
+        <form>
             <div class="main-larch">
                 <div class="larch-subcontainer">
                     <h2>
@@ -102,12 +105,14 @@
                         </a>
                 </div>
                 <div class="button-container btn-main">
-                    <a href="#" class="btn">Dalej: Sprawdź gałęzie</a>
+                    <button type="button" class="btn">Dalej: Sprawdź gałęzie</button>
                 </div>
             </div>
-            </div>
+        </form>
+        </div>
 
         <div class="larch-container">
+        <form>
             <div class="main-larch">
                 <div class="larch-subcontainer">
                     <h2>
@@ -126,12 +131,14 @@
                         </a>
                 </div>
                 <div class="button-container btn-main">
-                    <a href="#" class="btn">Dalej: Rozstrzygnij dowód</a>
+                    <button type="button" class="btn">Dalej: Rozstrzygnij dowód</button>
                 </div>
             </div> 
-            </div>
+        </form>
+        </div>
 
         <div class="larch-container">
+        <form>
             <div class="main-larch2">
                 <div class="larch-subcontainer" id="finish">
                     <h2>
@@ -157,13 +164,15 @@
                     </h3>
     
                     <div class="button-container btn-check">
-                        <a href="#" class="btn">Sprawdź</a>
+                        <button type="button" class="btn">Sprawdź</button>
                 </div>
                 </div>
             </div>
+        </form>
         </div>
 
         <div class="larch-container">
+        <form>
             <div class="main-larch3">
                 <div>
                     <img src="static/normal_u95.png" alt="choinka" width="86px" height="86px">
@@ -176,14 +185,16 @@
                         Bardzo sprawnie Ci poszło! Możesz teraz zapisać swój dowód lub zacząć od początku i przeprowadzić inny.
                     </p>
                     <div class="button-container">
-                        <a href="#" class="btn" id="save">Zapisz dowód</a>
-                        <a href="#" class="btn" id="new">Nowy dowód</a>
+                        <button type="button" class="btn" id="save">Zapisz dowód</button>
+                        <button type="button" class="btn" id="new">Nowy dowód</button>
                     </div>
                 </div>
             </div>
+        </form>
         </div>
 
         <div class="larch-container">
+        <form>
             <div class="main-larch3">
                 <div>
                     <img src="static/normal_u95.png" alt="choinka" width="86px" height="86px">
@@ -199,10 +210,10 @@
                         <a href="#" class="btn" id="more">
                             Dowiedz się więcej o dowodzeniu
                         </a>
-                        <a href="#" class="btn" id="new">Nowy dowód</a>
+                        <button type="button" class="btn" id="new">Nowy dowód</button>
                     </div>
                 </div>
             </div>    
-        </div>
         </form>
+        </div>
     </body>

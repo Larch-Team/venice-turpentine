@@ -9,7 +9,7 @@ def JSONResponse(type_: str, content: Any = None):
 
 
 # TODO: uzupełnić tag
-Tag = Template('<a href= $tID $sID $branch >$symbol</a>')
+Tag = Template('<button type="button" class="rule_button $branch $tID $sID">$symbol</button>')
 
 def _clickable(sentence: Sentence, sentenceID: int, branch: str) -> Iterator[str]:
     for tID, symbol in enumerate(sentence.getReadableList()):
