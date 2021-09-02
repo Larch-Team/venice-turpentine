@@ -472,7 +472,10 @@ def do_load(session: engine.Session, filename: str):
         - filename [str]
     """
     try:
-        return session.load_proof(filename)
+        ret = session.load_proof(filename)
+        for i in session.proof.nodes.getbranchnames():
+            session.deal_closure(i)
+        return ret 
     except EngineError as e:
         return e
 

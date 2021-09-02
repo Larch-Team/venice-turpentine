@@ -11,6 +11,7 @@ from json import loads
 from tqdm import tqdm
 from time import sleep
 from appdirs import user_data_dir
+from constants import REPO_URL, ALLOW_DOWNLOAD
 
 
 def try_gen(func: Callable[..., Union[str, None]]) -> Iterator[str]:
@@ -29,8 +30,7 @@ def try_gen(func: Callable[..., Union[str, None]]) -> Iterator[str]:
 
 class FileManager(object):
 
-    BRANCH = "development"
-    REPO_URL = f"https://raw.githubusercontent.com/Larch-Team/larch-plugins/{BRANCH}"
+
 
     # Class properties
 
@@ -113,7 +113,7 @@ class FileManager(object):
         """Downloads the file list"""
         if self.plugins is None or self.setups is None:
             try:
-                response = web_request.urlopen(f"{self.REPO_URL}/files.json")
+                response = web_request.urlopen(f"{REPO_URL}/files.json")
             except URLError as e:
                 return f'Couldn\'t download the file list'
             files = loads(response.read())
@@ -124,8 +124,9 @@ class FileManager(object):
     @try_gen
     def download_file(self, file: str, required: bool = False) -> Union[None, str]:
         """Downloads a given file and saves it at the given location"""
+        assert ALLOW_DOWNLOAD
         self.prepare_dirs(os.path.dirname(file))
-        url = f"{self.REPO_URL}/{file}"
+        url = f"{REPO_URL}/{file}"
         try:
             response = web_request.urlopen(url)
         except URLError as e:

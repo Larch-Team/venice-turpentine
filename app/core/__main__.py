@@ -4,17 +4,16 @@ import sys
 from datetime import datetime
 from manager import FileManager
 from engine import Session
+from constants import DEBUG, VERSION
 
 import pop_engine as pop
-
-DEBUG = True
 
 # Wyjaśnienie sensu istnienia pliku:
 # https://www.notion.so/szymanski/The-curious-case-of-the-UserInterface-socket-ab76cfc810d9486bb8ce9199f0cc7efc
 
 if __name__ == "__main__":
     try:
-        manager = FileManager(DEBUG, Session.ENGINE_VERSION)
+        manager = FileManager(DEBUG, VERSION)
         manager.download_required()
 
         # Log clearing

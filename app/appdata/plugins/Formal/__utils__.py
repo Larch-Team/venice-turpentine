@@ -80,9 +80,14 @@ def strict_filler(func: tp.Callable[..., SentenceTupleStructure]) -> tp.Callable
         ProofNode.insert_history(
             len(fin)*([[0]] if rule.reusable else [[sentence.sentence]]), old.children)
 
+        if rule.name.startswith('false'):
+            _, (_, a) = sentence.sentence.getComponents()
+            tid = a.getMainConnective() +2
+        else:
+            tid = sentence.sentence.getMainConnective()
         context = {
             'sentenceID': sentence.id,
-            'tokenID': sentence.sentence.getMainConnective()
+            'tokenID': tid
         }
 
         proof.metadata['usedrules'].append(
