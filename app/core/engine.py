@@ -4,6 +4,7 @@ from genericpath import isfile
 import json
 import logging
 import os
+import sys
 import typing as tp
 from manager import FileManager
 from misc import setup_iter
@@ -90,6 +91,8 @@ class Session(object):
         self.defined = {}
         self.proof = None
         self.branch = ""
+        self.undo_counter = 0
+        self.undone_rules = None
 
         self.compile_lexer()
 
@@ -393,7 +396,7 @@ class Session(object):
             raise EngineError("Wrong context")
 
         try:
-            self.proof.use_rule(rule, context, None)
+            self.proof.use_rule(rule, context, decisions=None)
         except RaisedUserMistake as e:
             if self.sockets['Assistant'].isplugged():
                 return self.acc('Assistant').mistake_userule(e) or [e.default]
@@ -410,9 +413,10 @@ class Session(object):
         if len(self.proof.metadata['usedrules']) < actions_amount:
             raise EngineError("Nothing to undo")
 
-        rules = [self.proof.metadata['usedrules'].pop()
+        self.undo_counter += actions_amount
+        self.undone_rules = [self.proof.metadata['usedrules'].pop()
                  for _ in range(actions_amount)]
-        min_layer = min((r.layer for r in rules))
+        min_layer = min((r.layer for r in self.undone_rules))
         self.proof.nodes.pop(min_layer)
 
         # Poprawianie gałęzi
@@ -421,7 +425,70 @@ class Session(object):
         else:
             self.proof.branch = self.proof.nodes.branch
 
-        return rules
+        return self.undone_rules
+ 
+    # @EngineLog -> '''nie dziala XD'''
+    # def redo(self, actions_amount: int):
+    #     if not self.proof:
+    #         raise EngineError('There is no proof started')
+    #     if self.undo_counter < actions_amount:
+    #         raise EngineError('Not enough actions to redo')
+    #     else:
+    #         for i in range(actions_amount):
+    #             self.proof.perform_usedrule(self.proof.metadata['usedrules'][-1-i])
+
+    @EngineLog
+    def save_proof(self, filename: str):
+        if not self.proof:
+            raise EngineError('There is no proof to save')
+
+        saved = False
+        used_rules = [{'layer': obj.layer, 'branch': obj.branch, 'rule': obj.rule, 'context': obj.context, 'decisions': obj.decisions, 'auto': obj.auto} for obj in self.proof.metadata['usedrules']]
+        
+        state = {
+            'sentence': self.proof.sentence,
+            'used rules': used_rules,
+            'setup': self.config
+        }
+        
+        if not os.path.isfile(f'./saved_proofs/{filename}'):
+            with open(f'saved_proofs/{filename}', 'w') as save_file:
+                json.dump(state, save_file)
+            return 'Proof saved successfully'
+        else:
+            raise EngineError('Plik o podanej nazwie juz istnieje')
+
+    @EngineLog
+    def load_proof(self, filename: str):
+        if self.proof != None:
+            raise EngineError('There is already a proof started. Save or finish it and leave the current proof to load a saved one.')
+        if not os.path.isfile(f'./saved_proofs/{filename}'):
+            raise EngineError('There is no such save file')
+
+        with open(f'saved_proofs/{filename}') as save_file:
+            state = json.load(save_file)
+            self.config = state['setup']
+
+            tokenized = Sentence(state['sentence'], self)
+            self.proof = BranchCentric(tokenized, self.config)
+            self.deal_closure(self.proof.nodes.getbranchnames()[0])
+            rules_to_perform = [
+                UsedRule(
+                    branch=rule['branch'],
+                    rule=rule['rule'],
+                    context=rule['context'],
+                    decisions=rule['decisions'],
+                    layer=rule['layer'],
+                    _proof=self.proof,
+                    auto=rule['auto'],
+                )
+                for rule in state['used rules']
+            ]
+
+            for rule in rules_to_perform:
+                self.proof.perform_usedrule(rule)
+            return('Proof loaded successfully')            
+
 
     # Proof assist
 

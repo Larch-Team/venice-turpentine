@@ -86,8 +86,9 @@ class FileManager(object):
                 __file__).removesuffix('manager.py')+'../appdata'
         else:
             self.directory = user_data_dir(appname='Larch', appauthor=False, version=larch_version)
-            self.prepare_dirs('plugins')
-            self.prepare_dirs('setups')
+        self.prepare_dirs('plugins')
+        self.prepare_dirs('setups')
+        self.prepare_dirs('saved_proofs')
 
         # if not os.path.isfile(f'{self.directory}/manifest.json'):
         #     with open(f'{self.directory}/manifest.json', 'w') as f:
