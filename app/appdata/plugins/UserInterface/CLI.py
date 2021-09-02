@@ -455,18 +455,24 @@ def do_write(session: engine.Session, filename: str):
 
 
 def do_save(session: engine.Session, filename: str):
-    """
-    Saves current state of proof if needed
+    """Saves current state of proof if needed
+    
+    Arguments:
+        - filename [str]
     """
     try:
-        session.save_proof(filename)
+        return session.save_proof(filename)
     except engine.EngineError as e:
         return e
 
 def do_load(session: engine.Session, filename: str):
-    """ Loads a saved proof """
+    """Loads a saved proof 
+    
+    Arguments:
+        - filename [str]
+    """
     try:
-        session.load_proof(filename)
+        return session.load_proof(filename)
     except EngineError as e:
         return e
 
@@ -543,14 +549,14 @@ command_dict = OrderedDict({
     'write': {'comm': do_write, 'args': [str]},
     'use': {'comm': do_use, 'args': 'multiple_strings'},
     'undo': {'comm': do_undo, 'args': [int]},
-    'redo': {'comm': do_redo, 'args': [int]},
+    # 'redo': {'comm': do_redo, 'args': [int]},
     'leave': {'comm': do_leave, 'args': []},
     'prove': {'comm': do_prove, 'args': 'multiple_strings'},
     'hint': {'comm': do_hint, 'args': []},
     'solve': {'comm': do_solve, 'args': []},
     'check': {'comm': do_check, 'args': []},
-    'save proof': {'comm': do_save, 'args': [str]},
-    'load proof': {'comm': do_load, 'args': [str]},
+    'save': {'comm': do_save, 'args': [str]},
+    'load': {'comm': do_load, 'args': [str]},
     # Program interaction
     'plugin switch': {'comm': do_plug_switch, 'args': [str, str]},
     'plugin get': {'comm': do_plug_get, 'args': [str, str]},

@@ -64,20 +64,20 @@ class Proof(object):
         else:
             return None, None
 
-    def use_rule(self, branch_name: str, rule: str, context: dict[str, Any], decisions: dict = None) -> None:
+    def use_rule(self, rule: str, context: dict[str, Any], branch_name: str, decisions: dict = None) -> None:
         """
         Wykorzystuje regułę dowodzenia systemu FormalSystem na określonej gałęzi z określonym kontekstem.
 
         :param FormalSystem: Socket FormalSystem, używany do przywołania use_rule
         :type FormalSystem: Socket
-        :param branch: nazwa gałęzi do zastosowania reguły
-        :type branch: str
         :param rule: Nazwa reguły
         :type rule: str
         :param context: Kontekst zastosowania reguły
         :type context: dict[str, Any]
         :param decisions: Zbiór podjętych decyzji, defaults to None
         :type decisions: dict, optional
+        :param branch: nazwa gałęzi do zastosowania reguły
+        :type branch: str
         :raises EngineError: [description]
         :return: Lista nowych gałęzi
         :rtype: tuple[str]
@@ -109,9 +109,9 @@ class Proof(object):
     def perform_usedrule(self, usedrule: UsedRule):
         """Wykonuje na dowodzie regułę na podstawie obiektu UsedRules"""
         self.use_rule(
-            # branch_name=usedrule.branch,
             rule=usedrule.rule,
             context=usedrule.context,
+            branch_name=usedrule.branch,
             decisions=usedrule.decisions
         )
         
@@ -214,5 +214,7 @@ class BranchCentric(Proof):
         else:
             raise EngineError("All branches are closed")
 
-    def use_rule(self, rule: str, context: dict[str, Any], decisions: dict):
-        return super().use_rule(self.branch, rule, context, decisions=decisions)
+    def use_rule(self, rule: str, context: dict[str, Any], branch_name: str = None, decisions: dict = None):
+        if branch_name:
+            self.jump(branch_name)
+        return super().use_rule(rule, context, self.branch, decisions=decisions)

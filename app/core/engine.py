@@ -19,8 +19,6 @@ from close import Close
 import lexer
 from usedrule import *
 
-sys.path.extend([os.path.abspath(i) for i in ['../app/appdata/config', '../app/appdata/saved_proofs']])
-
 Module = pop.Module
 
 
@@ -397,7 +395,7 @@ class Session(object):
             raise EngineError("Wrong context")
 
         try:
-            self.proof.use_rule(rule, context, None)
+            self.proof.use_rule(rule, context, decisions=None)
         except RaisedUserMistake as e:
             if self.sockets['Assistant'].isplugged():
                 return self.acc('Assistant').mistake_userule(e) or [e.default]
@@ -455,7 +453,7 @@ class Session(object):
         if not os.path.isfile(f'./saved_proofs/{filename}'):
             with open(f'saved_proofs/{filename}', 'w') as save_file:
                 json.dump(state, save_file)
-                return('Proof saved successfully')
+            return 'Proof saved successfully'
         else:
             raise EngineError('Plik o podanej nazwie juz istnieje')
 
@@ -465,7 +463,7 @@ class Session(object):
             raise EngineError('There is already a proof started. Save or finish it and leave the current proof to load a saved one.')
         if not os.path.isfile(f'./saved_proofs/{filename}'):
             raise EngineError('There is no such save file')
-        
+
         with open(f'saved_proofs/{filename}') as save_file:
             state = json.load(save_file)
             self.config = state['setup']
@@ -473,9 +471,19 @@ class Session(object):
             tokenized = Sentence(state['sentence'], self)
             self.proof = BranchCentric(tokenized, self.config)
             self.deal_closure(self.proof.nodes.getbranchnames()[0])
-            rules_to_perform = []
-            for rule in state['used rules']:
-                rules_to_perform.append(UsedRule(branch=rule['branch'], rule=rule['rule'], context=rule['context'], decisions=rule['decisions'], layer=rule['layer'], _proof=self.proof, auto=rule['auto']))
+            rules_to_perform = [
+                UsedRule(
+                    branch=rule['branch'],
+                    rule=rule['rule'],
+                    context=rule['context'],
+                    decisions=rule['decisions'],
+                    layer=rule['layer'],
+                    _proof=self.proof,
+                    auto=rule['auto'],
+                )
+                for rule in state['used rules']
+            ]
+
             for rule in rules_to_perform:
                 self.proof.perform_usedrule(rule)
             return('Proof loaded successfully')            
