@@ -1,4 +1,4 @@
-DEBUG = False
+DEBUG = True
 VERSION = '0.2-beta'
 
 ALLOW_DOWNLOAD = True
