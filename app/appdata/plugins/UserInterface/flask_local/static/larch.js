@@ -13,14 +13,29 @@ function sendPOST(url, body) {
     return JSON.parse(xmlHttp.responseText);
 }
 
+function getProof(url, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", 'API/worktree', true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            callback(xhr.responseText);
+        }
+    };
+    xhr.send(null);
+}
+
 function new_proof(e) {
     let ret = sendPOST('API/new_proof', formula.value);
     if (ret["type"] == "success") {
+        getProof('/API/worktree', function(text) {
+            document.getElementById('clickable-container').innerHTML = text;
+        });
         nextPage();
     } else {
-        // pojawianie się dymek z informacją o błędzie - ret["content"]
+        window.alert(ret["content"])
     }
 }
+
 
 document.getElementById("new_proof").addEventListener("click", new_proof)
 document.getElementById("start").addEventListener("click", nextPage)
@@ -38,10 +53,6 @@ function nextPage() {
         document.getElementById("progressbar").style.display = "none";
     }
 }
-
-// nextBtns.forEach((btn) => {
-//     btn.addEventListener("click", () => );
-// });
 
 function updateLarchSteps(){
     

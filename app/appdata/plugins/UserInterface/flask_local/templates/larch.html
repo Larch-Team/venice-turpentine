@@ -25,21 +25,24 @@
                         </p>
                     </li>
                     <li>
-                        <a href="/" id="leave">Wyjdź</a>
+                        <button id="leave" onclick="if (confirm('Czy jesteś pewny, że chcesz opuścić stronę?')) window.location.href='/';
+                        ">Wyjdź</button>
                     </li>
                 </ul>
             </div>
         </nav>
             <div class="container" id="progressbar">
-                <div class="progress-container">
-                    <div class="progress" id="progress"></div>
-                    <div class="circle progress-step-active">
-                    </div>
-                    <div class="circle">
-                    </div>
-                    <div class="circle">
-                    </div>
-                    <div class="circle">
+                <div class="semi-container">
+                    <div class="progress-container">
+                        <div class="progress" id="progress"></div>
+                        <div class="circle progress-step-active">
+                        </div>
+                        <div class="circle">
+                        </div>
+                        <div class="circle">
+                        </div>
+                        <div class="circle">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -92,6 +95,9 @@
                     <h2>
                         Rozłóż formuły
                     </h2>
+                    <p id="clickable-container">
+                        
+                    </p>
                 </div>
                 <div class="hints">
                     <p>
