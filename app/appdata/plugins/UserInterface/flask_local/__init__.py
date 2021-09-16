@@ -6,7 +6,7 @@ from manager import FileManager
 import plugins.UserInterface.__utils__ as utils
 from flask import Flask, render_template, request
 import webbrowser
-from engine import Session
+from engine import Session, contextdef_translate
 from exceptions import EngineError
 from collections import namedtuple
 from flask_local.libs import JSONResponse, get_clickable
@@ -45,6 +45,44 @@ def do_new_proof():
             return JSONResponse(type_='error', content="\n".join(text))
         else:
             print("New proof")
+            return JSONResponse('success')
+        
+@app.route('/API/use_rule', methods=['POST'])
+def do_use_rule():
+    rule = request.json['rule']
+    branch_name = request.json['branch']
+    context = request.json['context']
+    
+    # Check context
+    context_info = session.context_info(rule)
+    prepared = {}
+    if context_info is None:
+        return JSONResponse(type_='error', content="No such rule")
+    for variable, official, _, type_ in context_info:
+        if not context.get(variable):
+            return JSONResponse(type_='error', content=f"{official} is not provided to the rule")
+
+        vartype = contextdef_translate(type_)
+        try:
+            new = vartype(context[variable])
+        except ValueError:
+            return JSONResponse(type_='error', content=f"{official} is of a wrong type")
+        
+        prepared[variable] = new
+    
+    # Run use_rule
+    try:
+        session.jump(branch_name)
+        text = session.use_rule(rule, prepared)
+    except EngineError as e:
+        print(str(e))
+        return JSONResponse(type_='error', content=str(e))
+    else:
+        if text:
+            print("error")
+            return JSONResponse(type_='error', content="\n".join(text))
+        else:
+            print(f"rule used {rule=} {branch_name=}")
             return JSONResponse('success')
         
 @app.route('/API/worktree', methods=['GET'])
