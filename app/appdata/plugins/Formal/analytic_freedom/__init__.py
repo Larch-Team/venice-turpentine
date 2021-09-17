@@ -58,14 +58,14 @@ def check_syntax(sentence: Sentence) -> tp.Union[UserMistake, None]:
             return UserMistake('bracket left open', f'Otwarcie nawiasu na pozycji {indexes[er]+1} nie ma zamknięcia', {'pos': indexes[er]})
 
     if ')' in reduced:
-        errors = find_all(reduced, '(')
+        errors = find_all(reduced, ')')
         for er in errors:
             return UserMistake('bracket not opened', f'Zamknięcie nawiasu na pozycji {indexes[er]+1} nie ma otwarcia', {'pos': indexes[er]})
 
     if 's2' in reduced:
         errors = find_all(reduced, 's2')
         for er in errors:
-            return UserMistake('no right', f'Spójnik dwuargumentowy na pozycji {indexes[er]+2} nie ma prawego argumentu', {'pos': indexes[er]})
+            return UserMistake('no right', f'Spójnik dwuargumentowy na pozycji {indexes[er+1]+1} nie ma prawego argumentu', {'pos': indexes[er]})
 
     if '2s' in reduced:
         errors = find_all(reduced, '2s')

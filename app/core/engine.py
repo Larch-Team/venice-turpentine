@@ -324,7 +324,7 @@ class Session(object):
         try:
             tokenized = self.lexer.tokenize(statement)
         except lexer.LrchLexerError as e:
-            raise [EngineError(str(e))]
+            raise EngineError(str(e))
         tokenized = Sentence(tokenized, self)
         problem = self.acc('Formal').check_syntax(tokenized)
         if problem:
