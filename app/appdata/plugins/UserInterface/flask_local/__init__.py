@@ -17,6 +17,7 @@ VERSION = '0.0.1'
 
 app = Flask('flask_local', static_url_path='/static')
 session = Session('main', 'config.json')
+#TODO: dodać po skończeniu setup update
 
 @app.route('/', methods=['GET'])
 def index():
@@ -85,6 +86,19 @@ def do_use_rule():
             print(f"rule used {rule=} {branch_name=}")
             return JSONResponse('success')
         
+@app.route('/API/hint', methods=['GET'])       
+def do_hint() -> str:
+    """Gives you a hint"""
+    try:
+        hints = session.hint()
+    except EngineError as e:
+        return JSONResponse(type_='error', content=str(e))
+    if hints is not None:
+        return JSONResponse(type_='success', content=hints)
+    else:
+        return JSONResponse(type_='error', content="Podpowiedzi nie ma, trzymaj się tam")
+    
+        
 @app.route('/API/worktree', methods=['GET'])
 def do_get_worktree():
     return get_clickable(session.proof.nodes.sentence, 0, session.proof.nodes.branch)
@@ -92,6 +106,15 @@ def do_get_worktree():
 @app.route('/API/rules', methods=['GET'])
 def do_get_rules():
     return session.getrules()
+
+@app.route('/API/undo', methods=['POST'])
+def do_undo() -> str:
+    """Undos last action"""
+    try:
+        rules = session.undo(1)
+        return JSONResponse(type_='success')
+    except EngineError as e:
+        return JSONResponse(type_='error', content=str(e))
 
 def run() -> int:
     """
