@@ -105,8 +105,11 @@ def do_get_worktree():
 
 @app.route('/API/table', methods=['GET'])
 def do_get_table():
-    # html = ['<style> table, th, td {border: 1px solid black; border-collapse: collapse;} </style>','<table>','<tr><th>Proof</th></tr>','</table']
-    leaves = [(leaf.sentence, leaf.layer) for leaf in session.proof.nodes]
+    layers = session.proof.nodes.gettree()
+    width = max([len(l) for l in layers])
+    html = ['<style> table, th, td {border: 1px solid black; border-collapse: collapse;} </style>','<table>','<tr><th>Proof </th></tr>','</table']
+    # for layer in layers:
+
 
 @app.route('/API/rules', methods=['GET'])
 def do_get_rules():
