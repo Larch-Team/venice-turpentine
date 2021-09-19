@@ -441,7 +441,6 @@ class Session(object):
         if not self.proof:
             raise EngineError('There is no proof to save')
 
-        saved = False
         used_rules = [{'layer': obj.layer, 'branch': obj.branch, 'rule': obj.rule, 'context': obj.context, 'decisions': obj.decisions, 'auto': obj.auto} for obj in self.proof.metadata['usedrules']]
         
         state = {
