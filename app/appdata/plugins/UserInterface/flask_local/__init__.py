@@ -103,6 +103,11 @@ def do_hint() -> str:
 def do_get_worktree():
     return get_clickable(session.proof.nodes.sentence, 0, session.proof.nodes.branch)
 
+@app.route('/API/table', methods=['GET'])
+def do_get_table():
+    # html = ['<style> table, th, td {border: 1px solid black; border-collapse: collapse;} </style>','<table>','<tr><th>Proof</th></tr>','</table']
+    leaves = [(leaf.sentence, leaf.layer) for leaf in session.proof.nodes]
+
 @app.route('/API/rules', methods=['GET'])
 def do_get_rules():
     return session.getrules()
