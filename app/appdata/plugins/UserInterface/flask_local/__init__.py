@@ -105,9 +105,8 @@ def do_get_worktree():
 
 @app.route('/API/table', methods=['GET'])
 def do_get_table():
-    layers = session.proof.nodes.gettree()
-    width = max([len(l) for l in layers])
-    html = ['<style> table, th, td {border: 1px solid black; border-collapse: collapse;} </style>','<table>','<tr><th>Proof </th></tr>','</table']
+    node = session.proof.nodes
+    html = ['<style> table, th, td {border: 1px solid black; border-collapse: collapse;} </style>','<table>','<tr><th>Proof</th></tr>','</table']
     # for layer in layers:
 
 
