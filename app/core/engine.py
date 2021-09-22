@@ -29,16 +29,14 @@ logger = logging.getLogger('engine')
 
 def EngineLog(func):
     def new(*args, **kwargs):
-        logger.debug(
-            f"{func.__name__} with args={str(args)} and kwargs={str(kwargs)}")
+        logger.debug(f'{func.__name__} with args={args} and kwargs={kwargs}')
         return func(*args, **kwargs)
     return new
 
 
 def EngineChangeLog(func):
     def new(*args, **kwargs):
-        logger.info(
-            f"{func.__name__} with args={str(args)} and kwargs={str(kwargs)}")
+        logger.info(f'{func.__name__} with args={args} and kwargs={kwargs}')
         return func(*args, **kwargs)
     return new
 
@@ -85,8 +83,13 @@ class Session(object):
         self.read_config()
         self.sockets = {name: pop.Socket(name, os.path.abspath(f"plugins/{name}"), version, '__template__.py',
                                          self.config['chosen_plugins'].get(name, None)) for name, version in self.SOCKETS.items()}
-        self.sockets["UserInterface"] = pop.DummySocket("UserInterface", os.path.abspath(
-            f"plugins/UserInterface"), '0.0.1', '__template__.py')
+        self.sockets["UserInterface"] = pop.DummySocket(
+            "UserInterface",
+            os.path.abspath('plugins/UserInterface'),
+            '0.0.1',
+            '__template__.py',
+        )
+
 
         self.defined = {}
         self.proof = None
@@ -117,11 +120,10 @@ class Session(object):
         """Zwraca plugin aktualnie podłączony do gniazda o podanej nazwie"""
         if (sock := self.sockets.get(socket, None)) is None:
             raise EngineError(f"There is no socket named {socket}")
-        else:
-            try:
-                return sock()
-            except PluginError as e:
-                raise EngineError(str(e))
+        try:
+            return sock()
+        except PluginError as e:
+            raise EngineError(str(e))
 
     @EngineChangeLog
     def plug_switch(self, socket_or_old: str, new: str) -> None:
@@ -353,7 +355,7 @@ class Session(object):
         closure, info = self.proof.deal_closure(
             self.acc('Formal'), branch_name)
         if closure:
-            EngineLog(f"Closing {branch_name}: {str(closure)}, {info=}")
+            EngineLog(f'Closing {branch_name}: {closure}, info={info!r}')
             return info
         else:
             return None
