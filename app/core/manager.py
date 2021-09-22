@@ -118,7 +118,7 @@ class FileManager(object):
             try:
                 response = web_request.urlopen(f"{REPO_URL}/files.json", context=self.context())
             except URLError as e:
-                return f'Couldn\'t download the file list'
+                return "Couldn't download the file list"
             files = loads(response.read())
             self.plugins = files['plugins']
             self.setups = files['setups']

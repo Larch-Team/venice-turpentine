@@ -495,7 +495,7 @@ class Session(object):
 
             for rule in rules_to_perform:
                 self.proof.perform_usedrule(rule)
-            return('Proof loaded successfully')            
+            return 'Proof loaded successfully'
 
 
     # Proof assist
