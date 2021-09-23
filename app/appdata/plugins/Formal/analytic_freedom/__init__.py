@@ -14,7 +14,7 @@ from sentence import Sentence
 from usedrule import UsedRule
 
 SOCKET = 'Formal'
-VERSION = '0.2.0'
+VERSION = '0.3.0'
 
 PRECEDENCE = {
     'and': 3,
@@ -213,6 +213,10 @@ def check_closure(branch: list[Sentence], used: History) -> tp.Union[None, tuple
 def get_rules_docs() -> dict[str, str]:
     """Zwraca reguły rachunku z opisem"""
     return {rule.name: rule.__doc__ for rule in RULES.values()}
+
+def get_rules_symbolic() -> dict[str, str]:
+    """Zwraca reguły rachunku z zapisem symbolicznym"""
+    return {rule.name: rule.symbolic for rule in RULES.values()}
 
 
 def get_needed_context(rule_name: str) -> tuple[utils.ContextDef]:

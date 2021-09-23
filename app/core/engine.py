@@ -498,6 +498,10 @@ class Session(object):
     def getrules(self) -> dict[str, str]:
         """Zwraca nazwy reguł wraz z dokumentacją"""
         return self.acc('Formal').get_rules_docs()
+    
+    def getrulessymbol(self) -> dict[str, str]:
+        """Zwraca nazwy reguł wraz z zapisem symbolicznym"""
+        return self.acc('Formal').get_rules_symbolic()
 
     def gettree(self) -> list[str]:
         """Zwraca całość drzewa jako listę ciągów znaków"""

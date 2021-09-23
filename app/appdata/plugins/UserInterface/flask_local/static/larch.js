@@ -36,6 +36,9 @@ function new_proof(e) {
     }
 }
 
+function use_rule(branch, tokenID, sentenceID) {
+    console.log(branch)
+}
 
 document.getElementById("new_proof").addEventListener("click", new_proof)
 document.getElementById("start").addEventListener("click", nextPage)

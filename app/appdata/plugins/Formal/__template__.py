@@ -10,7 +10,7 @@ from sentence import Sentence
 from usedrule import UsedRule
 
 SOCKET = 'Formal'
-VERSION = '0.2.0'
+VERSION = '0.3.0'
 
 def get_tags() -> tuple[str]:
     pass
@@ -39,6 +39,9 @@ def get_rules_docs() -> dict[str, str]:
     """Zwraca reguły rachunku z opisem"""
     pass
 
+def get_rules_symbolic() ->  dict[str, str]:
+    """Zwraca reguły w formie symbolicznej rachunku z opisem"""
+    pass
 
 def get_needed_context(rule_name: str) -> tuple[utils.ContextDef]:
     """Zwraca informacje o wymaganym przez daną regułę kontekście w formie obiektów ContextDef"""

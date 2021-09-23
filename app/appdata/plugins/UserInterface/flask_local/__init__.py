@@ -9,7 +9,7 @@ import webbrowser
 from engine import Session, contextdef_translate
 from exceptions import EngineError
 from collections import namedtuple
-from flask_local.libs import JSONResponse, get_clickable
+from flask_local.libs import JSONResponse, get_clickable, symbol_HTML
 
 SOCKET = 'UserInterface'
 VERSION = '0.0.1'
@@ -112,7 +112,9 @@ def do_get_table():
 
 @app.route('/API/rules', methods=['GET'])
 def do_get_rules():
-    return session.getrules()
+    rules = session.getrulessymbol()
+    docs = session.getrules()
+    return {key:{'symbolic':symbol_HTML(rules[key]), 'docs':docs[key]} for key in rules}
 
 @app.route('/API/undo', methods=['POST'])
 def do_undo() -> str:
