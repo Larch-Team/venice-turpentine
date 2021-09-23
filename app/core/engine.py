@@ -66,7 +66,7 @@ class Session(object):
     """
     ENGINE_VERSION = '0.0.1'
     SOCKETS = {'Assistant': '0.0.1',
-               'Formal': '0.2.0',
+               'Formal': '0.3.0',
                'Lexicon': '0.0.1',
                'Output': '0.2.0'}
     SOCKETS_NOT_IN_CONFIG = ()
