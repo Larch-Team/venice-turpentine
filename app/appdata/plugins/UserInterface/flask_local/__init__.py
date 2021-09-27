@@ -107,13 +107,15 @@ def do_get_worktree():
 def do_get_table(table=None,node = session.proof.nodes):
     # style = '<style> table, th, td {border: 1px solid black; border-collapse: collapse;} </style>'
     if table == None:
-        table = ['<table>',''.join(['<tr><th>',node.sentence,'; ',node.branch,'; ',node.layer,'</th></tr>']),'</table']
+        table = ['<table>',''.join(['<tr><th>',node.sentence,'; ',node.branch,'; ',node.layer,'</th></tr>'])]
+        do_get_table(table=table, node = node)
     else:
         if len(node.children)==0:
             table.append(''.join(['<th><table><tr>',node.sentence,'; ',node.branch,'; ',node.layer,'</tr></table></tr>']))
         else:
             for child in node.children:
                 table.append(''.join(['<th><table><tr>', node.sentence, ';', node.branch, ';', node.layer,'</tr><th><table>',do_get_table(table=table, node=child), '</table></th></table></th>']))
+    table.append('</table>')
     return table
         
 
