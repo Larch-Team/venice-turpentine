@@ -104,10 +104,18 @@ def do_get_worktree():
     return get_clickable(session.proof.nodes.sentence, 0, session.proof.nodes.branch)
 
 @app.route('/API/table', methods=['GET'])
-def do_get_table():
-    node = session.proof.nodes
-    html = ['<style> table, th, td {border: 1px solid black; border-collapse: collapse;} </style>','<table>','<tr><th>Proof</th></tr>','</table']
-    # for layer in layers:
+def do_get_table(table=None,node = session.proof.nodes):
+    # style = '<style> table, th, td {border: 1px solid black; border-collapse: collapse;} </style>'
+    if table == None:
+        table = ['<table>',''.join(['<tr><th>',node.sentence,'; ',node.branch,'; ',node.layer,'</th></tr>']),'</table']
+    else:
+        if len(node.children)==0:
+            table.append(''.join(['<th><table><tr>',node.sentence,'; ',node.branch,'; ',node.layer,'</tr></table></tr>']))
+        else:
+            for child in node.children:
+                table.append(''.join(['<th><table><tr>', node.sentence, ';', node.branch, ';', node.layer,'</tr><th><table>',do_get_table(table=table, node=child), '</table></th></table></th>']))
+    return table
+        
 
 
 @app.route('/API/rules', methods=['GET'])
