@@ -9,8 +9,8 @@ import webbrowser
 from engine import Session, contextdef_translate
 from exceptions import EngineError
 from collections import namedtuple
-from flask_local.libs import JSONResponse, get_clickable, symbol_HTML
-from plugins.UserInterface.flask_local.libs import get_tree
+from flask_local.libs import JSONResponse, get_clickable, symbol_HTML, get_tree, get_preview
+from proof import Proof
 
 SOCKET = 'UserInterface'
 VERSION = '0.0.1'
@@ -110,6 +110,15 @@ def do_get_worktree():
         return table
     except EngineError as e:
         return f'<code>{e}</code>'
+
+
+@app.route('/API/preview', methods=['POST'])
+def do_preview():
+    rule = request.json['rule']
+    branch_name = request.json['branch']
+    context = request.json['context']
+    ret = session.proof.preview(branch_name, rule, context)
+    return get_preview(ret)
 
 
 @app.route('/API/rules', methods=['GET'])

@@ -3,7 +3,7 @@ from typing import Any, Iterator
 from string import Template
 
 from sentence import Sentence
-from tree import ProofNode
+from tree import ProofNode, SentenceTupleStructure
 
 def JSONResponse(type_: str, content: Any = None):
     return {'type':type_, 'content': content} if content is not None else {'type':type_}
@@ -33,3 +33,11 @@ def get_tree(node: ProofNode, table = None):
             table.append(''.join(['<th><table><tr>', get_clickable(node.sentence, len(node.ancestors), node.branch), '</tr><th><table>', get_tree(child, table=table), '</table></th></table></th>']))
     table.append('</table>')
     return "".join(table)
+
+def get_preview(render: SentenceTupleStructure):
+    max_len = max(len(i) for i in render)
+    render = (i+("")*(max_len(len(i))) for i in render)
+    table = []
+    for row in zip(*render):
+        table += ['<tr>', *["<td>"+i.getReadable()+"</td>" for i in row], '</tr>']
+    return f"<table> {''.join(table)} </table>"

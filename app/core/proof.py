@@ -9,7 +9,7 @@ from exceptions import EngineError, FormalError, UserMistake
 from history import History
 from pop_engine import Module
 from sentence import Sentence
-from tree import ProofNode
+from tree import ProofNode, SentenceTupleStructure
 from usedrule import UsedRule
 from colors import get_branch_name
 
@@ -104,6 +104,22 @@ class Proof(object):
         self.nodes.insert_history(used_extention, children)
 
         self.metadata['usedrules'].append(UsedRule(layer, branch_name, rule, self, context, decisions))
+        
+        
+    def preview(self, branch_name: str, rule: str, context: dict[str, Any], decisions: dict = None) -> SentenceTupleStructure:
+        FormalSystem = self.S.acc('Formal')
+
+        # Statement and used retrieving
+        old = self.nodes.getleaf(branch_name)
+        branch = old.getbranch_sentences()[0][:]
+        used = old.gethistory()
+
+        # Rule execution
+        try:
+            out, _ = FormalSystem.use_rule(rule, branch, used, context, decisions)
+        except FormalError as e:
+            return ()
+        return out
 
 
     def perform_usedrule(self, usedrule: UsedRule):
