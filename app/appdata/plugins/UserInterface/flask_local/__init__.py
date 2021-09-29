@@ -123,9 +123,19 @@ def do_preview():
 
 @app.route('/API/rules', methods=['GET'])
 def do_get_rules():
-    rules = session.getrulessymbol()
+    tokenID = request.args.get('tokenID', default = None, type = int)
+    sentenceID = request.args.get('sentenceID', default = None, type = int)
+    branch = request.args.get('branch', default = None, type = str)
+
     docs = session.getrules()
-    return {key:{'symbolic':symbol_HTML(rules[key]), 'docs':docs[key]} for key in rules}
+    if session.sockets['Formal'].plugin_name == 'analytic_freedom' and session.proof is not None and branch is not None and sentenceID is not None and tokenID is not None:
+        session.jump(branch)
+        b, _ =session.proof.nodes.getbranch_sentences()
+        token = b[sentenceID].getTypes()[tokenID]
+        docs = {i:j for i,j in docs.items() if i.endswith(token)}
+        
+    rules = session.getrulessymbol()
+    return {key:{'symbolic':symbol_HTML(rules[key]), 'docs':docs[key]} for key in docs}
 
 @app.route('/API/undo', methods=['POST'])
 def do_undo() -> str:
