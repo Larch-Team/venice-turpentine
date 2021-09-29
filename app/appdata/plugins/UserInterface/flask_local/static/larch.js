@@ -31,8 +31,22 @@ function new_proof(e) {
             document.getElementById('clickable-container').innerHTML = text;
         });
         nextPage();
+        getRules();
     } else {
         window.alert(ret["content"])
+    }
+}
+
+function getRules(e) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", 'API/rules');
+    xhr.responseType = 'json';
+    xhr.send();
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            const rules = xhr.response;
+            document.getElementById('rules-container').innerHTML = rules['double not']['symbolic'] + rules['false and']['symbolic'] + rules['false imp']['symbolic'] + rules['false or']['symbolic'] + rules['true and']['symbolic'] + rules['true imp']['symbolic'] + rules['true or']['symbolic'];   
+        }
     }
 }
 
