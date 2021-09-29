@@ -133,9 +133,9 @@ def do_get_rules():
         b, _ =session.proof.nodes.getbranch_sentences()
         token = b[sentenceID].getTypes()[tokenID]
         docs = {i:j for i,j in docs.items() if i.endswith(token)}
-        
+
     rules = session.getrulessymbol()
-    return {key:{'symbolic':symbol_HTML(rules[key]), 'docs':docs[key]} for key in docs}
+    return "".join(symbol_HTML(rules[key], branch, tokenID, sentenceID, docs[key]) for key in docs)
 
 @app.route('/API/undo', methods=['POST'])
 def do_undo() -> str:

@@ -31,21 +31,20 @@ function new_proof(e) {
             document.getElementById('clickable-container').innerHTML = text;
         });
         nextPage();
-        getRules();
     } else {
         window.alert(ret["content"])
     }
 }
 
-function getRules(e) {
+function getRules(branch, tokenID, sentenceID) {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", 'API/rules');
-    xhr.responseType = 'json';
+    xhr.open("GET", 'API/rules?branch='+branch+'&tokenID='+tokenID+'&sentenceID='+sentenceID);
+    xhr.responseType = 'text';
     xhr.send();
     xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
-            const rules = xhr.response;
-            document.getElementById('rules-container').innerHTML = rules['double not']['symbolic'] + rules['false and']['symbolic'] + rules['false imp']['symbolic'] + rules['false or']['symbolic'] + rules['true and']['symbolic'] + rules['true imp']['symbolic'] + rules['true or']['symbolic'];   
+            rules = xhr.response;
+            document.getElementById('rules-container').innerHTML = rules;   
         }
     }
 }
@@ -94,3 +93,28 @@ function updateProgressBar() {
 
     progress.style.width = ((actives.length -1) / (progressSteps.length - 1)) * 100 + "%";
 }
+
+// Buttons
+
+document.addEventListener('keydown', (event) => {
+    switch (event.key) {
+        case "Enter":
+            event.preventDefault();
+            switch (larchStepsNum) {
+                case 0:
+                    document.getElementById("start").click()
+                    break;
+                case 1:
+                    document.getElementById("new_proof").click()
+                    break;
+                case 2:
+
+                default:
+                    break;
+            }
+            break;
+    
+        default:
+            break;
+    }
+})
