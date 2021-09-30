@@ -39,7 +39,7 @@ body {
     color: #ecf0ec;
     text-align: center;
     text-decoration: none;
-    padding: 5px 35px;
+    padding: 20% 100%;
     font-size: 14px;
     font-family: 'Work Sans', sans-serif;
     background-color: #ad0a0a;
@@ -65,7 +65,8 @@ h1 {
 
 .btn {
     background-color: #2d5b30;
-    padding: 10px 35px;
+    border: none;
+    padding: 3% 5%;
     color: #ecf0ec;
     border-radius: 5px;
     text-align: center;
@@ -73,10 +74,15 @@ h1 {
     font-size: 13px;
 }
 
+#start {
+    padding: 1% 2%;
+}
+
 .container {
     display: none;
     text-align: center;
-    margin-top: 30px;
+    margin-top: 5%;
+    margin-bottom: 5%;
 }
 
 .semi-container {
@@ -144,14 +150,12 @@ h1 {
     display: grid;
     grid-template-columns: auto auto;
     justify-content: space-evenly;
-    margin-top: 100px;
 }
 
 .main-larch-rules {
     display: grid;
-    grid-template-columns: auto 12% auto;
+    grid-template-columns: auto 15% auto;
     justify-content: space-evenly;
-    margin-top: 100px;
 }
 
 .btn-main {
@@ -162,17 +166,18 @@ h1 {
 
 .hints {
     background-color: #ffffff;
-    border-radius: 20px;
+    border-radius: 5%;
     text-align: left;
     font-size: 14px;
-    line-height: 20px;
+    line-height: 1.6em;
     font-family: 'Work Sans', sans-serif;
-    padding: 20px;
-    max-width: 380px;
+    padding: 5%;
+    max-width: 30em;
+    max-height: 12.5em;
 }
 
 .hints p, a {
-    margin-bottom: 20px;
+    margin-bottom: 1.6em;
 }
 
 .hints a {
@@ -188,8 +193,8 @@ h1 {
 
 #formula {
     width: 100%;
-    height: 40px;
-    margin-top: 35px;
+    height: 2.5em;
+    margin-top: 5%;
 }
 
 .main-larch2 {
@@ -249,8 +254,7 @@ h1 {
     justify-content: center;
     align-items: center;
     font-size: 13px;
-    border-radius: 5%;
-    height: 4.5em;
+    padding: 10%;
 }
 
 .symbolic > div {
@@ -278,4 +282,19 @@ hr {
     grid-template-columns: 40% 40%;
     justify-content: space-evenly;
     grid-row-gap: 0.5em;
+}
+
+#rules-container button {
+    background-color: #ffffff;
+    border: none;
+}
+
+#rules-title {
+    display: none;
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 15%;
+    margin-top: 15%;
+    background-color: #ffffff;
+    padding: 5%;
 }

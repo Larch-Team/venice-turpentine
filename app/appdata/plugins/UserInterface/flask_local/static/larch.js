@@ -45,6 +45,7 @@ function getRules(branch, tokenID, sentenceID) {
         if (xhr.readyState === 4) {
             rules = xhr.response;
             document.getElementById('rules-container').innerHTML = rules;   
+            document.getElementById('rules-title').style.display = "block";
         }
     }
 }
