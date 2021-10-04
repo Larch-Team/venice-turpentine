@@ -8,10 +8,10 @@ from tree import ProofNode, SentenceTupleStructure
 def JSONResponse(type_: str, content: Any = None):
     return {'type':type_, 'content': content} if content is not None else {'type':type_}
 
-def symbol_HTML(rule: str, branch: str, tID: int, sID: int, tooltip: str):
-    rule = rule.replace(";", "<br>").replace("|", "</div> <div>")
-    premiss, result = rule.split(" / ")
-    return f'''<button type="button" onclick="use_rule('{branch}', {tID}, {sID})" title="{tooltip}">
+def symbol_HTML(rule: str, symbolic: str, branch: str, tID: int, sID: int, tooltip: str):
+    symbolic = symbolic.replace(";", "<br>").replace("|", "</div> <div>")
+    premiss, result = symbolic.split(" / ")
+    return f'''<button type="button" onclick="use_rule('{rule}', '{branch}', {tID}, {sID})" title="{tooltip}">
     <div class="symbolic"><div>{premiss}</div></div>
     <hr>
     <div class="symbolic"><div>{result}</div></div></button>'''

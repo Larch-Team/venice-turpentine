@@ -135,7 +135,7 @@ def do_get_rules():
         docs = {i:j for i,j in docs.items() if i.endswith(token)}
 
     rules = session.getrulessymbol()
-    return "".join(symbol_HTML(rules[key], branch, tokenID, sentenceID, docs[key]) for key in docs)
+    return "".join(symbol_HTML(key, rules[key], branch, tokenID, sentenceID, docs[key]) for key in docs)
 
 @app.route('/API/undo', methods=['POST'])
 def do_undo() -> str:

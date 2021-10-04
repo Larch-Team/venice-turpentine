@@ -50,7 +50,7 @@ function getRules(branch, tokenID, sentenceID) {
     }
 }
 
-function use_rule(branch, tokenID, sentenceID) {
+function use_rule(rule_name, branch, tokenID, sentenceID) {
     console.log(branch)
 }
 
