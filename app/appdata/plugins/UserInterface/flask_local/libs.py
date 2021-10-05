@@ -27,14 +27,13 @@ def _clickable(sentence: Sentence, sentenceID: int, branch: str) -> Iterator[str
 def get_clickable(sentence: Sentence, sentenceID: int, branch: str):
     return " ".join(_clickable(sentence, sentenceID, branch))
 
-def get_tree(node: ProofNode, table = None):
-    table = table or ['<table>']
-    if len(node.children)==0:
-        table.append(''.join(['<th><table><tr>', get_clickable(node.sentence, len(node.ancestors), node.branch), '</tr></table></tr>']))
-    else:
+def get_tree(node: ProofNode):
+    table = [get_clickable(node.sentence, len(node.ancestors), node.branch)]
+    if node.children:
+        table.append('<div class="symbolic">') # symbolic to zły wybór, ale ma potencjał!!!!
         for child in node.children:
-            table.append(''.join(['<th><table><tr>', get_clickable(node.sentence, len(node.ancestors), node.branch), '</tr><th><table>', get_tree(child, table=table), '</table></th></table></th>']))
-    table.append('</table>')
+            table.append(''.join(['<div>', get_tree(child), '</div>']))
+        table.append('</div>')
     return "".join(table)
 
 def get_preview(render: SentenceTupleStructure):

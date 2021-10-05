@@ -61,7 +61,7 @@ def do_use_rule():
     if context_info is None:
         return JSONResponse(type_='error', content="No such rule")
     for variable, official, _, type_ in context_info:
-        if not context.get(variable):
+        if variable not in context:
             return JSONResponse(type_='error', content=f"{official} is not provided to the rule")
 
         vartype = contextdef_translate(type_)
@@ -129,8 +129,7 @@ def do_get_rules():
 
     docs = session.getrules()
     if session.sockets['Formal'].plugin_name == 'analytic_freedom' and session.proof is not None and branch is not None and sentenceID is not None and tokenID is not None:
-        session.jump(branch)
-        b, _ =session.proof.nodes.getbranch_sentences()
+        b, _ =session.proof.nodes.getleaf(branch).getbranch_sentences()
         token = b[sentenceID].getTypes()[tokenID]
         docs = {i:j for i,j in docs.items() if i.endswith(token)}
 

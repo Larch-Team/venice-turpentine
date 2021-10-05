@@ -63,7 +63,15 @@ function use_rule(rule_name, branch, tokenID, sentenceID) {
     console.log(jsonData);
     xhr.open('POST', 'API/use_rule', true);
     xhr.setRequestHeader("Content-type", "application/json");
-    xhr.send(JSON.stringify(jsonData));  
+    xhr.send(JSON.stringify(jsonData));
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            console.log(xhr.responseText);
+            getProof('/API/worktree', function(text) {
+                document.getElementById('clickable-container').innerHTML = text;
+            });
+        }
+    };
 }
 
 document.getElementById("new_proof").addEventListener("click", new_proof)
