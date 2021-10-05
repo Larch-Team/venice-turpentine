@@ -51,7 +51,19 @@ function getRules(branch, tokenID, sentenceID) {
 }
 
 function use_rule(rule_name, branch, tokenID, sentenceID) {
-    console.log(branch)
+    var xhr = new XMLHttpRequest();
+    var jsonData= {
+        "rule":rule_name,
+        "branch":branch,
+        "context": {
+            "tokenID":tokenID,
+            "sentenceID":sentenceID
+            }
+        };
+    console.log(jsonData);
+    xhr.open('POST', 'API/use_rule', true);
+    xhr.setRequestHeader("Content-type", "application/json");
+    xhr.send(JSON.stringify(jsonData));  
 }
 
 document.getElementById("new_proof").addEventListener("click", new_proof)
