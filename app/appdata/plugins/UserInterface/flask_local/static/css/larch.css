@@ -154,7 +154,7 @@ h1 {
 
 .main-larch-rules {
     display: grid;
-    grid-template-columns: auto 15% auto;
+    grid-template-columns: 25% 15% auto;
     justify-content: space-evenly;
 }
 
@@ -188,7 +188,7 @@ h1 {
     font-size: 18px;
     font-family: 'Spectral', sans-serif;
     font-weight: bold;
-    text-align: left;
+    text-align: center;
 }
 
 #formula {
@@ -247,6 +247,10 @@ h1 {
 #clickable-container button:hover {
     text-decoration: underline;
     cursor: pointer;
+}
+
+#clickable-container {
+    font-size: 1em;
 }
 
 .symbolic {
