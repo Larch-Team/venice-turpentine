@@ -27,7 +27,7 @@ def index():
 
 @app.route('/run', methods=['GET'])
 def larch():
-    return render_template('larch.html')
+    return render_template('larch.html', hint_start = "<div>"+"</div><div>".join(session.start_help())+"</div>")
 
 # API
 
@@ -87,7 +87,7 @@ def do_use_rule():
             print(f"rule used {rule=} {branch_name=}")
             return JSONResponse('success')
         
-@app.route('/API/hint', methods=['GET'])       
+@app.route('/API/hint/wanted', methods=['GET'])       
 def do_hint() -> str:
     """Gives you a hint"""
     try:
