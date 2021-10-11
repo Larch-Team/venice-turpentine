@@ -2,6 +2,7 @@
 Tutaj umieść dokumentację swojego pluginu
 """
 from typing import Any
+from close import Contradiction
 from manager import FileManager
 import plugins.UserInterface.__utils__ as utils
 from flask import Flask, render_template, request
@@ -18,18 +19,21 @@ VERSION = '0.0.1'
 
 app = Flask('flask_local', static_url_path='/static')
 session = Session('main', 'config.json')
-#TODO: dodać po skończeniu setup update
+# TODO: dodać po skończeniu setup update
+
 
 @app.route('/', methods=['GET'])
 def index():
     session.reset_proof()
     return render_template('index.html')
 
+
 @app.route('/run', methods=['GET'])
 def larch():
-    return render_template('larch.html', hint_start = "<div>"+"</div><div>".join(session.start_help())+"</div>")
+    return render_template('larch.html', hint_start="<div>"+"</div><div>".join(session.start_help())+"</div>")
 
 # API
+
 
 @app.route('/API/new_proof', methods=['POST'])
 def do_new_proof():
@@ -48,13 +52,14 @@ def do_new_proof():
         else:
             print("New proof")
             return JSONResponse('success')
-        
+
+
 @app.route('/API/use_rule', methods=['POST'])
 def do_use_rule():
     rule = request.json['rule']
     branch_name = request.json['branch']
     context = request.json['context']
-    
+
     # Check context
     context_info = session.context_info(rule)
     prepared = {}
@@ -69,9 +74,9 @@ def do_use_rule():
             new = vartype(context[variable])
         except ValueError:
             return JSONResponse(type_='error', content=f"{official} is of a wrong type")
-        
+
         prepared[variable] = new
-    
+
     # Run use_rule
     try:
         session.jump(branch_name)
@@ -86,8 +91,9 @@ def do_use_rule():
         else:
             print(f"rule used {rule=} {branch_name=}")
             return JSONResponse('success')
-        
-@app.route('/API/hint/wanted', methods=['GET'])       
+
+
+@app.route('/API/hint/wanted', methods=['GET'])
 def do_hint() -> str:
     """Gives you a hint"""
     try:
@@ -98,12 +104,12 @@ def do_hint() -> str:
         return JSONResponse(type_='success', content=hints)
     else:
         return JSONResponse(type_='error', content="Podpowiedzi nie ma, trzymaj się tam")
-    
-        
+
+
 @app.route('/API/worktree', methods=['GET'])
 def do_get_worktree():
-    if not session.proof: 
-            return "no proof"
+    if not session.proof:
+        return "no proof"
 
     try:
         table = get_tree(session.proof.nodes)
@@ -123,18 +129,19 @@ def do_preview():
 
 @app.route('/API/rules', methods=['GET'])
 def do_get_rules():
-    tokenID = request.args.get('tokenID', default = None, type = int)
-    sentenceID = request.args.get('sentenceID', default = None, type = int)
-    branch = request.args.get('branch', default = None, type = str)
+    tokenID = request.args.get('tokenID', default=None, type=int)
+    sentenceID = request.args.get('sentenceID', default=None, type=int)
+    branch = request.args.get('branch', default=None, type=str)
 
     docs = session.getrules()
     if session.sockets['Formal'].plugin_name == 'analytic_freedom' and session.proof is not None and branch is not None and sentenceID is not None and tokenID is not None:
-        b, _ =session.proof.nodes.getleaf(branch).getbranch_sentences()
+        b, _ = session.proof.nodes.getleaf(branch).getbranch_sentences()
         token = b[sentenceID].getTypes()[tokenID]
-        docs = {i:j for i,j in docs.items() if i.endswith(token)}
+        docs = {i: j for i, j in docs.items() if i.endswith(token)}
 
     rules = session.getrulessymbol()
     return "".join(symbol_HTML(key, rules[key], branch, tokenID, sentenceID, docs[key]) for key in docs)
+
 
 @app.route('/API/undo', methods=['POST'])
 def do_undo() -> str:
@@ -144,6 +151,32 @@ def do_undo() -> str:
         return JSONResponse(type_='success')
     except EngineError as e:
         return JSONResponse(type_='error', content=str(e))
+
+
+@app.route('/API/contra', methods=['POST'])
+def do_undo() -> str:
+    """Check contradiction"""
+    branch_name = request.json['branch']
+    sID1 = request.json['sendenceID1']
+    sID2 = request.json['sentenceID2']
+    try:
+        branch, closed = session.proof.nodes.getleaf(
+            branch_name).getbranch_sentences()
+        if closed:
+            return JSONResponse(type_='error', content="Branch already closed")
+        elif (branch[sID1].getNonNegated() == branch[sID2].getNonNegated() and
+              len(branch[sID1].reduceBrackets()) - len(branch[sID2].reduceBrackets()) % 2 == 1):
+            session.proof.nodes.getleaf(branch_name).close(Contradiction(sentenceID1 = sID1+1, sentenceID2 = sID2+1))
+            return JSONResponse(type_='success')
+        else:
+            return JSONResponse(type_='error', content="Branch couldn't be closed")
+    except EngineError as e:
+        return JSONResponse(type_='error', content=str(e))
+
+
+#
+# TEMPLATE
+#
 
 def run() -> int:
     """
