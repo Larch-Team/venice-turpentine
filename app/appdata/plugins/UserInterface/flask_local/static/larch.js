@@ -74,8 +74,14 @@ function use_rule(rule_name, branch, tokenID, sentenceID) {
     };
 }
 
+function branchCheckPage() {
+    document.getElementById("checking-container").appendChild(document.getElementById("clickable-container"));
+    nextPage();
+}
+
 document.getElementById("new_proof").addEventListener("click", new_proof)
 document.getElementById("start").addEventListener("click", nextPage)
+document.getElementById("check").addEventListener("click", branchCheckPage)
 
 function nextPage() {
     larchStepsNum++;

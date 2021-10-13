@@ -185,10 +185,9 @@ h1 {
 }
 
 .larch-subcontainer {
-    font-size: 18px;
+    font-size: 1em;
     font-family: 'Spectral', sans-serif;
     font-weight: bold;
-    text-align: center;
 }
 
 #formula {
@@ -251,6 +250,16 @@ h1 {
 
 #clickable-container {
     font-size: 1em;
+    text-align: center;
+    margin-top: 1em;
+}
+
+.symbolic2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 13px;
+    padding: 1em 3em;
 }
 
 .symbolic {
@@ -261,7 +270,7 @@ h1 {
     padding: 10%;
 }
 
-.symbolic > div {
+.symbolic > div, .symbolic2 > div {
     width: 100%;
     text-align: center;
     height: 100%; 
@@ -301,4 +310,34 @@ hr {
     margin-top: 15%;
     background-color: #ffffff;
     padding: 5%;
+}
+
+.new-window {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    transition: 200ms ease-in-out;
+    border-radius: 10%;
+    z-index: 10;
+    background-color: white;
+    width: 380px;
+    max-width: 80%;
+}
+
+.new-window.active {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+#overlay {
+    position: fixed;
+    opacity: 0;
+    background-color: rgba(0, 0, 0, .5);
+    pointer-events: none;
+    transition: 200ms ease-in-out;
+}
+
+#overlay.active {
+    opacity: 1;
+    pointer-events: all;
 }

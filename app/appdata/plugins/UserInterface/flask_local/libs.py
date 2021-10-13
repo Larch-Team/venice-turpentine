@@ -30,7 +30,7 @@ def get_clickable(sentence: Sentence, sentenceID: int, branch: str):
 def get_tree(node: ProofNode):
     table = [get_clickable(node.sentence, len(node.ancestors), node.branch)]
     if node.children:
-        table.append('<div class="symbolic">') # symbolic to zły wybór, ale ma potencjał!!!!
+        table.append('<div class="symbolic2">') # symbolic to zły wybór, ale ma potencjał!!!!
         for child in node.children:
             table.append(''.join(['<div>', get_tree(child), '</div>']))
         table.append('</div>')
