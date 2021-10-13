@@ -154,7 +154,7 @@ def do_undo() -> str:
 
 
 @app.route('/API/contra', methods=['POST'])
-def do_undo() -> str:
+def do_contra() -> str:
     """Check contradiction"""
     branch_name = request.json['branch']
     sID1 = request.json['sendenceID1']
