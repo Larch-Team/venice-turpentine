@@ -117,6 +117,19 @@ def do_get_worktree():
     except EngineError as e:
         return f'<code>{e}</code>'
 
+@app.route('/API/branch', methods=['GET'])
+def do_get_branch():
+    branch = request.args.get('branch', default=None, type=str)
+    if not session.proof:
+        return "no proof"
+
+    try:
+        session.jump(branch)
+        return session.getbranch_strings()[0]
+    except EngineError as e:
+        return f'<code>{e}</code>'
+
+
 
 @app.route('/API/preview', methods=['POST'])
 def do_preview():
