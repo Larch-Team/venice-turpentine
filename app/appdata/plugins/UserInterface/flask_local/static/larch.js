@@ -76,8 +76,35 @@ function use_rule(rule_name, branch, tokenID, sentenceID) {
 
 function branchCheckPage() {
     document.getElementById("checking-container").appendChild(document.getElementById("clickable-container"));
+    var removing = document.querySelectorAll(".trying");
+    for (var r = 0; r < removing.length; r++) {
+      removing[r].removeAttribute("onclick");
+    };
+    var lastItem = document.querySelectorAll(".symbolic2");
+    var lastItem2 = lastItem[lastItem.length -1];
+    var lastButtons = lastItem2.querySelectorAll(".trying");
+    for (var i = 0; i < lastButtons.length; i++) {
+        lastButtons[i].setAttribute("onclick",  "getBranch();");
+      };
     nextPage();
 }
+
+function getBranch() {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", 'API/branch', true);
+    xhr.responseType = 'text';
+    xhr.send();
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            branch = xhr.response;
+            document.getElementById("checking-window").classList.add("active");
+            document.getElementById("overlay").classList.add("active");
+            document.getElementById("branch-container").innerHTML = branch;
+        }
+    };
+}
+
+
 
 document.getElementById("new_proof").addEventListener("click", new_proof)
 document.getElementById("start").addEventListener("click", nextPage)

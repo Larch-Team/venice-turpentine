@@ -18,7 +18,7 @@ def symbol_HTML(rule: str, symbolic: str, branch: str, tID: int, sID: int, toolt
     
 
 # TODO: uzupełnić tag
-Tag = Template('<button type="button" onclick="getRules(\'$branch\', $tID, $sID)">$symbol</button>')
+Tag = Template('<button type="button" class="trying" onclick="getRules(\'$branch\', $tID, $sID)">$symbol</button>')
 
 def _clickable(sentence: Sentence, sentenceID: int, branch: str) -> Iterator[str]:
     for tID, symbol in enumerate(sentence.getReadableList()):
