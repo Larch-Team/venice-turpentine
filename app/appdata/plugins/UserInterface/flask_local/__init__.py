@@ -136,7 +136,7 @@ def do_get_branch():
 
     try:
         session.jump(branch)
-        return tuple(session.getbranch_strings()[0])
+        return "<br>".join(session.getbranch_strings()[0])
     except EngineError as e:
         return f'<code>{e}</code>'
 
