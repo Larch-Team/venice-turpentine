@@ -15,7 +15,7 @@ function sendPOST(url, body) {
 
 function getProof(url, callback) {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", 'API/worktree', true);
+    xhr.open("GET", url, true);
     xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
             callback(xhr.responseText);
@@ -75,23 +75,25 @@ function use_rule(rule_name, branch, tokenID, sentenceID) {
 }
 
 function branchCheckPage() {
-    document.getElementById("checking-container").appendChild(document.getElementById("clickable-container"));
-    var removing = document.querySelectorAll(".trying");
-    for (var r = 0; r < removing.length; r++) {
-      removing[r].removeAttribute("onclick");
-    };
-    var lastItem = document.querySelectorAll(".symbolic2");
-    var lastItem2 = lastItem[lastItem.length -1];
-    var lastButtons = lastItem2.querySelectorAll(".trying");
-    for (var i = 0; i < lastButtons.length; i++) {
-        lastButtons[i].setAttribute("onclick",  "getBranch();");
-      };
+    getProof('API/contratree', function(text) {
+        document.getElementById('checking-container').innerHTML = text;
+    });
+    // var removing = document.querySelectorAll(".trying");
+    // for (var r = 0; r < removing.length; r++) {
+    //   removing[r].removeAttribute("onclick");
+    // };
+    // var lastItem = document.querySelectorAll(".symbolic2");
+    // var lastItem2 = lastItem[lastItem.length -1];
+    // var lastButtons = lastItem2.querySelectorAll(".trying");
+    // for (var i = 0; i < lastButtons.length; i++) {
+    //     lastButtons[i].setAttribute("onclick",  "getBranch();");
+    //   };
     nextPage();
 }
 
-function getBranch() {
+function getBranch(branch_name) {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", 'API/branch', true);
+    xhr.open("GET", 'API/branch?branch='+branch_name, true);
     xhr.responseType = 'text';
     xhr.send();
     xhr.onreadystatechange = function() {

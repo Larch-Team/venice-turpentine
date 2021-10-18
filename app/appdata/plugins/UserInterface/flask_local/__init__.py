@@ -10,7 +10,8 @@ import webbrowser
 from engine import Session, contextdef_translate
 from exceptions import EngineError
 from collections import namedtuple
-from flask_local.libs import JSONResponse, get_clickable, symbol_HTML, get_tree, get_preview
+from flask_local.libs import JSONResponse, get_clickable, symbol_HTML, get_tree_clickable, get_preview
+from plugins.UserInterface.flask_local.libs import get_tree_contra
 from proof import Proof
 
 SOCKET = 'UserInterface'
@@ -112,10 +113,20 @@ def do_get_worktree():
         return "no proof"
 
     try:
-        table = get_tree(session.proof.nodes)
-        return table
+        return get_tree_clickable(session.proof.nodes)
     except EngineError as e:
         return f'<code>{e}</code>'
+    
+@app.route('/API/contratree', methods=['GET'])
+def do_get_contratree():
+    if not session.proof:
+        return "no proof"
+
+    try:
+        return get_tree_contra(session.proof.nodes)
+    except EngineError as e:
+        return f'<code>{e}</code>'
+
 
 @app.route('/API/branch', methods=['GET'])
 def do_get_branch():
@@ -125,10 +136,9 @@ def do_get_branch():
 
     try:
         session.jump(branch)
-        return session.getbranch_strings()[0]
+        return tuple(session.getbranch_strings()[0])
     except EngineError as e:
         return f'<code>{e}</code>'
-
 
 
 @app.route('/API/preview', methods=['POST'])

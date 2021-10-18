@@ -15,10 +15,9 @@ def symbol_HTML(rule: str, symbolic: str, branch: str, tID: int, sID: int, toolt
     <div class="symbolic"><div>{premiss}</div></div>
     <hr>
     <div class="symbolic"><div>{result}</div></div></button>'''
-    
 
 # TODO: uzupełnić tag
-Tag = Template('<button type="button" class="trying" onclick="getRules(\'$branch\', $tID, $sID)">$symbol</button>')
+Tag = Template('<button type="button" onclick="getRules(\'$branch\', $tID, $sID)">$symbol</button>')
 
 def _clickable(sentence: Sentence, sentenceID: int, branch: str) -> Iterator[str]:
     for tID, symbol in enumerate(sentence.getReadableList()):
@@ -27,13 +26,23 @@ def _clickable(sentence: Sentence, sentenceID: int, branch: str) -> Iterator[str
 def get_clickable(sentence: Sentence, sentenceID: int, branch: str):
     return " ".join(_clickable(sentence, sentenceID, branch))
 
-def get_tree(node: ProofNode):
+def get_tree_clickable(node: ProofNode):
     table = [get_clickable(node.sentence, len(node.ancestors), node.branch)]
     if node.children:
-        table.append('<div class="symbolic2">') # symbolic to zły wybór, ale ma potencjał!!!!
+        table.append('<div class="symbolic2">')
         for child in node.children:
-            table.append(''.join(['<div>', get_tree(child), '</div>']))
+            table.append(''.join(['<div>', get_tree_clickable(child), '</div>']))
         table.append('</div>')
+    return "".join(table)
+
+def get_tree_contra(node: ProofNode):
+    if node.children:
+        table = [node.sentence.getReadable(), '<div class="symbolic2">']
+        for child in node.children:
+            table.append(''.join(['<div>', get_tree_contra(child), '</div>']))
+        table.append('</div>')
+    else:
+        table = ['<button type="button" onclick="getBranch(\'', node.branch, '\');">', node.sentence.getReadable(), '</button>']
     return "".join(table)
 
 def get_preview(render: SentenceTupleStructure):
