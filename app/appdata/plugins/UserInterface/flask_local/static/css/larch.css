@@ -187,7 +187,6 @@ h1 {
 .larch-subcontainer {
     font-size: 1em;
     font-family: 'Spectral', sans-serif;
-    font-weight: bold;
 }
 
 #formula {
@@ -243,9 +242,24 @@ h1 {
     margin: 2px;
 }
 
-#clickable-container button:hover {
+#clickable-container button:hover, #checking-container button:hover {
     text-decoration: underline;
     cursor: pointer;
+}
+
+#checking-container {
+    text-align: center;
+    margin-top: 1em;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 1em;
+}
+
+#checking-container button {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: 'Work Sans', sans-serif;
+    margin: 2px;
 }
 
 #clickable-container {
@@ -258,7 +272,7 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 13px;
+    font-size: 1em;
     padding: 1em 3em;
 }
 
@@ -270,12 +284,19 @@ h1 {
     padding: 10%;
 }
 
-.symbolic > div, .symbolic2 > div {
+.symbolic > div {
     width: 100%;
     text-align: center;
     height: 100%; 
     box-sizing: border-box;
     font-family: 'Spectral', sans-serif;
+}
+
+.symbolic2 > div {
+    width: 100%;
+    text-align: center;
+    height: 100%; 
+    box-sizing: border-box;
 }
 
 hr {
@@ -323,6 +344,7 @@ hr {
     background-color: white;
     width: 380px;
     max-width: 80%;
+    padding: 2em;
 }
 
 .new-window.active {
@@ -332,6 +354,10 @@ hr {
 #overlay {
     position: fixed;
     opacity: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background-color: rgba(0, 0, 0, .5);
     pointer-events: none;
     transition: 200ms ease-in-out;
@@ -340,4 +366,20 @@ hr {
 #overlay.active {
     opacity: 1;
     pointer-events: all;
+}
+
+#branch-container {
+    display: grid;
+    grid-template-columns: max-content;
+    padding: 1em;
+}
+
+#branch-container button {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: 'Work Sans', sans-serif;
+    margin: 2px;
+    text-align: left;
+    font-size: 18px;
 }
