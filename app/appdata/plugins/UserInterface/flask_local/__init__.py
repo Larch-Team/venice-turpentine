@@ -1,6 +1,7 @@
 """
 Tutaj umieść dokumentację swojego pluginu
 """
+import enum
 from typing import Any
 from close import Contradiction
 from manager import FileManager
@@ -136,7 +137,11 @@ def do_get_branch():
 
     try:
         session.jump(branch)
-        return "<button>"+"</button> <button>".join(session.getbranch_strings()[0]) + "</button>"
+        return " ".join(
+            f'<button onclick="nazwa(\'{branch}\', {i});">{sen}</button>'
+            for i, sen in enumerate(session.getbranch_strings()[0])
+        )
+
     except EngineError as e:
         return f'<code>{e}</code>'
 
