@@ -134,6 +134,10 @@ function checkBranch() {
     xhr.open('POST', 'API/contra', true);
     xhr.setRequestHeader("Content-type", "application/json");
     xhr.send(JSON.stringify(jsonData));
+    // TO ROBOCZO DODAŁEM:
+    getProof('API/contratree', function(text) {
+        document.getElementById('checking-container').innerHTML = text;
+    });
 }
 
 function closeWindow() {
