@@ -123,6 +123,7 @@ function forCheckBranch(branch, sentenceID) {
 }
 
 function checkBranch() {
+    closeWindow();
     var xhr = new XMLHttpRequest();
     var jsonData= {
         "branch":checkingBranch,
@@ -135,11 +136,17 @@ function checkBranch() {
     xhr.send(JSON.stringify(jsonData));
 }
 
+function closeWindow() {
+    document.getElementById("checking-window").classList.remove("active");
+    document.getElementById("overlay").classList.remove("active");
+}
+
 
 document.getElementById("new_proof").addEventListener("click", new_proof)
 document.getElementById("start").addEventListener("click", nextPage)
 document.getElementById("check").addEventListener("click", branchCheckPage)
 document.getElementById("check-branch-btn").addEventListener("click", checkBranch)
+document.getElementById("close-window-btn").addEventListener("click", closeWindow)
 
 function nextPage() {
     larchStepsNum++;
