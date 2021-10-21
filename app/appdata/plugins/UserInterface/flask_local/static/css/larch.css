@@ -242,7 +242,7 @@ h1 {
     margin: 2px;
 }
 
-#clickable-container button:hover, #checking-container button:hover {
+#clickable-container button:hover, #checking-container button:hover, #branch-container button:hover {
     text-decoration: underline;
     cursor: pointer;
 }
