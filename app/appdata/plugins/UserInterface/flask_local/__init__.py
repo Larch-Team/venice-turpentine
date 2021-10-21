@@ -138,7 +138,7 @@ def do_get_branch():
     try:
         session.jump(branch)
         return " ".join(
-            f'<button onclick="nazwa(\'{branch}\', {i});">{sen}</button>'
+            f'<button class="branch-btn" id="btn{i}" onclick="forCheckBranch(\'{branch}\', {i});">{sen}</button>'
             for i, sen in enumerate(session.getbranch_strings()[0])
         )
 
@@ -185,7 +185,7 @@ def do_undo() -> str:
 def do_contra() -> str:
     """Check contradiction"""
     branch_name = request.json['branch']
-    sID1 = request.json['sendenceID1']
+    sID1 = request.json['sentenceID1']
     sID2 = request.json['sentenceID2']
     try:
         branch, closed = session.proof.nodes.getleaf(

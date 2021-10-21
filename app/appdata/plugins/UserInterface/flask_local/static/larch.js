@@ -78,16 +78,6 @@ function branchCheckPage() {
     getProof('API/contratree', function(text) {
         document.getElementById('checking-container').innerHTML = text;
     });
-    // var removing = document.querySelectorAll(".trying");
-    // for (var r = 0; r < removing.length; r++) {
-    //   removing[r].removeAttribute("onclick");
-    // };
-    // var lastItem = document.querySelectorAll(".symbolic2");
-    // var lastItem2 = lastItem[lastItem.length -1];
-    // var lastButtons = lastItem2.querySelectorAll(".trying");
-    // for (var i = 0; i < lastButtons.length; i++) {
-    //     lastButtons[i].setAttribute("onclick",  "getBranch();");
-    //   };
     nextPage();
 }
 
@@ -106,11 +96,50 @@ function getBranch(branch_name) {
     };
 }
 
+var sentenceID1;
+var sentenceID2;
+var i = 0;
+var checkingBranch;
+
+function forCheckBranch(branch, sentenceID) {
+    if(i==0) {
+        checkingBranch = branch;
+        sentenceID1 = sentenceID;
+        i++;
+        document.getElementById("btn"+sentenceID).disabled = true;
+    }
+    else if(i==1) {
+        sentenceID2 = sentenceID;
+        i++;
+        document.getElementById("btn"+sentenceID).disabled = true;
+    }
+    else if(i>1) {
+        document.getElementById("btn"+sentenceID1).disabled = false;
+        document.getElementById("btn"+sentenceID2).disabled = false;
+        sentenceID1 = sentenceID;
+        document.getElementById("btn"+sentenceID1).disabled = true;
+        i = 1;
+    }
+}
+
+function checkBranch() {
+    var xhr = new XMLHttpRequest();
+    var jsonData= {
+        "branch":checkingBranch,
+        "sentenceID1":sentenceID1,
+        "sentenceID2":sentenceID2
+        };
+    console.log(jsonData);
+    xhr.open('POST', 'API/contra', true);
+    xhr.setRequestHeader("Content-type", "application/json");
+    xhr.send(JSON.stringify(jsonData));
+}
 
 
 document.getElementById("new_proof").addEventListener("click", new_proof)
 document.getElementById("start").addEventListener("click", nextPage)
 document.getElementById("check").addEventListener("click", branchCheckPage)
+document.getElementById("check-branch-btn").addEventListener("click", checkBranch)
 
 function nextPage() {
     larchStepsNum++;
