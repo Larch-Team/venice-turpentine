@@ -198,7 +198,7 @@ class Sentence(list):
         if not conn or not conn.startswith('not'):
             return self
 
-        while conn.startswith('not'):
+        while conn and conn.startswith('not'):
             conn, new = new[1].getComponents()
         return new[1]
     
