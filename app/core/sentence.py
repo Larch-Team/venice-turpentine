@@ -197,11 +197,10 @@ class Sentence(list):
         conn, new = self.getComponents()
         if not conn or not conn.startswith('not'):
             return self
+        else:
+            return new[1].getNonNegated()
 
-        while conn and conn.startswith('not'):
-            conn, new = new[1].getComponents()
-        return new[1]
-    
+
     def isLiteral(self) -> bool:
         main = self.getMainConnective()
         return main is None or (main == 0 and len(self.readPrecedence()) == 1)
