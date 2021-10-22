@@ -154,8 +154,9 @@ h1 {
 
 .main-larch-rules {
     display: grid;
-    grid-template-columns: 25% 15% auto;
-    justify-content: space-evenly;
+    grid-template-columns: 30% 15% auto;
+    justify-content: center;
+    grid-gap: 2em;
 }
 
 .btn-main {
@@ -197,9 +198,10 @@ h1 {
 
 .main-larch2 {
     display: grid;
-    grid-template-columns: auto auto auto;
-    justify-content: space-evenly;
-    margin-top: 100px;
+    grid-template-columns: 23% 23% 23%;
+    justify-content: center;
+    grid-gap: 2em;
+    margin-top: 4em;
 }
 
 #finish {
@@ -207,13 +209,14 @@ h1 {
 }
 
 .end-hints {
-    height: 295px;
-    width: 300px;
-    margin-top: 50px;
+    max-width: 24em;
+    margin-top: 2em;
+    min-height: 20em;
 }
 
 .btn-check {
     text-align: right;
+    margin-top: 5em;
 }
 
 .main-larch3 {
@@ -247,14 +250,14 @@ h1 {
     cursor: pointer;
 }
 
-#checking-container {
+#checking-container, #final-tree {
     text-align: center;
     margin-top: 1em;
     font-family: 'Work Sans', sans-serif;
     font-size: 1em;
 }
 
-#checking-container button {
+#checking-container button, #final-tree button {
     background: none;
     border: none;
     padding: 0;
@@ -271,9 +274,13 @@ h1 {
 .symbolic2 {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     font-size: 1em;
-    padding: 1em 3em;
+    padding: 1em 2em;
+}
+
+.symbolic2 button {
+    font-size: 1em;
 }
 
 .symbolic {
@@ -383,3 +390,29 @@ hr {
     text-align: left;
     font-size: 18px;
 }
+
+#formula-end {
+    margin-top: 1.4em;
+    margin-bottom: 1.4em;
+    font-family: 'Spectral', sans-serif;
+    font-size: 1.4em;
+}
+
+mark {
+    margin: 0 -0.4em;
+    padding: 0.1em 0.4em;
+    border-radius: 0.8em 0.3em;
+    background: transparent;
+    background-image: linear-gradient(
+      to right,
+      rgba(255, 225, 0, 0.1),
+      rgba(255, 225, 0, 0.7) 4%,
+      rgba(255, 225, 0, 0.3)
+    );
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  .branch_close {
+      margin-top: 0.5em;
+  }

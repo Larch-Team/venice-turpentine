@@ -147,7 +147,7 @@
                         </a>
                 </div>
                 <div class="button-container btn-main">
-                    <button type="button" class="btn">Dalej: Rozstrzygnij dowód</button>
+                    <button type="button" class="btn" id="finish-proof">Dalej: Rozstrzygnij dowód</button>
                 </div>
             </div> 
         </form>
@@ -168,6 +168,9 @@
                     <h3>
                         Drzewo dowodu
                     </h3>
+                    <div id="final-tree">
+                        
+                    </div>
                 </div>
                 <div class="hints end-hints">
                     <h3>
@@ -178,6 +181,17 @@
                     <h3>
                         Rozstrzygnięcie
                     </h3>
+                    <div>
+                        <p id="formula-end">
+
+                        </p>
+                        <form>
+                            <input type="radio" id="is-tautology" name="tautology" value="is-tautology">
+                            <label for="is-tautology">jest tautologią</label><br>
+                            <input type="radio" id="is-not-tautology" name="tautology" value="is-not-tautology">
+                            <label for="is-not-tautology">nie jest tautologią</label>
+                        </form>
+                    </div>
     
                     <div class="button-container btn-check">
                         <button type="button" class="btn">Sprawdź</button>

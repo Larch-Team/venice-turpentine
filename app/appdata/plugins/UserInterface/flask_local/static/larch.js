@@ -6,6 +6,8 @@ const formula = document.getElementById("formula");
 
 let larchStepsNum = 0;
 
+
+
 function sendPOST(url, body) {
     let xmlHttp = new XMLHttpRequest();
     xmlHttp.open( "POST", url, false ); // false for synchronous request
@@ -143,11 +145,21 @@ function checkBranch() {
 function closeWindow() {
     document.getElementById("checking-window").classList.remove("active");
     document.getElementById("overlay").classList.remove("active");
+    i = 0;
+}
+
+function finishProofPage() {
+    getProof('API/contratree', function(text) {
+        document.getElementById('final-tree').innerHTML = text;
+    });
+    document.getElementById("formula-end").innerHTML ="<mark>" + formula.value + "</mark>";
+    nextPage();
 }
 
 
 document.getElementById("new_proof").addEventListener("click", new_proof)
 document.getElementById("start").addEventListener("click", nextPage)
+document.getElementById("finish-proof").addEventListener("click", finishProofPage)
 document.getElementById("check").addEventListener("click", branchCheckPage)
 document.getElementById("check-branch-btn").addEventListener("click", checkBranch)
 document.getElementById("close-window-btn").addEventListener("click", closeWindow)

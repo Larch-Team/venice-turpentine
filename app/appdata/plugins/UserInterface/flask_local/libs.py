@@ -42,7 +42,7 @@ def get_tree_contra(node: ProofNode):
             table.append(''.join(['<div>', get_tree_contra(child), '</div>']))
         table.append('</div>')
     elif node.closed:
-        table = [node.sentence.getReadable(), '<br><div class="branch_close">', node.closed.text, '</div>']
+        table = [node.sentence.getReadable(), '<br><div class="branch_close">&#10060;</div>']
     else:
         table = ['<button type="button" onclick="getBranch(\'', node.branch, '\');">', node.sentence.getReadable(), '</button>']
     return "".join(table)
