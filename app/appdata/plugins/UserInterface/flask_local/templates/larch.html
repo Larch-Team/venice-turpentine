@@ -67,8 +67,9 @@
                     <h2>
                         Wpisz formułę, którą chcesz zbadać
                     </h2>
-                    <p>
+                    <p class="formula-container">
                         <input type="text" id="formula" placeholder="np. p->q & q">
+                        <button type="button" id="qm">&#10067;</button>
                     </p>
                 </div>
                 <div class="hints">
@@ -264,6 +265,21 @@
                     Brak sprzeczności
                 </button>
             </div>
+        </div>
+        <div class="new-window" id="hint-window">
+            <div class="btn-div">
+                <button type="button" id="hint-x">&#10005;</button>
+            </div>
+            <h3>
+                Nie masz pewności, jak zapisać formułę?
+            </h3>
+            <p>
+                Nie musisz kopiować symboli logicznych. Larch interpretuje:<br>
+                · <mark>-></mark> jako implikację<br>
+                · <mark>and</mark> jako koniunkcję<br>
+                · <mark>or</mark> jako alternatywę<br>
+                · <mark>not</mark> i <mark>~</mark> jako negację.
+            </p>
         </div>
         <div id="overlay"></div>
     </body>

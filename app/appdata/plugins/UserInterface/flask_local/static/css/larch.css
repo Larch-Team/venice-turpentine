@@ -10,6 +10,10 @@ body {
     font-family: 'Work Sans', sans-serif;
 }
 
+button {
+    cursor: pointer;
+}
+
 #navigation-bar ul {
     list-style-type: none;
     padding: 2% 1%;
@@ -47,7 +51,7 @@ body {
 }
 
 #central-container {
-    margin-top: 100px;
+    margin-top: 10%;
     text-align: center;
 }
 
@@ -167,14 +171,14 @@ h1 {
 
 .hints {
     background-color: #ffffff;
-    border-radius: 5%;
+    border-radius: 1.5em;
     text-align: left;
     font-size: 14px;
     line-height: 1.6em;
     font-family: 'Work Sans', sans-serif;
-    padding: 5%;
+    padding: 1.5em;
     max-width: 30em;
-    max-height: 12.5em;
+    height: max-content;
 }
 
 .hints p, a {
@@ -187,7 +191,26 @@ h1 {
 
 .larch-subcontainer {
     font-size: 1em;
-    font-family: 'Spectral', sans-serif;
+    font-family: 'Spectral-Regular', 'Spectral', sans-serif;
+    color: #333333
+}
+
+.larch-subcontainer p {
+    font-family: 'Work Sans', sans-serif;
+}
+
+.formula-container {
+    display: flex;
+}
+
+.formula-container button {
+    height: 2.5em;
+    background: none;
+    border: none;
+    padding: 0;
+    margin-top: 5%;
+    margin-left: 0.5em;
+    font-size: inherit;
 }
 
 #formula {
@@ -241,13 +264,11 @@ h1 {
     border: none;
     padding: 0;
     font-family: 'Work Sans', sans-serif;
-    font-size: 18px;
-    margin: 2px;
+    font-size: 1em;
 }
 
 #clickable-container button:hover, #checking-container button:hover, #branch-container button:hover {
     text-decoration: underline;
-    cursor: pointer;
 }
 
 #checking-container, #final-tree {
@@ -328,16 +349,18 @@ hr {
 #rules-container button {
     background-color: #ffffff;
     border: none;
+    border-radius: 1.2em;
 }
 
 #rules-title {
     display: none;
-    font-size: 14px;
+    font-size: 0.9em;
     text-align: center;
     margin-bottom: 15%;
     margin-top: 15%;
     background-color: #ffffff;
-    padding: 5%;
+    padding: 0.5em;
+    border-radius: 1.2em;
 }
 
 .new-window {
@@ -346,7 +369,7 @@ hr {
     left: 50%;
     transform: translate(-50%, -50%) scale(0);
     transition: 200ms ease-in-out;
-    border-radius: 10%;
+    border-radius: 1.5em;
     z-index: 10;
     background-color: white;
     width: 380px;
@@ -365,7 +388,7 @@ hr {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, .5);
+    background-color: rgba(0, 0, 0, .7);
     pointer-events: none;
     transition: 200ms ease-in-out;
 }
@@ -388,7 +411,7 @@ hr {
     font-family: 'Work Sans', sans-serif;
     margin: 2px;
     text-align: left;
-    font-size: 18px;
+    font-size: 1.2em;
 }
 
 #formula-end {
@@ -413,6 +436,30 @@ mark {
     box-decoration-break: clone;
   }
 
-  .branch_close {
-      margin-top: 0.5em;
-  }
+.branch_close {
+    margin-top: 0.5em;
+}
+
+#hint-x {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 1.5em;
+}
+
+.btn-div {
+    text-align: right;
+}
+
+#hint-window {
+    font-size: 0.8em;
+    line-height: 1.5em;
+    color: #333333;
+    padding: 1em 1.2em 3em 3em;
+    width: 493px;
+    background-color: #d7d7d7;
+}
+
+#hint-window h3 {
+    margin: 1em 0;
+}

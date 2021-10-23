@@ -26,6 +26,16 @@ function getProof(url, callback) {
     xhr.send(null);
 }
 
+function showHint() {
+    document.getElementById("hint-window").classList.add("active");
+    document.getElementById("overlay").classList.add("active");
+}
+
+function hideHint() {
+    document.getElementById("hint-window").classList.remove("active");
+    document.getElementById("overlay").classList.remove("active");
+}
+
 function new_proof(e) {
     let ret = sendPOST('API/new_proof', formula.value);
     if (ret["type"] == "success") {
@@ -156,7 +166,8 @@ function finishProofPage() {
     nextPage();
 }
 
-
+document.getElementById("hint-x").addEventListener('click', hideHint)
+document.getElementById("qm").addEventListener('click', showHint)
 document.getElementById("new_proof").addEventListener("click", new_proof)
 document.getElementById("start").addEventListener("click", nextPage)
 document.getElementById("finish-proof").addEventListener("click", finishProofPage)
