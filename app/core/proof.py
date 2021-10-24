@@ -153,7 +153,7 @@ class Proof(object):
         for used in self.metadata['usedrules']:
             p.perform_usedrule(used)
         for i in self.nodes.getleaves():
-            if i.is_closed():
+            if i.closed:
                 p.nodes.getleaf(i.branch).close(i.closed)
         return p
     
