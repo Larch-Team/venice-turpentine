@@ -40,6 +40,8 @@ def hint_command(proof: Union[Proof, None]) -> Union[list[str], None]:
     if mistakes:
         return mistake_check(mistakes[0])
     moves = proof.copy().solve()
+    while moves and moves[0] == proof.metadata['usedrules'][0]:
+        moves.pop(0)
     if moves:
         return [articles['main']['rule'], f"Spójrz na zdanie: <code>{moves[0].get_premisses()['sentenceID']}</code>"]
     else:

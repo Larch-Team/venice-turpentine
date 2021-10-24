@@ -347,8 +347,7 @@ class Session(object):
             raise EngineError("There is no proof started")
 
         # Branch checking
-        closure, info = self.proof.deal_closure(
-            self.acc('Formal'), branch_name)
+        closure, info = self.proof.deal_closure(branch_name)
         if closure:
             EngineLog(f"Closing {branch_name}: {str(closure)}, {info=}")
             return info

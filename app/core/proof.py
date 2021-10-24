@@ -38,8 +38,9 @@ class Proof(object):
 
     # Proof manipulation
 
-    def deal_closure(self, FormalSystem: Module, branch_name: str) -> tuple[Close, str]:
+    def deal_closure(self, branch_name: str, FormalSystem: Module = None) -> tuple[Close, str]:
         """Wywołuje proces sprawdzenia zamykalności gałęzi oraz (jeśli można) zamyka ją; Zwraca informacje o zamknięciu"""
+        FormalSystem = FormalSystem or self.S.acc('Formal')
         return self.deal_closure_func(FormalSystem.check_closure, branch_name)
 
     def deal_closure_func(self, func: Callable[[list[Sentence], History], Union[None, tuple[Close, str]]], branch_name: str) -> tuple[Close, str]:
@@ -183,9 +184,8 @@ class Proof(object):
     
     def solve(self) -> tuple[UsedRule]:
         """Dokańcza dowód, jest to wrapper przywołujący `Session.solve`"""
-        l = len(self.metadata['usedrules'])
         self.S.solve(proof=self)
-        return self.metadata['usedrules'][l:]
+        return self.metadata['usedrules']
 
 
 class BranchCentric(Proof):

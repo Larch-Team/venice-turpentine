@@ -202,6 +202,52 @@ def do_contra() -> str:
         return JSONResponse(type_='error', content=str(e))
 
 
+@app.route('/API/finish', methods=['POST'])
+def do_finish() -> str:
+    try:
+        is_tautology = request.json['tautology']
+        problems = session.check()
+        
+        # Check proof
+        if problems:
+            return JSONResponse(type_='success', content='wrong rule')
+
+        test_proof = session.proof.copy()
+        
+        # Check branch closure
+        for i in test_proof.nodes.getopen():
+            test_proof.deal_closure(i.branch)
+
+        if len(test_proof.nodes.getopen()) != len(session.proof.nodes.getopen()):
+            return JSONResponse(type_='success', content='not all closed')
+
+        # Check decision
+        test_proof.solve()
+        if is_tautology:
+            if session.proof.nodes.is_successful():
+                # Zaznaczono tautologię i poprawny dowód to wykazuje
+                return JSONResponse(type_='success', content='correct')
+            elif test_proof.nodes.is_successful():
+                # Zaznaczono tautologię, ale z dowodu to nie wynika, gdyż nie został dokończony
+                return JSONResponse(type_='success', content='not finished')
+            else:
+                # Zaznaczono tautologię, gdy nie jest to tautologia i dowód to wykazuje
+                return JSONResponse(type_='success', content='wrong decision')
+        else:
+            if session.proof.nodes.is_successful():
+                # Zaznaczono nie-tautologię, gdy jest to tautologia i dowód to wykazuje
+                return JSONResponse(type_='success', content='wrong decision')
+            elif test_proof.nodes.is_successful():
+                # Zaznaczono nie-tautologię, ale formuła jest tautologią, ale dowód nie został dokończony
+                return JSONResponse(type_='success', content='not finished')
+            else:
+                # Zaznaczono nie-tautologię i poprawny dowód to wykazuje
+                return JSONResponse(type_='success', content='correct')
+        
+    except EngineError as e:
+        return JSONResponse(type_='error', content=str(e))
+
+
 #
 # TEMPLATE
 #
