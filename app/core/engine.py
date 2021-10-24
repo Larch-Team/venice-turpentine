@@ -446,7 +446,8 @@ class Session(object):
         state = {
             'sentence': self.proof.sentence,
             'used rules': used_rules,
-            'setup': self.config
+            'setup': self.config,
+            'closed': {i.branch:i.closed.to_dict() for i in self.proof.nodes.getleaves() if i.closed}
         }
         
         if not os.path.isfile(f'./saved_proofs/{filename}'):
@@ -469,7 +470,6 @@ class Session(object):
 
             tokenized = Sentence(state['sentence'], self)
             self.proof = BranchCentric(tokenized, self.config)
-            self.deal_closure(self.proof.nodes.getbranchnames()[0])
             rules_to_perform = [
                 UsedRule(
                     branch=rule['branch'],
@@ -485,6 +485,8 @@ class Session(object):
 
             for rule in rules_to_perform:
                 self.proof.perform_usedrule(rule)
+            for branch, closure in state['closed'].items():
+                self.proof.nodes.getleaf(branch).close(Close.from_dict(closure))
             return('Proof loaded successfully')            
 
 
