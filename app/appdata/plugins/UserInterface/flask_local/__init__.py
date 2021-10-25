@@ -203,7 +203,7 @@ def do_contra() -> str:
 
 
 @app.route('/API/finish', methods=['POST'])
-def do_finish() -> str:
+def do_finish() -> str:  # sourcery skip: merge-else-if-into-elif
     try:
         is_tautology = request.json['tautology']
         problems = session.check()
@@ -213,13 +213,13 @@ def do_finish() -> str:
             return JSONResponse(type_='success', content='wrong rule')
 
         test_proof = session.proof.copy()
+        closed_branches = [i.branch for i in session.proof.nodes.getopen()]
         
         # Check branch closure
         for i in test_proof.nodes.getopen():
             test_proof.deal_closure(i.branch)
-
-        if len(test_proof.nodes.getopen()) != len(session.proof.nodes.getopen()):
-            return JSONResponse(type_='success', content='not all closed')
+            if i.closed and i.closed.success and i.branch not in closed_branches:
+                return JSONResponse(type_='success', content='not all closed')
 
         # Check decision
         test_proof.solve()

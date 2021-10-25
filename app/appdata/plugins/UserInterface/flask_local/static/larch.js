@@ -168,11 +168,11 @@ function finishProofPage() {
 
 function tautologyCheck() {
     var tautology;
-    if (document.getElementById("is-tautology").checked) {
-        tautology = document.getElementById("is-tautology").value;
+    if (document.getElementById("is-tautology").checked || document.getElementById("is-not-tautology").checked) {
+        tautology = document.getElementById("is-tautology").checked;
     }
-    else if (document.getElementById("is-not-tautology").checked) {
-        tautology = document.getElementById("is-not-tautology").value;
+    else {
+        return; // TODO: DOPISAĆ JAKĄŚ PROŚBĘ O ZAZNACZENIE CZY COŚ
     };
     var jsonData = {
         "tautology":tautology

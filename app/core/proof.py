@@ -170,8 +170,8 @@ class Proof(object):
     
     def check(self) -> list[UserMistake]:
         """Sprawdza poprawność dowodu"""
-        if not self.metadata['usedrules']:
-            raise EngineError("Nie wykonano żadnej operacji")
+        # if not self.metadata['usedrules']:
+        #     raise EngineError("Nie wykonano żadnej operacji")
         
         checker = self.S.acc('Formal').checker
         

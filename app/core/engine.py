@@ -443,8 +443,8 @@ class Session(object):
         proof = proof or self.proof
         if not proof:
             raise EngineError("There is no proof started")
-        if not proof.nodes.is_closed():
-            raise EngineError("Nie możesz sprawdzić nieskończonego dowodu")
+        # if not proof.nodes.is_closed():
+        #     raise EngineError("Nie możesz sprawdzić nieskończonego dowodu")
 
         mistakes = proof.check()
         l = []
