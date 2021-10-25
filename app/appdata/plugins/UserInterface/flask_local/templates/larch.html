@@ -69,7 +69,7 @@
                     </h2>
                     <p class="formula-container">
                         <input type="text" id="formula" placeholder="np. p->p & q">
-                        <button type="button" id="qm">&#10067;</button>
+                        <button type="button" class="qm" id="qm">&#10067;</button>
                     </p>
                 </div>
                 <div class="hints">
@@ -77,7 +77,7 @@
                     <a href="#">Kliknij aby dowiedzieć się więcej</a>
                 </div>
                 <div class="button-container btn-main">
-                    <button type="button" class="btn" id="new_proof">Dalej: Rozłóż formuły</button>
+                    <button type="button" class="btn btn-larch" id="new_proof">Dalej: Rozłóż formuły</button>
                 </div>
             </div>
         </form>
@@ -87,9 +87,12 @@
             <form>
                 <div class="main-larch-rules">
                     <div class="larch-subcontainer">
-                        <h2>
-                            Rozłóż formuły
-                        </h2>
+                        <div class="for-qm">
+                            <h2>
+                                Rozłóż formuły
+                            </h2>
+                            <button type="button" class="qm" id="qm2">&#10067;</button>
+                        </div>
                         <p id="clickable-container">
                             
                         </p>
@@ -103,20 +106,8 @@
                         </div>
     
                     </div>
-    
-                <div class="hints">
-                    <p>
-                        Po prostu kliknij najsilniej wiążący spójnik i używaj reguł dla tworzenia tabel analitycznych.
-                    </p>
-                    <p>
-                        Nie pamiętasz reguł?
-                    </p>
-                    <a href="#">
-                        Kliknij, aby dowiedzieć się więcej
-                        </a>
-                </div>
-                <div class="button-container btn-main">
-                    <button type="button" class="btn" id="check">Dalej: Sprawdź gałęzie</button>
+                <div class="button-container btn-main" id="check-div">
+                    <button type="button" class="btn btn-larch" id="check">Dalej: Sprawdź gałęzie</button>
                 </div>
             </div>
         </form>
@@ -148,7 +139,7 @@
                         </a>
                 </div>
                 <div class="button-container btn-main">
-                    <button type="button" class="btn" id="finish-proof">Dalej: Rozstrzygnij dowód</button>
+                    <button type="button" class="btn btn-larch" id="finish-proof">Dalej: Rozstrzygnij dowód</button>
                 </div>
             </div> 
         </form>
@@ -266,7 +257,7 @@
         </div>
         <div class="new-window" id="hint-window">
             <div class="btn-div">
-                <button type="button" id="hint-x">&#10005;</button>
+                <button type="button" class="hint-x" id="hint-x">&#10005;</button>
             </div>
             <h3>
                 Nie masz pewności, jak zapisać formułę?
@@ -278,6 +269,22 @@
                 · <mark>or</mark> jako alternatywę<br>
                 · <mark>not</mark> i <mark>~</mark> jako negację.
             </p>
+        </div>
+        <div class="hints new-window" id="hint-window2">
+            <div class="btn-div">
+                <button type="button" class="hint-x" id="hint-x2">
+                    &#10005;
+                </button>
+            </div>
+            <p>
+                Po prostu kliknij najsilniej wiążący spójnik i używaj reguł dla tworzenia tabel analitycznych.
+            </p>
+            <p>
+                Nie pamiętasz reguł?
+            </p>
+            <a href="#">
+                Kliknij, aby dowiedzieć się więcej
+                </a>
         </div>
         <div id="overlay"></div>
     </body>
