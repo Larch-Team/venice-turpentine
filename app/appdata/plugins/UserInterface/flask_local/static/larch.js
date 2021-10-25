@@ -180,7 +180,15 @@ function tautologyCheck() {
                 document.getElementById("decision").appendChild(document.getElementById("right"));
                 nextPage();
             }
+            else if (lastPage["content"] == "not all closed") {
+                document.getElementById("decision").appendChild(document.getElementById("wrong"));
+                nextPage();
+            }
             else if (lastPage["content"] == "wrong decision") {
+                document.getElementById("decision").appendChild(document.getElementById("wrong"));
+                nextPage();
+            }
+            else if (lastPage["content"] == "wrong rule") {
                 document.getElementById("decision").appendChild(document.getElementById("wrong"));
                 nextPage();
             }
