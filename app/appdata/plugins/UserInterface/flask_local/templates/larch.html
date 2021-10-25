@@ -68,7 +68,7 @@
                         Wpisz formułę, którą chcesz zbadać
                     </h2>
                     <p class="formula-container">
-                        <input type="text" id="formula" placeholder="np. p->q & q">
+                        <input type="text" id="formula" placeholder="np. p->p & q">
                         <button type="button" id="qm">&#10067;</button>
                     </p>
                 </div>
@@ -165,7 +165,7 @@
                         Na podstawie podsumowania możesz stwierdzić, czy Twoja formuła jest tautologią czy nie.
                     </p>
                 </div>
-                <div class="hints end-hints">
+                <div class="end-hints">
                     <h3>
                         Drzewo dowodu
                     </h3>
@@ -173,12 +173,7 @@
                         
                     </div>
                 </div>
-                <div class="hints end-hints">
-                    <h3>
-                        Gałęzie dowodu
-                    </h3>
-                </div>
-                <div class="hints end-hints">
+                <div class="end-hints">
                     <h3>
                         Rozstrzygnięcie
                     </h3>
@@ -186,25 +181,29 @@
                         <p id="formula-end">
 
                         </p>
-                        <form>
-                            <input type="radio" id="is-tautology" name="tautology" value="is-tautology">
+                        <form id="tautology-form">
+                            <input type="radio" id="is-tautology" name="tautology" value="True">
                             <label for="is-tautology">jest tautologią</label><br>
-                            <input type="radio" id="is-not-tautology" name="tautology" value="is-not-tautology">
+                            <input type="radio" id="is-not-tautology" name="tautology" value="False">
                             <label for="is-not-tautology">nie jest tautologią</label>
                         </form>
                     </div>
     
                     <div class="button-container btn-check">
-                        <button type="button" class="btn">Sprawdź</button>
+                        <button type="button" class="btn" id="btn-check">Sprawdź</button>
                 </div>
                 </div>
             </div>
         </form>
         </div>
+        <div class="larch-container" id="decision">
+            <form>
 
+            </form>
+        </div>
         <div class="larch-container">
         <form>
-            <div class="main-larch3">
+            <div class="main-larch3" id="right">
                 <div>
                     <img src="static/normal_u95.png" alt="choinka" width="86px" height="86px">
                 </div>
@@ -223,10 +222,9 @@
             </div>
         </form>
         </div>
-
         <div class="larch-container">
         <form>
-            <div class="main-larch3">
+            <div class="main-larch3" id="wrong">
                 <div>
                     <img src="static/normal_u95.png" alt="choinka" width="86px" height="86px">
                 </div>
@@ -238,9 +236,9 @@
                         Możesz dowiedzieć się więcej o dowodzeniu nie wprost lub zacząć od początku.
                     </p>
                     <div class="button-container">
-                        <a href="#" class="btn" id="more">
+                        <button type="button" class="btn" id="more">
                             Dowiedz się więcej o dowodzeniu
-                        </a>
+                        </button>
                         <button type="button" class="btn" id="new">Nowy dowód</button>
                     </div>
                 </div>

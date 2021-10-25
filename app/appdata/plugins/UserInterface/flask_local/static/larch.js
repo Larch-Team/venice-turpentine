@@ -166,6 +166,42 @@ function finishProofPage() {
     nextPage();
 }
 
+function tautologyCheck() {
+    var tautology;
+    if (document.getElementById("is-tautology").checked) {
+        tautology = document.getElementById("is-tautology").value;
+    }
+    else if (document.getElementById("is-not-tautology").checked) {
+        tautology = document.getElementById("is-not-tautology").value;
+    };
+    var jsonData = {
+        "tautology":tautology
+    };
+    console.log(jsonData);
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'API/finish', true);
+    xhr.setRequestHeader("Content-type", "application/json");
+    xhr.send(JSON.stringify(jsonData));
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            var lastPage = JSON.parse(xhr.responseText);
+            console.log(lastPage);
+            if (lastPage["content"] == "correct") {
+                document.getElementById("decision").appendChild(document.getElementById("right"));
+                nextPage();
+            }
+            else if (lastPage["content"] == "wrong decision") {
+                document.getElementById("decision").appendChild(document.getElementById("wrong"));
+                nextPage();
+            }
+            else if (lastPage["content"] == "not finished") {
+                document.getElementById("decision").appendChild(document.getElementById("wrong"));
+                nextPage();
+            }
+        };
+    };
+}
+
 document.getElementById("hint-x").addEventListener('click', hideHint)
 document.getElementById("qm").addEventListener('click', showHint)
 document.getElementById("new_proof").addEventListener("click", new_proof)
@@ -174,6 +210,7 @@ document.getElementById("finish-proof").addEventListener("click", finishProofPag
 document.getElementById("check").addEventListener("click", branchCheckPage)
 document.getElementById("check-branch-btn").addEventListener("click", checkBranch)
 document.getElementById("close-window-btn").addEventListener("click", closeWindow)
+document.getElementById("btn-check").addEventListener("click", tautologyCheck)
 
 function nextPage() {
     larchStepsNum++;
