@@ -9,8 +9,17 @@ import plugins.Output.__utils__ as utils
 from anytree import Node, RenderTree
 
 SOCKET = 'Output'
-VERSION = '0.0.1'
+VERSION = '0.2.0'
 
+def convert_token(token: str) -> str:
+    """Returns a readable version of a token
+
+    :param sentence: Transcribed sentence
+    :type sentence: Sentence
+    :return: Transcribed string
+    :rtype: str
+    """
+    return token.split('_')[-1]
 
 def get_readable(sentence: utils.Sentence) -> str:
     """Zwraca zdanie w czytelnej formie

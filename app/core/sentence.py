@@ -42,6 +42,9 @@ class Sentence(list):
 
     def getReadable(self) -> str:
         return self.S.acc('Output').get_readable(self)
+    
+    def getReadableList(self) -> list[str]:
+        return [self.S.acc('Output').convert_token(i) for i in self]
 
     def getUnique(self) -> list[str]:
         """Zwraca zapis unikalny dla tego zdania; odporne na różnice w formacie zapisu"""
@@ -193,12 +196,11 @@ class Sentence(list):
         """
         conn, new = self.getComponents()
         if not conn or not conn.startswith('not'):
-            return self
+            return self.reduceBrackets()
+        else:
+            return new[1].getNonNegated()
 
-        while conn.startswith('not'):
-            conn, new = new[1].getComponents()
-        return new[1]
-    
+
     def isLiteral(self) -> bool:
         main = self.getMainConnective()
         return main is None or (main == 0 and len(self.readPrecedence()) == 1)

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pl">
+    <head>
+        <title>Larch</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <link rel="stylesheet" type="text/css" href="static/css/larch.css"/>
+        <script src="static/larch.js" defer></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,700;1,700&display=swap" rel="stylesheet"> 
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,700;1,700&family=Work+Sans&display=swap" rel="stylesheet"> 
+    </head>
+
+    <body>
+        <nav id="navigation-bar">
+            <div class="nav-container">
+                <ul>
+                    <li style="float:left">
+                        <p>
+                            Larch | Twój dowód
+                        </p>
+                    </li>
+                    <li>
+                        <button id="leave" onclick="if (confirm('Czy jesteś pewny, że chcesz opuścić stronę?')) window.location.href='/';
+                        ">Wyjdź</button>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div class="container" id="progressbar">
+            <div class="semi-container">
+                <div class="progress-container">
+                    <div class="progress" id="progress"></div>
+                    <div class="circle progress-step-active">
+                    </div>
+                    <div class="circle">
+                    </div>
+                    <div class="circle">
+                    </div>
+                    <div class="circle">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="larch-container larch-container-active" id="central-container">
+            <div>
+                <img src="static/normal_u95.png" alt="choinka" width="86px" height="86px">
+            </div>
+            <div>
+                <h1>
+                    Rozpocznij dowód z Larchem
+                </h1>
+            </div>
+            <div class="button-container">
+                <a href="#" class="btn", id='start'>Zaczynamy</a>
+            </div>
+        </div>
+        
+        <div class="larch-container">
+        <form>
+            <div class="main-larch">
+                <div class="larch-subcontainer">
+                    <h2>
+                        Wpisz formułę, którą chcesz zbadać
+                    </h2>
+                    <p class="formula-container">
+                        <input type="text" id="formula" placeholder="np. p->p & q">
+                        <button type="button" class="qm" id="qm">&#10067;</button>
+                    </p>
+                </div>
+                <div class="hints">
+                    {{ hint_start | safe }}
+                    <a href="#">Kliknij aby dowiedzieć się więcej</a>
+                </div>
+                <div class="button-container btn-main">
+                    <button type="button" class="btn btn-larch" id="new_proof">Dalej: Rozłóż formuły</button>
+                </div>
+            </div>
+        </form>
+        </div>
+
+        <div class="larch-container">
+            <form>
+                <div class="main-larch-rules">
+                    <div class="larch-subcontainer">
+                        <div class="for-qm">
+                            <h2>
+                                Rozłóż formuły
+                            </h2>
+                            <button type="button" class="qm" id="qm2">&#10067;</button>
+                        </div>
+                        <p id="clickable-container">
+                            
+                        </p>
+                    </div>
+                    <div class="larch-subcontainer">
+                        <h3 id="rules-title">
+                            Której reguły chcesz użyć?
+                        </h3>
+                        <div id="rules-container">
+
+                        </div>
+    
+                    </div>
+                <div class="button-container btn-main" id="check-div">
+                    <button type="button" class="btn btn-larch" id="check">Dalej: Sprawdź gałęzie</button>
+                </div>
+            </div>
+        </form>
+        </div>
+
+        <div class="larch-container">
+        <form>
+            <div class="main-larch">
+                <div class="larch-subcontainer">
+                    <h2>
+                        Sprawdź gałęzie
+                    </h2>
+                    <p>
+                        Kliknij na ostatni wyraz w dowolnej z gałęzi, aby poszukać sprzeczności.
+                    </p>
+                    <div id="checking-container">
+                            
+                    </div>
+                </div>
+                <div class="hints">
+                    <p>
+                        Dowodzisz nie wprost, więc poszukaj sprzeczności w gałęziach, aby udowodnić, że formuła jest tautologią.
+                    </p>
+                    <p>
+                        Potrzebujesz wskazówki?
+                    </p>
+                    <a href="#">
+                        Kliknij, aby dowiedzieć się więcej
+                        </a>
+                </div>
+                <div class="button-container btn-main">
+                    <button type="button" class="btn btn-larch" id="finish-proof">Dalej: Rozstrzygnij dowód</button>
+                </div>
+            </div> 
+        </form>
+        </div>
+
+        <div class="larch-container">
+        <form>
+            <div class="main-larch2">
+                <div class="larch-subcontainer" id="finish">
+                    <h2>
+                        Rozstrzygnij dowód
+                    </h2>
+                    <p>
+                        Na podstawie podsumowania możesz stwierdzić, czy Twoja formuła jest tautologią czy nie.
+                    </p>
+                </div>
+                <div class="end-hints">
+                    <h3>
+                        Drzewo dowodu
+                    </h3>
+                    <div id="final-tree">
+                        
+                    </div>
+                </div>
+                <div class="end-hints">
+                    <h3>
+                        Rozstrzygnięcie
+                    </h3>
+                    <div>
+                        <p id="formula-end">
+
+                        </p>
+                        <form id="tautology-form">
+                            <input type="radio" id="is-tautology" name="tautology" value="True">
+                            <label for="is-tautology">jest tautologią</label><br>
+                            <input type="radio" id="is-not-tautology" name="tautology" value="False">
+                            <label for="is-not-tautology">nie jest tautologią</label>
+                        </form>
+                    </div>
+    
+                    <div class="button-container btn-check">
+                        <button type="button" class="btn" id="btn-check">Sprawdź</button>
+                </div>
+                </div>
+            </div>
+        </form>
+        </div>
+        <div class="larch-container" id="decision">
+            <form>
+
+            </form>
+        </div>
+        <div class="larch-container">
+        <form>
+            <div class="main-larch3" id="right">
+                <div>
+                    <img src="static/normal_u95.png" alt="choinka" width="86px" height="86px">
+                </div>
+                <div>
+                    <h1>
+                        To dobra odpowiedz!
+                    </h1>
+                    <p>
+                        Bardzo sprawnie Ci poszło! Możesz teraz zapisać swój dowód lub zacząć od początku i przeprowadzić inny.
+                    </p>
+                    <div class="button-container">
+                        <button type="button" class="btn" id="save">Zapisz dowód</button>
+                        <button type="button" class="btn" id="new">Nowy dowód</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        </div>
+        <div class="larch-container">
+        <form>
+            <div class="main-larch3" id="wrong">
+                <div>
+                    <img src="static/normal_u95.png" alt="choinka" width="86px" height="86px">
+                </div>
+                <div>
+                    <h1>
+                        To nie jest poprawna odpowiedź
+                    </h1>
+                    <p>
+                        Możesz dowiedzieć się więcej o dowodzeniu nie wprost lub zacząć od początku.
+                    </p>
+                    <div class="button-container">
+                        <button type="button" class="btn" id="more">
+                            Dowiedz się więcej o dowodzeniu
+                        </button>
+                        <button type="button" class="btn" id="new">Nowy dowód</button>
+                    </div>
+                </div>
+            </div>    
+        </form>
+        </div>
+        <div class="new-window" id="checking-window">
+            <h2 id="check-branch-name">
+                Gałąź
+            </h2>
+            <p>
+                Kliknij dwa sprzeczne wyrażenia.
+            </p>
+            <div id="branch-container">
+
+            </div>
+            <div class="button-container2">
+                <button type="button" class="btn" id="check-branch-btn">
+                    Sprawdź
+                </button>
+                <button type="button" class="btn" id="close-window-btn">
+                    Brak sprzeczności
+                </button>
+            </div>
+        </div>
+        <div class="new-window" id="hint-window">
+            <div class="btn-div">
+                <button type="button" class="hint-x" id="hint-x">&#10005;</button>
+            </div>
+            <h3>
+                Nie masz pewności, jak zapisać formułę?
+            </h3>
+            <p>
+                Nie musisz kopiować symboli logicznych. Larch interpretuje:<br>
+                · <mark>-></mark> jako implikację<br>
+                · <mark>and</mark> jako koniunkcję<br>
+                · <mark>or</mark> jako alternatywę<br>
+                · <mark>not</mark> i <mark>~</mark> jako negację.
+            </p>
+        </div>
+        <div class="hints new-window" id="hint-window2">
+            <div class="btn-div">
+                <button type="button" class="hint-x" id="hint-x2">
+                    &#10005;
+                </button>
+            </div>
+            <p>
+                Po prostu kliknij główny spójnik i używaj reguł dla tworzenia tabel analitycznych.
+            </p>
+            <p>
+                Nie pamiętasz reguł?
+            </p>
+            <a href="#">
+                Kliknij, aby dowiedzieć się więcej
+                </a>
+        </div>
+        <div id="overlay"></div>
+    </body>

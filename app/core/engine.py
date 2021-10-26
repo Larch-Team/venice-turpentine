@@ -65,9 +65,9 @@ class Session(object):
     """
     ENGINE_VERSION = '0.0.1'
     SOCKETS = {'Assistant': '0.0.1',
-               'Formal': '0.2.0',
+               'Formal': '0.3.0',
                'Lexicon': '0.0.1',
-               'Output': '0.0.1'}
+               'Output': '0.2.0'}
     SOCKETS_NOT_IN_CONFIG = ()
 
     def __init__(self, session_ID: str, config_file: str):
@@ -352,8 +352,7 @@ class Session(object):
             raise EngineError("There is no proof started")
 
         # Branch checking
-        closure, info = self.proof.deal_closure(
-            self.acc('Formal'), branch_name)
+        closure, info = self.proof.deal_closure(branch_name)
         if closure:
             EngineLog(f'Closing {branch_name}: {closure}, info={info!r}')
             return info
@@ -453,7 +452,8 @@ class Session(object):
         state = {
             'sentence': self.proof.sentence,
             'used rules': used_rules,
-            'setup': self.config
+            'setup': self.config,
+            'closed': {i.branch:i.closed.to_dict() for i in self.proof.nodes.getleaves() if i.closed}
         }
         
         if not os.path.isfile(f'./saved_proofs/{filename}'):
@@ -479,7 +479,6 @@ class Session(object):
 
             tokenized = Sentence(state['sentence'], self)
             self.proof = BranchCentric(tokenized, self.config)
-            self.deal_closure(self.proof.nodes.getbranchnames()[0])
             rules_to_perform = [
                 UsedRule(
                     branch=rule['branch'],
@@ -495,6 +494,8 @@ class Session(object):
 
             for rule in rules_to_perform:
                 self.proof.perform_usedrule(rule)
+            for branch, closure in state['closed'].items():
+                self.proof.nodes.getleaf(branch).close(Close.from_dict(closure))
             return 'Proof loaded successfully'
 
 
@@ -519,8 +520,8 @@ class Session(object):
         proof = proof or self.proof
         if not proof:
             raise EngineError("There is no proof started")
-        if not proof.nodes.is_closed():
-            raise EngineError("Nie możesz sprawdzić nieskończonego dowodu")
+        # if not proof.nodes.is_closed():
+        #     raise EngineError("Nie możesz sprawdzić nieskończonego dowodu")
 
         mistakes = proof.check()
         l = []
@@ -573,6 +574,10 @@ class Session(object):
     def getrules(self) -> dict[str, str]:
         """Zwraca nazwy reguł wraz z dokumentacją"""
         return self.acc('Formal').get_rules_docs()
+    
+    def getrulessymbol(self) -> dict[str, str]:
+        """Zwraca nazwy reguł wraz z zapisem symbolicznym"""
+        return self.acc('Formal').get_rules_symbolic()
 
     def gettree(self) -> list[str]:
         """Zwraca całość drzewa jako listę ciągów znaków"""

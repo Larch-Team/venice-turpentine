@@ -9,7 +9,7 @@ from exceptions import EngineError, FormalError, UserMistake
 from history import History
 from pop_engine import Module
 from sentence import Sentence
-from tree import ProofNode
+from tree import ProofNode, SentenceTupleStructure
 from usedrule import UsedRule
 from colors import get_branch_name
 
@@ -38,8 +38,9 @@ class Proof(object):
 
     # Proof manipulation
 
-    def deal_closure(self, FormalSystem: Module, branch_name: str) -> tuple[Close, str]:
+    def deal_closure(self, branch_name: str, FormalSystem: Module = None) -> tuple[Close, str]:
         """Wywołuje proces sprawdzenia zamykalności gałęzi oraz (jeśli można) zamyka ją; Zwraca informacje o zamknięciu"""
+        FormalSystem = FormalSystem or self.S.acc('Formal')
         return self.deal_closure_func(FormalSystem.check_closure, branch_name)
 
     def deal_closure_func(self, func: Callable[[list[Sentence], History], Union[None, tuple[Close, str]]], branch_name: str) -> tuple[Close, str]:
@@ -104,6 +105,22 @@ class Proof(object):
         self.nodes.insert_history(used_extention, children)
 
         self.metadata['usedrules'].append(UsedRule(layer, branch_name, rule, self, context, decisions))
+        
+        
+    def preview(self, branch_name: str, rule: str, context: dict[str, Any], decisions: dict = None) -> SentenceTupleStructure:
+        FormalSystem = self.S.acc('Formal')
+
+        # Statement and used retrieving
+        old = self.nodes.getleaf(branch_name)
+        branch = old.getbranch_sentences()[0][:]
+        used = old.gethistory()
+
+        # Rule execution
+        try:
+            out, _ = FormalSystem.use_rule(rule, branch, used, context, decisions)
+        except FormalError as e:
+            return ()
+        return out
 
 
     def perform_usedrule(self, usedrule: UsedRule):
@@ -136,6 +153,9 @@ class Proof(object):
         p = Proof(self.sentence.copy(), self.config.copy())
         for used in self.metadata['usedrules']:
             p.perform_usedrule(used)
+        for i in self.nodes.getleaves():
+            if i.closed:
+                p.nodes.getleaf(i.branch).close(i.closed)
         return p
     
     
@@ -150,8 +170,8 @@ class Proof(object):
     
     def check(self) -> list[UserMistake]:
         """Sprawdza poprawność dowodu"""
-        if not self.metadata['usedrules']:
-            raise EngineError("Nie wykonano żadnej operacji")
+        # if not self.metadata['usedrules']:
+        #     raise EngineError("Nie wykonano żadnej operacji")
         
         checker = self.S.acc('Formal').checker
         
@@ -164,9 +184,8 @@ class Proof(object):
     
     def solve(self) -> tuple[UsedRule]:
         """Dokańcza dowód, jest to wrapper przywołujący `Session.solve`"""
-        l = len(self.metadata['usedrules'])
         self.S.solve(proof=self)
-        return self.metadata['usedrules'][l:]
+        return self.metadata['usedrules']
 
 
 class BranchCentric(Proof):
