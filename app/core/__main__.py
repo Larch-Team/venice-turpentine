@@ -24,24 +24,20 @@ if __name__ == "__main__":
         UI = pop.Socket('UserInterface', os.path.abspath(
             'plugins/UserInterface'), '0.0.1', '__template__')
 
-        # return exit code -1 to initiate a restart (useful for UI plugin switching)
-        exit_code = -1  # Not implemented in cmd plugin
-        while exit_code == -1:
-
-            # App run
-            try:
-                configs = os.listdir(os.path.abspath('config'))
-            except FileNotFoundError:
-                os.mkdir('config')
-                configs = []
-            if not configs:
-                UI.plug('CLI')
-            else:
-                p = 'config/config.json' if 'config.json' in configs else config[0]
-                with open(p, 'r') as file:
-                    config = json.load(file)
-                UI.plug(config['chosen_plugins']['UserInterface'])
-            exit_code = UI().run()
+        # App run
+        try:
+            configs = os.listdir(os.path.abspath('config'))
+        except FileNotFoundError:
+            os.mkdir('config')
+            configs = []
+        if not configs:
+            UI.plug('CLI')
+        else:
+            p = 'config/config.json' if 'config.json' in configs else config[0]
+            with open(p, 'r') as file:
+                config = json.load(file)
+            UI.plug(config['chosen_plugins']['UserInterface'])
+        UI().run()
 
     except Exception as e:
         if DEBUG:
@@ -58,4 +54,4 @@ if __name__ == "__main__":
             f.write('\nEXCEPTION:\n')
             f.write(str(e))
     else:
-        sys.exit(exit_code)
+        sys.exit()

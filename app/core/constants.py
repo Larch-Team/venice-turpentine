@@ -1,6 +1,6 @@
 DEBUG = True
-VERSION = '0.2-beta'
+VERSION = '1.0-pre'
 
 ALLOW_DOWNLOAD = True
-BRANCH = "development"
+BRANCH = "prerelease"
 REPO_URL = f"https://raw.githubusercontent.com/Larch-Team/larch-plugins/{BRANCH}"

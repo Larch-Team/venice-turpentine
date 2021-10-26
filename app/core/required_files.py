@@ -1,4 +1,7 @@
-NEED = [    
+NEED = [
+        # Setups
+        "setups/GUI.json",
+        
         # Assistant
         'plugins/Assistant/__template__.py',
         
@@ -11,7 +14,7 @@ NEED = [
         'plugins/Formal/__template__.py',
         'plugins/Formal/__utils__.py',
         
-        # analytic_freedom
+        # Formal/analytic_freedom
         'plugins/Formal/analytic_freedom/__init__.py',
         'plugins/Formal/analytic_freedom/solver.py',
         'plugins/Formal/analytic_freedom/syntax_check.py',
@@ -29,9 +32,20 @@ NEED = [
         'plugins/Output/actual_tree.py',
         'plugins/Output/TeX_infer.py',
         
-        #User Interface
+        # UserInterface
         'plugins/UserInterface/__template__.py',
         'plugins/UserInterface/__utils__.py',
         
         'plugins/UserInterface/CLI.py',
+        
+        # UserInterface/flask_local
+        "plugins/UserInterface/flask_local/libs.py", 
+        "plugins/UserInterface/flask_local/__init__.py", 
+        "plugins/UserInterface/flask_local/static/larch.js", 
+        "plugins/UserInterface/flask_local/static/logo.png", 
+        "plugins/UserInterface/flask_local/static/normal_u95.png", 
+        "plugins/UserInterface/flask_local/static/css/larch.css", 
+        "plugins/UserInterface/flask_local/static/css/styles.css", 
+        "plugins/UserInterface/flask_local/templates/index.html", 
+        "plugins/UserInterface/flask_local/templates/larch.html",
     ]
