@@ -193,7 +193,7 @@ def do_contra() -> str:
         if closed:
             return JSONResponse(type_='error', content="Branch already closed")
         elif (branch[sID1].getNonNegated() == branch[sID2].getNonNegated() and
-              len(branch[sID1].reduceBrackets()) - len(branch[sID2].reduceBrackets()) % 2 == 1):
+              (len(branch[sID1].reduceBrackets()) - len(branch[sID2].reduceBrackets())) % 2 == 1):
             session.proof.nodes.getleaf(branch_name).close(Contradiction(sentenceID1 = sID1+1, sentenceID2 = sID2+1))
             return JSONResponse(type_='success')
         else:

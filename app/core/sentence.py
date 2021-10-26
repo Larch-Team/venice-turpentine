@@ -196,7 +196,7 @@ class Sentence(list):
         """
         conn, new = self.getComponents()
         if not conn or not conn.startswith('not'):
-            return self
+            return self.reduceBrackets()
         else:
             return new[1].getNonNegated()
 

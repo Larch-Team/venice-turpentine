@@ -62,13 +62,11 @@ function use_rule(rule_name, branch, tokenID, sentenceID) {
             "sentenceID":sentenceID
             }
         };
-    console.log(jsonData);
     xhr.open('POST', 'API/use_rule', true);
     xhr.setRequestHeader("Content-type", "application/json");
     xhr.send(JSON.stringify(jsonData));
     xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
-            console.log(xhr.responseText);
             getProof('/API/worktree', function(text) {
                 document.getElementById('clickable-container').innerHTML = text;
             });
@@ -93,6 +91,7 @@ function getBranch(branch_name) {
             branch = xhr.response;
             document.getElementById("checking-window").classList.add("active");
             document.getElementById("overlay").classList.add("active");
+            document.getElementById('check-branch-name').innerHTML = `Gałąź "${branch_name}"`
             document.getElementById("branch-container").innerHTML = branch;
         }
     };
@@ -132,11 +131,9 @@ function checkBranch() {
         "sentenceID1":sentenceID1,
         "sentenceID2":sentenceID2
         };
-    console.log(jsonData);
     xhr.open('POST', 'API/contra', true);
     xhr.setRequestHeader("Content-type", "application/json");
     xhr.send(JSON.stringify(jsonData));
-    // TO ROBOCZO DODAŁEM:
     getProof('API/contratree', function(text) {
         document.getElementById('checking-container').innerHTML = text;
     });
@@ -167,7 +164,6 @@ function tautologyCheck() {
     var jsonData = {
         "tautology":tautology
     };
-    console.log(jsonData);
     var xhr = new XMLHttpRequest();
     xhr.open('POST', 'API/finish', true);
     xhr.setRequestHeader("Content-type", "application/json");
@@ -175,7 +171,6 @@ function tautologyCheck() {
     xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
             var lastPage = JSON.parse(xhr.responseText);
-            console.log(lastPage);
             if (lastPage["content"] == "correct") {
                 document.getElementById("decision").appendChild(document.getElementById("right"));
                 nextPage();
@@ -268,7 +263,7 @@ function showHint2() {
 function hideHint2() {
     document.getElementById("hint-window2").classList.remove("active");
     document.getElementById("overlay").classList.remove("active");
-}f
+}
 
 // Buttons
 
@@ -284,7 +279,11 @@ document.addEventListener('keydown', (event) => {
                     document.getElementById("new_proof").click()
                     break;
                 case 2:
-
+                    document.getElementById("finish-proof").click()
+                    break;
+                case 3:
+                    document.getElementById("btn-check").click()
+                    break;
                 default:
                     break;
             }
