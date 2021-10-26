@@ -224,7 +224,7 @@ class Socket(object):
         assert 'SOCKET' in dir(plugin), "No socket name in the plugin"
         if plugin.SOCKET != self.name:
             raise PluginError(message)
-        logger.debug(f"Checked socket")
+        logger.debug('Checked socket')
         return True
 
     def check_version(self, plugin: Module, message: str) -> None:
@@ -239,14 +239,12 @@ class Socket(object):
         assert 'VERSION' in dir(plugin), "No plugin version in the plugin"
         plugin_ver = [int(i) for i in plugin.VERSION.split(".")]
         if len(plugin_ver) != 3:
-            logger.error(
-                f"Wrong version format in the plugin: {str(plugin.VERSION)}")
-            raise PluginError(
-                f"Wrong version format used in the plugin: {str(plugin.VERSION)}")
+            logger.error(f'Wrong version format in the plugin: {plugin.VERSION}')
+            raise PluginError(f'Wrong version format used in the plugin: {plugin.VERSION}')
         if plugin_ver[:-1] != self.version[:-1]:
             raise VersionError(message)
 
-        logger.debug(f"Checked version")
+        logger.debug('Checked version')
         return True
 
     def fits(self, plugin: Module) -> bool:

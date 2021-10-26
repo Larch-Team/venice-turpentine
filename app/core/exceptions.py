@@ -43,11 +43,17 @@ class FunctionInterfaceError(PluginError):
 
     def __init__(self, argument_problem: bool, socket, func: Callable, what_is: Any):
         if argument_problem:
-            info = f"{func.__name__} can't be connected to {socket.name}; " + \
-                f"Arguments are: {str(what_is)}, should be: {str(socket.functions[func.__name__][0])}"
+            info = (
+                f"{func.__name__} can't be connected to {socket.name}; "
+                + f'Arguments are: {what_is}, should be: {socket.functions[func.__name__][0]}'
+            )
+
         else:
-            info = f"{func.__name__} can't be connected to {socket.name}; " + \
-                f"Return is: {str(what_is)}, should be: {str(socket.functions[func.__name__][1])}"
+            info = (
+                f"{func.__name__} can't be connected to {socket.name}; "
+                + f'Return is: {what_is}, should be: {socket.functions[func.__name__][1]}'
+            )
+
         super().__init__(info)
 
 
