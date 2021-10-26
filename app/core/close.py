@@ -8,6 +8,9 @@ class Close(object):
     https://www.notion.so/szymanski/Zamykanie-ga-zi-53249279f1884ab4b6f58bbd6346ec8d
     """
 
+    @staticmethod
+    def from_dict(d: dict[str, _Any]):
+        return Close(d['success'], d['text'])
 
     def __init__(self, success: bool, text: str, text_template: _Union[str, _Template] = None) -> None:
         """Stempel przybijany na zamkniętą gałąź
@@ -34,6 +37,9 @@ class Close(object):
     
     def __str__(self) -> str:
         return self.text
+    
+    def to_dict(self) -> dict[str, _Any]:
+        return {'success':self.success, 'text':self.text}
 
 
 Emptiness = Close(False, "---")

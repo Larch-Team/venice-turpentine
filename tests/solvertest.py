@@ -1,7 +1,7 @@
 import os
 import sys
 import time
-
+# dodac check
 sys.path.extend([os.path.abspath(i) for i in ['../app/appdata', '../app/core']])
 from plugins.UserInterface import CLI as c
 

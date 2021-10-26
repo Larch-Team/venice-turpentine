@@ -10,7 +10,6 @@ from collections import OrderedDict, namedtuple
 from math import log10
 from xml.sax.saxutils import escape
 from colors import COLORS, DEFAULT_COLOR
-
 import engine
 import prompt_toolkit as ptk
 
@@ -381,6 +380,12 @@ def do_undo(session: engine.Session, amount: int) -> str:
     except engine.EngineError as e:
         return str(e)
 
+def do_redo(session: engine.Session, amount: int) -> str:
+    """Redoes last [arg] undone actions"""
+    try:
+        session.redo(amount)
+    except engine.EngineError as e:
+        return str(e)
 
 def do_contra(session: engine.Session, branch: str) -> str:
     """Detects contradictions and handles them by closing their branches"""
@@ -447,6 +452,29 @@ def do_write(session: engine.Session, filename: str):
         with open(filename, 'wb') as f:
             f.writelines([(i+'\n').encode('utf-8') for i in proof])
         return f"Proof saved as {filename}"
+
+
+def do_save(session: engine.Session, filename: str):
+    """Saves current state of proof if needed
+    
+    Arguments:
+        - filename [str]
+    """
+    try:
+        return session.save_proof(filename)
+    except engine.EngineError as e:
+        return e
+
+def do_load(session: engine.Session, filename: str):
+    """Loads a saved proof 
+    
+    Arguments:
+        - filename [str]
+    """
+    try:
+        return session.load_proof(filename)
+    except EngineError as e:
+        return e
 
 
 # Proof navigation
@@ -521,11 +549,14 @@ command_dict = OrderedDict({
     'write': {'comm': do_write, 'args': [str]},
     'use': {'comm': do_use, 'args': 'multiple_strings'},
     'undo': {'comm': do_undo, 'args': [int]},
+    # 'redo': {'comm': do_redo, 'args': [int]},
     'leave': {'comm': do_leave, 'args': []},
     'prove': {'comm': do_prove, 'args': 'multiple_strings'},
     'hint': {'comm': do_hint, 'args': []},
     'solve': {'comm': do_solve, 'args': []},
     'check': {'comm': do_check, 'args': []},
+    'save': {'comm': do_save, 'args': [str]},
+    'load': {'comm': do_load, 'args': [str]},
     # Program interaction
     'plugin switch': {'comm': do_plug_switch, 'args': [str, str]},
     'plugin get': {'comm': do_plug_get, 'args': [str, str]},
