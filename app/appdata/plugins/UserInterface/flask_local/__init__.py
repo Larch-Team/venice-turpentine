@@ -1,6 +1,7 @@
 """
 Tutaj umieść dokumentację swojego pluginu
 """
+from datetime import datetime
 import enum
 from typing import Any
 from close import Contradiction
@@ -201,6 +202,11 @@ def do_contra() -> str:
     except EngineError as e:
         return JSONResponse(type_='error', content=str(e))
 
+@app.route('/API/save', methods=['GET'])
+def do_save() -> str:
+    name = request.args.get('name', default=str(datetime.now()).replace(':', '-'), type=int)
+    return session.save_proof(name)    
+    
 
 @app.route('/API/finish', methods=['POST'])
 def do_finish() -> str:  # sourcery skip: merge-else-if-into-elif
