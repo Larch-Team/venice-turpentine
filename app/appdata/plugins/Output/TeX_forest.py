@@ -1,7 +1,6 @@
 """
 Konwertuje dowód do kodu TeX dla pakietu forest. Należy go zaimportować przed użyciem.
 """
-import typing as tp
 import plugins.Output.__utils__ as utils
 
 SOCKET = 'Output'
