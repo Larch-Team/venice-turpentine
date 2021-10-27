@@ -6,6 +6,7 @@
         <meta name="viewport" content="width=device-width, initial scale=1.0" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
         <link rel="stylesheet" type="text/css" href="static/css/larch.css"/>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
         <script src="static/larch.js" defer></script>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -91,20 +92,30 @@
                             <h2>
                                 Rozłóż formuły
                             </h2>
-                            <div class="qm-div">
-                                <button type="button" class="qm" id="qm2">&#10067;</button>
-                            </div>
                         </div>
                         <p id="clickable-container">
                             
                         </p>
                     </div>
                     <div class="larch-subcontainer">
-                        <h3 id="rules-title">
-                            Której reguły chcesz użyć?
-                        </h3>
-                        <div id="rules-container">
-
+                        <div class="rules-main">
+                            <h3 id="rules-title">
+                                Której reguły chcesz użyć?
+                            </h3>
+                            <div id="rules-container">
+    
+                            </div>
+                        </div>
+                        <div class="btn-container">
+                            <button type="button" class="rules-btn" id="rules-hint">
+                               <i class="material-icons">lightbulb_outline</i> Podpowiedź
+                            </button>
+                            <button type="button" class="rules-btn" id="rules-report">
+                                <i class="material-icons">bug_report</i>Zgłoś błąd
+                            </button>
+                            <button type="button" class="rules-btn" id="rules-undo">
+                                <i class="material-icons">undo</i>Cofnij
+                            </button>
                         </div>
     
                     </div>

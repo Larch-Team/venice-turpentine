@@ -56,7 +56,6 @@ function getRules(branch, tokenID, sentenceID) {
         if (xhr.readyState === 4) {
             rules = xhr.response;
             document.getElementById('rules-container').innerHTML = rules;   
-            document.getElementById('rules-title').style.display = "block";
         }
     }
 }
@@ -205,7 +204,7 @@ function tautologyCheck() {
 }
 
 document.getElementById("hint-x2").addEventListener('click', hideHint2)
-document.getElementById("qm2").addEventListener('click', showHint2)
+document.getElementById("rules-hint").addEventListener('click', showHint2)
 document.getElementById("hint-x").addEventListener('click', hideHint)
 document.getElementById("qm").addEventListener('click', showHint)
 document.getElementById("new_proof").addEventListener("click", new_proof)
