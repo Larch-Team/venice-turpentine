@@ -26,6 +26,15 @@ function getProof(url, callback) {
     xhr.send(null);
 }
 
+function disableBtn() {
+    if(document.getElementById("formula").value==="") { 
+           document.getElementById("new_proof").disabled = true; 
+       } 
+    else { 
+       document.getElementById("new_proof").disabled = false;
+    }
+}
+
 function new_proof(e) {
     let ret = sendPOST('API/new_proof', formula.value);
     if (ret["type"] == "success") {

@@ -388,7 +388,7 @@ hr {
     border-radius: 1.5em;
     z-index: 10;
     background-color: white;
-    width: 380px;
+    width: max-content;
     max-width: 80%;
     padding: 2em;
 }
@@ -472,7 +472,7 @@ mark {
     line-height: 1.5em;
     color: #333333;
     padding: 1em 1.2em 3em 3em;
-    width: 493px;
+    width: max-content;
     background-color: #d7d7d7;
 }
 
@@ -491,4 +491,8 @@ mark {
     display: flex;
     justify-content: space-between;
     width: 140%;
+}
+
+button:disabled {
+    background-color: #d7d7d7;
 }

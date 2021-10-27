@@ -68,7 +68,7 @@
                         Wpisz formułę, którą chcesz zbadać
                     </h2>
                     <p class="formula-container">
-                        <input type="text" id="formula" placeholder="np. p->p & q">
+                        <input type="text" id="formula" onkeyup="disableBtn()" placeholder="np. p->p & q">
                         <button type="button" class="qm" id="qm">&#10067;</button>
                     </p>
                 </div>
@@ -77,7 +77,7 @@
                     <a href="#">Kliknij aby dowiedzieć się więcej</a>
                 </div>
                 <div class="button-container btn-main">
-                    <button type="button" class="btn btn-larch" id="new_proof">Dalej: Rozłóż formuły</button>
+                    <button type="button" class="btn btn-larch" id="new_proof" disabled>Dalej: Rozłóż formuły</button>
                 </div>
             </div>
         </form>
@@ -91,7 +91,9 @@
                             <h2>
                                 Rozłóż formuły
                             </h2>
-                            <button type="button" class="qm" id="qm2">&#10067;</button>
+                            <div class="qm-div">
+                                <button type="button" class="qm" id="qm2">&#10067;</button>
+                            </div>
                         </div>
                         <p id="clickable-container">
                             
