@@ -253,6 +253,16 @@ def do_finish() -> str:  # sourcery skip: merge-else-if-into-elif
     except EngineError as e:
         return JSONResponse(type_='error', content=str(e))
 
+@app.route('/API/print', methods=['GET'])
+def do_print() -> str:
+    old_plug = session.sockets['Output'].get_plugin_name()
+    try:
+        session.plug_switch('Output', request.args.get('plugin', default='TeX_forest', type=str))
+        t = "\n".join(session.gettree())
+    finally:
+        session.plug_switch('Output', old_plug)
+    return t
+
 
 #
 # TEMPLATE
