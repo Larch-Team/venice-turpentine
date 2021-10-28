@@ -37,12 +37,28 @@ def larch():
 
 # API
 
+@app.route('/API/branchname', methods=['GET'])
+def do_branch_name():
+    return session.get_current_branch()
+
+@app.route('/API/allbranch', methods=['GET'])
+def do_all_branches():
+    return session.getbranches()
+
+@app.route('/API/jump', methods=['POST'])
+def do_jump():
+    where = request.json['branch']
+    try:
+        session.jump({'<': 'left', '>': 'right'}.get(where, where))
+        return JSONResponse('success')
+    except EngineError as e:
+        return JSONResponse(type_='error', content=str(e))
 
 @app.route('/API/new_proof', methods=['POST'])
 def do_new_proof():
     sentence = request.data.decode()
     if session.proof:
-        return JSONResponse(type_='error', content="A proof would be deleted")
+        session.reset_proof()
     try:
         text = session.new_proof(sentence)
     except EngineError as e:
@@ -60,7 +76,6 @@ def do_new_proof():
 @app.route('/API/use_rule', methods=['POST'])
 def do_use_rule():
     rule = request.json['rule']
-    branch_name = request.json['branch']
     context = request.json['context']
 
     # Check context
@@ -82,21 +97,18 @@ def do_use_rule():
 
     # Run use_rule
     try:
-        session.jump(branch_name)
         text = session.use_rule(rule, prepared)
     except EngineError as e:
         print(str(e))
         return JSONResponse(type_='error', content=str(e))
     else:
         if text:
-            print("error")
             return JSONResponse(type_='error', content="\n".join(text))
         else:
-            print(f"rule used {rule=} {branch_name=}")
             return JSONResponse('success')
 
 
-@app.route('/API/hint/wanted', methods=['GET'])
+@app.route('/API/hint', methods=['GET'])
 def do_hint() -> str:
     """Gives you a hint"""
     try:
@@ -117,7 +129,7 @@ def do_get_worktree():
     try:
         return get_tree_clickable(session.proof.nodes)
     except EngineError as e:
-        return f'<code>{e}</code>'
+        return str(e)
     
 @app.route('/API/contratree', methods=['GET'])
 def do_get_contratree():
@@ -147,29 +159,28 @@ def do_get_branch():
         return f'<code>{e}</code>'
 
 
-@app.route('/API/preview', methods=['POST'])
-def do_preview():
-    rule = request.json['rule']
-    branch_name = request.json['branch']
-    context = request.json['context']
-    ret = session.proof.preview(branch_name, rule, context)
-    return get_preview(ret)
+# @app.route('/API/preview', methods=['POST'])
+# def do_preview():
+#     rule = request.json['rule']
+#     branch_name = request.json['branch']
+#     context = request.json['context']
+#     ret = session.proof.preview(branch_name, rule, context)
+#     return get_preview(ret)
 
 
 @app.route('/API/rules', methods=['GET'])
 def do_get_rules():
     tokenID = request.args.get('tokenID', default=None, type=int)
     sentenceID = request.args.get('sentenceID', default=None, type=int)
-    branch = request.args.get('branch', default=None, type=str)
 
     docs = session.getrules()
-    if session.sockets['Formal'].plugin_name == 'analytic_freedom' and session.proof is not None and branch is not None and sentenceID is not None and tokenID is not None:
-        b, _ = session.proof.nodes.getleaf(branch).getbranch_sentences()
+    if session.sockets['Formal'].plugin_name == 'analytic_freedom' and session.proof is not None and sentenceID is not None and tokenID is not None:
+        b, _ = session.proof.get_node().getbranch_sentences()
         token = b[sentenceID].getTypes()[tokenID]
         docs = {i: j for i, j in docs.items() if i.endswith(token)}
 
     rules = session.getrulessymbol()
-    return "".join(symbol_HTML(key, rules[key], branch, tokenID, sentenceID, docs[key]) for key in docs)
+    return "".join(symbol_HTML(key, rules[key], tokenID, sentenceID, docs[key]) for key in docs)
 
 
 @app.route('/API/undo', methods=['POST'])

@@ -55,7 +55,7 @@ def hint_start() -> Union[list[str], None]:
     :return: Lista podpowiedzi, jeden str na odpowiedź
     :rtype: list[str] | None
     """
-    return [articles['main']['start_text'], "Powodzenia!"]
+    return ['Po prostu wpisz formułę, którą chcesz zbadać. Nie musisz jej negować.', 'Powodzenia!']
 
 
 # Mistake correction

@@ -8,31 +8,38 @@ from tree import ProofNode, SentenceTupleStructure
 def JSONResponse(type_: str, content: Any = None):
     return {'type':type_, 'content': content} if content is not None else {'type':type_}
 
-def symbol_HTML(rule: str, symbolic: str, branch: str, tID: int, sID: int, tooltip: str):
+def symbol_HTML(rule: str, symbolic: str, tID: int, sID: int, tooltip: str):
     symbolic = symbolic.replace(";", "<br>").replace("|", "</div> <div>")
     premiss, result = symbolic.split(" / ")
-    return f'''<button type="button" onclick="use_rule('{rule}', '{branch}', {tID}, {sID})" title="{tooltip}">
+    return f'''<button type="button" onclick="use_rule('{rule}', {tID}, {sID})" title="{tooltip}">
     <div class="symbolic"><div>{premiss}</div></div>
     <hr>
     <div class="symbolic"><div>{result}</div></div></button>'''
 
-# TODO: uzupełnić tag
-Tag = Template('<button type="button" onclick="getRules(\'$branch\', $tID, $sID)">$symbol</button>')
+Tag = Template('<button type="button" class="$branch" onclick="getRules($tID, $sID)">$symbol</button>')
 
-def _clickable(sentence: Sentence, sentenceID: int, branch: str) -> Iterator[str]:
+def _clickable(sentence: Sentence, sentenceID: int, branches: list[str], isleaf) -> Iterator[str]:
     for tID, symbol in enumerate(sentence.getReadableList()):
-        yield Tag.substitute(tID=tID, sID=sentenceID, branch=branch, symbol=symbol)
+        yield Tag.substitute(tID=tID, sID=sentenceID, branch="branch-"+" branch-".join(branches)+isleaf, symbol=symbol)
 
-def get_clickable(sentence: Sentence, sentenceID: int, branch: str):
-    return " ".join(_clickable(sentence, sentenceID, branch))
+def get_clickable(sentence: Sentence, sentenceID: int, branch: str, isleaf=''):
+    return " ".join(_clickable(sentence, sentenceID, branch, isleaf))
 
 def get_tree_clickable(node: ProofNode):
-    table = [get_clickable(node.sentence, len(node.ancestors), node.branch)]
     if node.children:
-        table.append('<div class="symbolic2">')
+        table = [
+            get_clickable(
+                node.sentence,
+                len(node.ancestors),
+                {i.branch.lower() for i in node.leaves},
+            ),
+            '<div class="symbolic2">',
+        ]
         for child in node.children:
             table.append(''.join(['<div>', get_tree_clickable(child), '</div>']))
         table.append('</div>')
+    else:
+        table = [get_clickable(node.sentence, len(node.ancestors), {node.branch}, isleaf=f' leaf-{node.branch}')]
     return "".join(table)
 
 def get_tree_contra(node: ProofNode):

@@ -47,9 +47,9 @@ function new_proof(e) {
     }
 }
 
-function getRules(branch, tokenID, sentenceID) {
+function getRules(tokenID, sentenceID) {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", 'API/rules?branch='+branch+'&tokenID='+tokenID+'&sentenceID='+sentenceID);
+    xhr.open("GET", 'API/rules?tokenID='+tokenID+'&sentenceID='+sentenceID);
     xhr.responseType = 'text';
     xhr.send();
     xhr.onreadystatechange = function() {
@@ -214,6 +214,16 @@ document.getElementById("check").addEventListener("click", branchCheckPage)
 document.getElementById("check-branch-btn").addEventListener("click", checkBranch)
 document.getElementById("close-window-btn").addEventListener("click", closeWindow)
 document.getElementById("btn-check").addEventListener("click", tautologyCheck)
+document.getElementById("rules-undo").addEventListener("click", function (){
+    ret = sendPOST('API/undo', null);
+    if (ret["type"] == "success") {
+        getProof('/API/worktree', function(text) {
+            document.getElementById('clickable-container').innerHTML = text;
+        });
+    } else {
+        window.alert(ret["content"])
+    }
+})
 
 function nextPage() {
     larchStepsNum++;
