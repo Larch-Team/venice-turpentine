@@ -204,6 +204,9 @@ class Sentence(list):
     def isLiteral(self) -> bool:
         main = self.getMainConnective()
         return main is None or (main == 0 and len(self.readPrecedence()) == 1)
+    
+    def generate(self, type_: str) -> str:
+        return self.S.lexer.generate(self, type_)
 
     # Overwriting list methods
 
