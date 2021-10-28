@@ -203,8 +203,8 @@ function tautologyCheck() {
     };
 }
 
-document.getElementById("hint-x2").addEventListener('click', hideHint2)
-document.getElementById("rules-hint").addEventListener('click', showHint2)
+document.getElementById("hint-x2").addEventListener('click', hideHintRules)
+document.getElementById("rules-hint").addEventListener('click', showHintRules)
 document.getElementById("hint-x").addEventListener('click', hideHint)
 document.getElementById("qm").addEventListener('click', showHint)
 document.getElementById("new_proof").addEventListener("click", new_proof)
@@ -214,6 +214,9 @@ document.getElementById("check").addEventListener("click", branchCheckPage)
 document.getElementById("check-branch-btn").addEventListener("click", checkBranch)
 document.getElementById("close-window-btn").addEventListener("click", closeWindow)
 document.getElementById("btn-check").addEventListener("click", tautologyCheck)
+document.getElementById("rules-report").addEventListener("click", function () {
+    window.open('https://szymanski.notion.site/4a180f6826464e9dac60dd9c18c5ac0b?v=56fec8f735024f94ab421aa97cab3dc8','_blank')
+})
 document.getElementById("rules-undo").addEventListener("click", function (){
     ret = sendPOST('API/undo', null);
     if (ret["type"] == "success") {
@@ -240,7 +243,6 @@ function nextPage() {
 }
 
 function updateLarchSteps(){
-    
     larchSteps.forEach(larchStep => {
         larchStep.classList.contains("larch-container-active") &&
         larchStep.classList.remove("larch-container-active");
@@ -273,12 +275,26 @@ function hideHint() {
     document.getElementById("overlay").classList.remove("active");
 }
 
-function showHint2() {
-    document.getElementById("hint-window2").classList.add("active");
-    document.getElementById("overlay").classList.add("active");
+function showHintRules() {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", 'API/hint', true);
+    xhr.responseType = 'json';
+    xhr.send();
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            if (xhr.response['type']=='success') {
+                ret = xhr.response['content']
+            } else {
+                ret = `</h2>Wystąpił błąd:</h2>${xhr.response['content']}`
+            }
+            document.getElementById("hint-textbox").innerHTML = ret;
+            document.getElementById("hint-window2").classList.add("active");
+            document.getElementById("overlay").classList.add("active");
+        }
+    };
 }
 
-function hideHint2() {
+function hideHintRules() {
     document.getElementById("hint-window2").classList.remove("active");
     document.getElementById("overlay").classList.remove("active");
 }

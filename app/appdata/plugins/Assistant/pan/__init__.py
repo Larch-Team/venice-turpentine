@@ -33,6 +33,8 @@ def hint_command(proof: Union[Proof, None]) -> Union[list[str], None]:
     :return: Lista podpowiedzi, jeden str na odpowiedź
     :rtype: list[str] | None
     """
+    if len(proof.nodes.children) == 0:
+        return ["<p>Po prostu kliknij główny spójnik i używaj reguł dla tworzenia tabel analitycznych.</p>"]
     try:
         mistakes = proof.check()
     except EngineError:
@@ -45,7 +47,7 @@ def hint_command(proof: Union[Proof, None]) -> Union[list[str], None]:
     if moves:
         return [articles['main']['rule'], f"Spójrz na zdanie: <code>{moves[0].get_premisses()['sentenceID']}</code>"]
     else:
-        return ['To koniec brachu']
+        return ['To koniec! Wszystkie formuły zostały rozłożone.']
 
 
 def hint_start() -> Union[list[str], None]:
