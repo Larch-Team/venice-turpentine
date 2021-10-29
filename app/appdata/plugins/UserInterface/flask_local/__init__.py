@@ -15,6 +15,7 @@ from collections import namedtuple
 from flask_local.libs import JSONResponse, get_clickable, symbol_HTML, get_tree_clickable, get_preview
 from plugins.UserInterface.flask_local.libs import get_tree_contra
 from proof import Proof
+from random import randint
 
 SOCKET = 'UserInterface'
 VERSION = '0.0.1'
@@ -120,6 +121,12 @@ def do_hint() -> str:
     else:
         return JSONResponse(type_='error', content="Podpowiedzi nie ma, trzymaj się tam")
 
+@app.route('/API/randform', methods=['GET'])
+def do_get_randform():
+    try:
+        return JSONResponse(type_='success', content=" ".join(session.gen_formula(randint(5, 10), randint(2, 5)).getLexems()))
+    except EngineError as e:
+        return JSONResponse(type_='error', content=str(e))
 
 @app.route('/API/worktree', methods=['GET'])
 def do_get_worktree():
