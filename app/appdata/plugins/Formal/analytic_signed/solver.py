@@ -3,12 +3,14 @@ from rule import Rule, SentenceTupleStructure
 from sentence import Sentence
 from proof import Proof
 import plugins.Formal.__utils__ as utils
+from analytic_signed.signed import *
 from tree import ProofNode
 
 def find_rule(sentence: Sentence) -> str:
     """
     Rozpoznaje jaka reguła powinna zostać użyta na formule
     """
+    sentence = convert_from_signed(sentence)
     main, other = sentence.getComponents()
     if main is None:
         return None
@@ -43,7 +45,7 @@ def append_by_rules(containers: dict[str, list[utils.SignedSentence]], nodes: It
 
         if not node.closed and (rule := find_rule(node.sentence)) is not None:
             containers[rule].append(
-                utils.SignedSentence(node.sentence, node.branch, num))
+                utils.SignedSentence(convert_from_signed(node.sentence), node.branch, num))
     return containers
 
 

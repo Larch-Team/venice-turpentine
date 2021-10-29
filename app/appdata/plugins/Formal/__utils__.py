@@ -312,12 +312,11 @@ def add_prefix(sentence: Sentence, prefix: str, lexem: str = None) -> Sentence:
     :return: Zmieniony prefiks
     :rtype: Sentence
     """
-    if not lexem:
-        lexem = sentence.S.lexe.generate(sentence, prefix)
+    token = sentence.generate(prefix) if not lexem else f"{prefix}_{lexem}"
     if len(sentence) == 1:
-        return Sentence([f"{prefix}_{lexem}", *sentence], sentence.S)
+        return Sentence([token, *sentence], sentence.S)
     new_record = {0:sentence.calcPrecedenceVal(prefix)}
-    return Sentence([f"{prefix}_{lexem}", '(', *sentence, ')'], sentence.S, {i+2:j+1 for i,j in sentence.precedenceBaked.values()} | new_record)
+    return Sentence([token, '(', *sentence, ')'], sentence.S, {i+2:j+1 for i,j in sentence.precedenceBaked.values()} | new_record)
 
 
 @Modifier
@@ -446,6 +445,8 @@ class Smullyan(Rule):
         if sentenceID < 0 or sentenceID >= len(branch):
             raise FormalError("No such sentence")
         sentence = branch[sentenceID] 
+        if tokenID < 0 or tokenID >= len(sentence):
+            raise FormalError("No such token")
         if sentence[tokenID].startswith('sentvar'):
             raise FormalError("You can't divide a sentence by a variable")
         elif sentence[tokenID].startswith('not'):
