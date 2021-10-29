@@ -164,10 +164,10 @@ class BuiltLexer(object):
             used_lexems = sentence.getLexems()
 
             try:
-                while (new_lex := next(new_lexems)) not in used_lexems:
+                while (new_lex := next(new_lexems)) in used_lexems:
                     pass
             except StopIteration:
-                return None
+                raise LexError(f"Need more lexems for the {type_} type")
             else:
                 return f"{type_}_{new_lex}"
 

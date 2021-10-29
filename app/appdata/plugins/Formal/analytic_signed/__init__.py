@@ -15,7 +15,7 @@ from sentence import Sentence
 from usedrule import UsedRule
 
 SOCKET = 'Formal'
-VERSION = '0.3.0'
+VERSION = '0.4.0'
 
 PRECEDENCE = {
     'and': 3,
@@ -24,6 +24,13 @@ PRECEDENCE = {
     'not': 4
 }
 
+def generate_formula(sess: utils.Session_, length: int, vars: int) -> Sentence:
+    f = utils.generate_wff(sess, length, {
+        2 : ['and', 'or', 'imp'],
+        1 : ['not']
+    }, vars, 'sentvar')
+    assert (p := check_syntax(f)) is None, f"Formuła jest niepoprawna: {p}"
+    return f
 
 def get_operator_precedence() -> dict[str, int]:
     """Zwraca siłę wiązania danych spójników, im wyższa, tym mocniej wiąże (negacja ma najwyższą przykładowo)"""

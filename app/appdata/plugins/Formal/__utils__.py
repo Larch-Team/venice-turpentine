@@ -9,7 +9,7 @@ from exceptions import FormalError
 from rule import Rule, ParameterContext, SentenceID, TokenID, ContextDef
 from tree import HistoryTupleStructure, ProofNode, SentenceTupleStructure
 from usedrule import UsedRule
-from random import choice as rchoice, choices as rchoices
+from random import choice as rchoice, choices as rchoices, shuffle
 
 ContextDef = namedtuple(
     'ContextDef', ('variable', 'official', 'docs', 'type_'))
@@ -474,12 +474,13 @@ class Smullyan(Rule):
             ),)
             
 def random_sets(l: int, conns: tp.Iterable[int]):
-    while l - sum((r := rchoices(conns, k=l))) != 1:
-        pass
+    r = rchoices(conns, k=l)
+    r += (sum(r) + 1 - l)*[0]
+    shuffle(r)
     return r
 
 def generate_tree(l: int, conns: tp.Iterable[int]) -> list[int]:
-    A = random_sets(l, list(conns)+[0])
+    A = random_sets(l, list(conns))
     n, k = 0, 0
     for i, Ai in enumerate(A):
         n = n + 1 - Ai
@@ -489,8 +490,14 @@ def generate_tree(l: int, conns: tp.Iterable[int]) -> list[int]:
     return A[k+1:]+A[:k+1]
 
 def into_sentence(prefix: list[int], conn_dict: dict[int, tp.Iterable[str]], var_amount: int, var_type: str, sess) -> Sentence:
-    s = Sentence([], sess) # Brakuje sentence i session
-    variables = [s.generate(var_type) for _ in range(var_amount)]
+    s = Sentence([], sess)
+    variables = []
+    for _ in range(var_amount):
+        t = s.generate(var_type)
+        s.append(t)
+        variables.append(t)
+
+    s = Sentence([], sess)
     _into_sentence(s, prefix, conn_dict, variables)
     return s
     

@@ -124,7 +124,7 @@ def do_hint() -> str:
 @app.route('/API/randform', methods=['GET'])
 def do_get_randform():
     try:
-        return JSONResponse(type_='success', content=" ".join(session.gen_formula(session.gen_formula(randint(7, 14), randint(2, 5)))))
+        return JSONResponse(type_='success', content=" ".join(session.gen_formula(randint(5, 10), randint(2, 5)).getLexems()))
     except EngineError as e:
         return JSONResponse(type_='error', content=str(e))
 
