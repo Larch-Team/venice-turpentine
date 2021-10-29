@@ -12,7 +12,7 @@ from usedrule import UsedRule
 SOCKET = 'Formal'
 VERSION = '0.4.0'
 
-def generate_formula(length: int, vars: int) -> Sentence:
+def generate_formula(sess: utils.Session_, length: int, vars: int) -> Sentence:
     f = utils.generate_wff(length, {
         2 : [], # Spójniki jednoargumentowe
         1 : []  # Spójniki dwuargumentowe

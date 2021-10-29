@@ -13,7 +13,7 @@ from random import choice as rchoice, choices as rchoices
 
 ContextDef = namedtuple(
     'ContextDef', ('variable', 'official', 'docs', 'type_'))
-
+Session_ = tp.NewType('Session_', tp.Any)
 
 # Rule decorators
 
@@ -487,8 +487,8 @@ def generate_tree(l: int, conns: tp.Iterable[int]) -> list[int]:
             k = i
     return A[k+1:]+A[:k+1]
 
-def into_sentence(prefix: list[int], conn_dict: dict[int, tp.Iterable[str]], var_amount: int, var_type: str) -> Sentence:
-    s = Sentence() # Brakuje sentence i session
+def into_sentence(prefix: list[int], conn_dict: dict[int, tp.Iterable[str]], var_amount: int, var_type: str, sess) -> Sentence:
+    s = Sentence([], sess) # Brakuje sentence i session
     variables = [s.generate(var_type) for _ in range(var_amount)]
     _into_sentence(s, prefix, conn_dict, variables)
     return s
@@ -512,6 +512,6 @@ def _into_sentence(s: Sentence, prefix: list[int], conn_dict: dict[int, tp.Itera
             for _ in range(l):
                 _into_sentence(s, prefix[1:], conn_dict, variables)
             
-def generate_wff(length: int, conn_dict: dict[int, tp.Iterable[str]], var_amount: int, var_type: str):
+def generate_wff(sess, length: int, conn_dict: dict[int, tp.Iterable[str]], var_amount: int, var_type: str):
     prefix = generate_tree(length, conn_dict.keys())
-    return into_sentence(prefix, conn_dict, var_amount, var_type)
+    return into_sentence(prefix, conn_dict, var_amount, var_type, sess)

@@ -38,8 +38,8 @@ def get_tags() -> tuple[str]:
     return 'propositional', 'uses negation'
 
 
-def generate_formula(length: int, vars: int) -> Sentence:
-    f = utils.generate_wff(length, {
+def generate_formula(sess: utils.Session_, length: int, vars: int) -> Sentence:
+    f = utils.generate_wff(sess, length, {
         2 : ['and', 'or', 'imp'],
         1 : ['not']
     }, vars, 'sentvar')

@@ -315,7 +315,7 @@ class Session(object):
 
     @EngineLog
     def gen_formula(self, length: int, var_amount: int) -> Sentence:
-        return self.acc('Formal').generate_formula(length, var_amount)
+        return self.acc('Formal').generate_formula(self, length, var_amount)
     
     @EngineLog
     def new_proof(self, statement: str) -> tp.Union[None, list[str]]:
