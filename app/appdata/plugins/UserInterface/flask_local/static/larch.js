@@ -217,6 +217,9 @@ document.getElementById("btn-check").addEventListener("click", tautologyCheck)
 document.getElementById("rules-report").addEventListener("click", function () {
     window.open('https://szymanski.notion.site/4a180f6826464e9dac60dd9c18c5ac0b?v=56fec8f735024f94ab421aa97cab3dc8','_blank')
 })
+document.getElementById("new_end").addEventListener("click", function () {
+    window.location.reload(true)
+})
 document.getElementById("rules-undo").addEventListener("click", function (){
     ret = sendPOST('API/undo', null);
     if (ret["type"] == "success") {
