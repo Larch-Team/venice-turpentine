@@ -547,7 +547,7 @@ def do_gen_form(session: engine.Session, length: int, variable_amount: int):
         - Formula length [int]
         - Amount of variables in the formula [int]
     """
-    return " ".join(session.gen_formula(length, variable_amount).getLexems()
+    return " ".join(session.gen_formula(length, variable_amount).getLexems())
 
 command_dict = OrderedDict({
     # Navigation

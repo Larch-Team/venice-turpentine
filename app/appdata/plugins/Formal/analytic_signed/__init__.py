@@ -96,43 +96,43 @@ class SignedSmullyan(utils.Smullyan):
 RULES = {
     'double not': utils.Rule(
         name='double not',
-        symbolic="~~A / A",
+        symbolic="F~A / TA",
         docs="Usuwanie podwójnej negacji. Wymaga wskazania zdania w gałęzi.",
         reusable=False
     ),
     'true and': SignedSmullyan(
         name='true and',
-        symbolic="A and B / A; B",
+        symbolic="TA and B / TA; TB",
         docs="Rozkładanie prawdziwej koniunkcji. Wymaga wskazania zdania w gałęzi oraz rozkładanego spójnika.",
         reusable=False
     ),
     'false or': SignedSmullyan(
         name='false or',
-        symbolic="~(A or B) / ~A; ~B",
+        symbolic="FA or B / FA; FB",
         docs="Rozkładanie fałszywej alternatywy. Wymaga wskazania zdania w gałęzi oraz rozkładanego spójnika.",
         reusable=False
     ),
     'false imp': SignedSmullyan(
         name='false imp',
-        symbolic="~(A -> B) / A; ~B",
+        symbolic="FA -> B / TA; FB",
         docs="Rozkładanie fałszywej implikacji. Wymaga wskazania zdania w gałęzi oraz rozkładanego spójnika.",
         reusable=False
     ),
     'true or': SignedSmullyan(
         name='true or',
-        symbolic="(A or B) / A | B",
+        symbolic="TA or B / TA | TB",
         docs="Rozkładanie prawdziwej alternatywy. Wymaga wskazania zdania w gałęzi oraz rozkładanego spójnika.",
         reusable=False
     ),
     'false and': SignedSmullyan(
         name='false and',
-        symbolic="~(A and B) / ~A | ~B",
+        symbolic="FA and B / FA | FB",
         docs="Rozkładanie fałszywej koniunkcji. Wymaga wskazania zdania w gałęzi oraz rozkładanego spójnika.",
         reusable=False
     ),
     'true imp': SignedSmullyan(
         name='true imp',
-        symbolic="(A -> B) / ~A | B",
+        symbolic="TA -> B / FA | TB",
         docs="Rozkładanie prawdziwej implikacji. Wymaga wskazania zdania w gałęzi oraz rozkładanego spójnika.",
         reusable=False
     )
@@ -156,7 +156,11 @@ def strict_doublenot(sentence: Sentence):
 
 @double_not.setNaive
 def naive_doublenot(branch: list[Sentence], sentenceID: SentenceID):
-    return convert_to_signed(utils.reduce_prefix(utils.reduce_prefix(utils.empty_creator(convert_from_signed(branch[sentenceID])), 'not'), 'not'))
+    f = convert_from_signed(branch[sentenceID])
+    res = utils.reduce_prefix(utils.reduce_prefix(utils.empty_creator(f), 'not'), 'not')
+    if res is None:
+        raise RaisedUserMistake('cannot perform', "This rule cannot be performed")
+    return convert_to_signed(res)
 
 
 # CHECKER

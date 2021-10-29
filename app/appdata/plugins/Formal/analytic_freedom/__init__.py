@@ -148,7 +148,12 @@ def strict_doublenot(sentence: Sentence):
 
 @double_not.setNaive
 def naive_doublenot(branch: list[Sentence], sentenceID: SentenceID):
-    return utils.reduce_prefix(utils.reduce_prefix(utils.empty_creator(branch[sentenceID]), 'not'), 'not')
+    f = branch[sentenceID]
+    res = utils.reduce_prefix(utils.reduce_prefix(utils.empty_creator(f), 'not'), 'not')
+    if res is None:
+        raise RaisedUserMistake('cannot perform', "This rule cannot be performed")
+    return res
+
 
 
 # CHECKER

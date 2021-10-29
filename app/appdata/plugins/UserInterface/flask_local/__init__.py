@@ -181,7 +181,7 @@ def do_get_rules():
     sentenceID = request.args.get('sentenceID', default=None, type=int)
 
     docs = session.getrules()
-    if session.sockets['Formal'].plugin_name == 'analytic_freedom' and session.proof is not None and sentenceID is not None and tokenID is not None:
+    if session.sockets['Formal'].plugin_name in ('analytic_freedom', 'analytic_signed') and session.proof is not None and sentenceID is not None and tokenID is not None:
         b, _ = session.proof.get_node().getbranch_sentences()
         token = b[sentenceID].getTypes()[tokenID]
         docs = {i: j for i, j in docs.items() if i.endswith(token)}
