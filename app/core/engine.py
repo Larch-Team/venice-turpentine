@@ -65,7 +65,7 @@ class Session(object):
     """
     ENGINE_VERSION = '0.0.1'
     SOCKETS = {'Assistant': '0.0.1',
-               'Formal': '0.3.0',
+               'Formal': '0.4.0',
                'Lexicon': '0.0.1',
                'Output': '0.2.0'}
     SOCKETS_NOT_IN_CONFIG = ()
@@ -313,6 +313,10 @@ class Session(object):
 
     # Proof manipulation
 
+    @EngineLog
+    def gen_formula(self, length: int, var_amount: int) -> Sentence:
+        return self.acc('Formal').generate_formula(length, var_amount)
+    
     @EngineLog
     def new_proof(self, statement: str) -> tp.Union[None, list[str]]:
         """Parsuje zdanie, testuje poprawność i tworzy z nim dowód

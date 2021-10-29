@@ -9,6 +9,7 @@ from exceptions import FormalError
 from rule import Rule, ParameterContext, SentenceID, TokenID, ContextDef
 from tree import HistoryTupleStructure, ProofNode, SentenceTupleStructure
 from usedrule import UsedRule
+from random import choice as rchoice, choices as rchoices
 
 ContextDef = namedtuple(
     'ContextDef', ('variable', 'official', 'docs', 'type_'))
@@ -470,3 +471,47 @@ class Smullyan(Rule):
                 branch1 if self.comp1 else add_prefix(branch1, 'not', '~'),
                 branch2 if self.comp2 else add_prefix(branch2, 'not', '~')
             ),)
+            
+def random_sets(l: int, conns: tp.Iterable[int]):
+    while l - sum((r := rchoices(conns, k=l))) != 1:
+        pass
+    return r
+
+def generate_tree(l: int, conns: tp.Iterable[int]) -> list[int]:
+    A = random_sets(l, list(conns)+[0])
+    n, k = 0, 0
+    for i, Ai in enumerate(A):
+        n = n + 1 - Ai
+        if n == 1:
+            n = 0
+            k = i
+    return A[k+1:]+A[:k+1]
+
+def into_sentence(prefix: list[int], conn_dict: dict[int, tp.Iterable[str]], var_amount: int, var_type: str) -> Sentence:
+    s = Sentence() # Brakuje sentence i session
+    variables = [s.generate(var_type) for _ in range(var_amount)]
+    _into_sentence(s, prefix, conn_dict, variables)
+    return s
+    
+def _into_sentence(s: Sentence, prefix: list[int], conn_dict: dict[int, tp.Iterable[str]], variables: list[str]):
+    l = prefix[0]
+    if l == 0:
+        s.append(rchoice(variables))
+    else:
+        possible_main = conn_dict[l]
+        main = s.generate(rchoice(possible_main))
+        if l == 2:
+            # INFIX
+            s.append('(')
+            _into_sentence(s, prefix[1:], conn_dict, variables)
+            s.append(main)
+            _into_sentence(s, prefix[1:], conn_dict, variables)
+            s.append(')')
+        else:
+            s.append(main)
+            for _ in range(l):
+                _into_sentence(s, prefix[1:], conn_dict, variables)
+            
+def generate_wff(length: int, conn_dict: dict[int, tp.Iterable[str]], var_amount: int, var_type: str):
+    prefix = generate_tree(length, conn_dict.keys())
+    return into_sentence(prefix, conn_dict, var_amount, var_type)

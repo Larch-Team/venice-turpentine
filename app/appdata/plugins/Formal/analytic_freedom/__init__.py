@@ -14,7 +14,7 @@ from sentence import Sentence
 from usedrule import UsedRule
 
 SOCKET = 'Formal'
-VERSION = '0.3.0'
+VERSION = '0.4.0'
 
 PRECEDENCE = {
     'and': 3,
@@ -36,6 +36,15 @@ def prepare_for_proving(statement: Sentence) -> Sentence:
 
 def get_tags() -> tuple[str]:
     return 'propositional', 'uses negation'
+
+
+def generate_formula(length: int, vars: int) -> Sentence:
+    f = utils.generate_wff(length, {
+        2 : ['and', 'or', 'imp'],
+        1 : ['not']
+    }, vars, 'sentvar')
+    assert (p := check_syntax(f)) is None, f"Formuła jest niepoprawna: {p}"
+    return f
 
 
 # SYNTAX CHECKING
