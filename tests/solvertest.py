@@ -1,7 +1,6 @@
 import os
 import sys
 import time
-# dodac check
 sys.path.extend([os.path.abspath(i) for i in ['../app/appdata', '../app/core']])
 from plugins.UserInterface import CLI as c
 
@@ -20,5 +19,8 @@ for num, formula in enumerate(TAUTOLOGIES):
         print(num, "- brak rozwiązania -" , formula)
     elif 'Formuła jest tautologią' not in wynik:
         print(num, "- błędne rozwiązanie -" , formula)
-    runner(f'leave')
+    ch = runner('check')
+    if ch != 'Dowód jest poprawny':
+        print(num, "-", ch,"-" , formula)
+    runner('leave')
 print(round((time.time()-start)/len(TAUTOLOGIES), 4), 'sekund na dowód')

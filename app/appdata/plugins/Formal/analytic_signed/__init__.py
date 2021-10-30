@@ -6,10 +6,11 @@ import typing as tp
 import plugins.Formal.__utils__ as utils
 from exceptions import UserMistake, RaisedUserMistake
 from history import History
-from analytic_freedom.solver import find_rule, _solver
+from analytic_signed.solver import find_rule as find_rule, _solver
+from analytic_signed.signed import *
 from analytic_freedom.syntax_check import reduce_, find_all
 from proof import Proof
-from rule import SentenceID
+from rule import SentenceID, SentenceTupleStructure, TokenID
 from sentence import Sentence
 from usedrule import UsedRule
 
@@ -23,21 +24,6 @@ PRECEDENCE = {
     'not': 4
 }
 
-
-def get_operator_precedence() -> dict[str, int]:
-    """Zwraca siłę wiązania danych spójników, im wyższa, tym mocniej wiąże (negacja ma najwyższą przykładowo)"""
-    return PRECEDENCE
-
-
-def prepare_for_proving(statement: Sentence) -> Sentence:
-    """Przygotowuje zdanie do dowodzenia - czyszczenie, dodawanie elementów"""
-    return utils.add_prefix(statement, 'not', "~")
-
-
-def get_tags() -> tuple[str]:
-    return 'propositional', 'uses negation'
-
-
 def generate_formula(sess: utils.Session_, length: int, vars: int) -> Sentence:
     f = utils.generate_wff(sess, length, {
         2 : ['and', 'or', 'imp'],
@@ -46,11 +32,26 @@ def generate_formula(sess: utils.Session_, length: int, vars: int) -> Sentence:
     assert (p := check_syntax(f)) is None, f"Formuła jest niepoprawna: {p}"
     return f
 
+def get_operator_precedence() -> dict[str, int]:
+    """Zwraca siłę wiązania danych spójników, im wyższa, tym mocniej wiąże (negacja ma najwyższą przykładowo)"""
+    return PRECEDENCE
+
+
+def prepare_for_proving(statement: Sentence) -> Sentence:
+    """Przygotowuje zdanie do dowodzenia - czyszczenie, dodawanie elementów"""
+    return convert_to_signed(utils.add_prefix(statement, 'not', "~"))
+
+
+def get_tags() -> tuple[str]:
+    return 'propositional', 'uses negation', 'signed'
+
 
 # SYNTAX CHECKING
 
 def check_syntax(sentence: Sentence) -> tp.Union[UserMistake, None]:
     """Sprawdza poprawność zapisu tokenizowanego zdania, zwraca informacje o błędach w formule"""
+    if any((i.startswith('sign') for i in sentence.getTypes())):
+        return UserMistake('no sign symbols', 'Program samodzielnie sygnuje formuły, znaki te są zarezerwowane')
     reduced, indexes = reduce_(sentence)
     if reduced == 's':
         # ok
@@ -82,49 +83,56 @@ def check_syntax(sentence: Sentence) -> tp.Union[UserMistake, None]:
             return UserMistake('no left', f'Spójnik dwuargumentowy na pozycji {indexes[er]+1} nie ma lewego argumentu', {'pos': indexes[er]})
     raise Exception('Zdanie nie jest poprawne')
 
-
+class SignedSmullyan(utils.Smullyan):
+    
+    def _strict(self, sentence: Sentence) -> tp.Union[None, SentenceTupleStructure]:
+        return convert_to_signed(super()._strict(convert_from_signed(sentence)))
+    
+    def _naive(self, branch: list[Sentence], sentenceID: SentenceID, tokenID: TokenID) -> tp.Union[None, SentenceTupleStructure]:
+        return convert_to_signed(super()._naive([convert_from_signed(i) for i in branch], sentenceID, tokenID-int(branch[sentenceID][0].startswith('signtrue_'))))
+    
 # RULES
 
 RULES = {
     'double not': utils.Rule(
         name='double not',
-        symbolic="~~A / A",
+        symbolic="F~A / TA",
         docs="Usuwanie podwójnej negacji. Wymaga wskazania zdania w gałęzi.",
         reusable=False
     ),
-    'true and': utils.Smullyan(
+    'true and': SignedSmullyan(
         name='true and',
-        symbolic="A and B / A; B",
+        symbolic="TA and B / TA; TB",
         docs="Rozkładanie prawdziwej koniunkcji. Wymaga wskazania zdania w gałęzi oraz rozkładanego spójnika.",
         reusable=False
     ),
-    'false or': utils.Smullyan(
+    'false or': SignedSmullyan(
         name='false or',
-        symbolic="~(A or B) / ~A; ~B",
+        symbolic="FA or B / FA; FB",
         docs="Rozkładanie fałszywej alternatywy. Wymaga wskazania zdania w gałęzi oraz rozkładanego spójnika.",
         reusable=False
     ),
-    'false imp': utils.Smullyan(
+    'false imp': SignedSmullyan(
         name='false imp',
-        symbolic="~(A -> B) / A; ~B",
+        symbolic="FA -> B / TA; FB",
         docs="Rozkładanie fałszywej implikacji. Wymaga wskazania zdania w gałęzi oraz rozkładanego spójnika.",
         reusable=False
     ),
-    'true or': utils.Smullyan(
+    'true or': SignedSmullyan(
         name='true or',
-        symbolic="(A or B) / A | B",
+        symbolic="TA or B / TA | TB",
         docs="Rozkładanie prawdziwej alternatywy. Wymaga wskazania zdania w gałęzi oraz rozkładanego spójnika.",
         reusable=False
     ),
-    'false and': utils.Smullyan(
+    'false and': SignedSmullyan(
         name='false and',
-        symbolic="~(A and B) / ~A | ~B",
+        symbolic="FA and B / FA | FB",
         docs="Rozkładanie fałszywej koniunkcji. Wymaga wskazania zdania w gałęzi oraz rozkładanego spójnika.",
         reusable=False
     ),
-    'true imp': utils.Smullyan(
+    'true imp': SignedSmullyan(
         name='true imp',
-        symbolic="(A -> B) / ~A | B",
+        symbolic="TA -> B / FA | TB",
         docs="Rozkładanie prawdziwej implikacji. Wymaga wskazania zdania w gałęzi oraz rozkładanego spójnika.",
         reusable=False
     )
@@ -143,17 +151,16 @@ RULES['false and'].children = (RULES['true imp'],)
 
 @double_not.setStrict
 def strict_doublenot(sentence: Sentence):
-    return utils.reduce_prefix(utils.reduce_prefix(utils.empty_creator(sentence), 'not'), 'not')
+    return convert_to_signed(utils.reduce_prefix(utils.reduce_prefix(utils.empty_creator(convert_from_signed(sentence)), 'not'), 'not'))
 
 
 @double_not.setNaive
 def naive_doublenot(branch: list[Sentence], sentenceID: SentenceID):
-    f = branch[sentenceID]
+    f = convert_from_signed(branch[sentenceID])
     res = utils.reduce_prefix(utils.reduce_prefix(utils.empty_creator(f), 'not'), 'not')
     if res is None:
         raise RaisedUserMistake('cannot perform', "This rule cannot be performed")
-    return res
-
+    return convert_to_signed(res)
 
 
 # CHECKER
@@ -174,7 +181,7 @@ def group_by_rules(proof: Proof) -> dict[str, list[utils.SignedSentence]]:
 
             if (rule := find_rule(sentence)) is not None:
                 containers[rule].append(
-                    utils.SignedSentence(sentence, leaf.branch, num))
+                    utils.SignedSentence(convert_from_signed(sentence), leaf.branch, num))
     return containers
 
 def checker(rule: UsedRule, conclusion: Sentence) -> tp.Union[UserMistake, None]:
@@ -182,11 +189,12 @@ def checker(rule: UsedRule, conclusion: Sentence) -> tp.Union[UserMistake, None]
     Na podstawie informacji o użytych regułach i podanym wyniku zwraca informacje o błędach. None wskazuje na poprawność wyprowadzenia wniosku z reguły.
     Konceptualnie przypomina zbiory Hintikki bez reguły o niesprzeczności.
     """
+    conclusion = convert_from_signed(conclusion)
     premiss = rule.get_premisses()['sentenceID']  # Istnieje tylko jedna
     entailed = RULES[rule.rule].strict(premiss)
     if not entailed:
         return UserMistake('wrong rule', f"'{rule.rule}' can't be used on '{premiss.getReadable()}'", {'rule':rule.rule, 'premiss':premiss})
-    elif conclusion in sum(entailed, ()) and find_rule(premiss) == rule.rule:
+    elif conclusion in sum(convert_from_signed(entailed), ()) and find_rule(premiss) == rule.rule:
         return None
     else:
         return UserMistake('wrong precedence', f"Check which connective is the main one in '{premiss.getReadable()}'", {'rule':rule.rule, 'premiss':premiss})
@@ -207,6 +215,7 @@ def solver(proof: Proof) -> bool:
 
 def check_closure(branch: list[Sentence], used: History) -> tp.Union[None, tuple[utils.close.Close, str]]:
     """Sprawdza możliwość zamknięcia gałęzi, zwraca obiekty zamknięcia oraz komunikat do wyświetlenia"""
+    branch = [convert_from_signed(i) for i in branch]
     for num1, statement_1 in enumerate(branch):
         for num2, statement_2 in enumerate(branch):
             if statement_1[0].startswith('not') and not statement_2[0].startswith('not'):

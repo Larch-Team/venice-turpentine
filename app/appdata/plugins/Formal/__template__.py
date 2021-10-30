@@ -10,7 +10,15 @@ from sentence import Sentence
 from usedrule import UsedRule
 
 SOCKET = 'Formal'
-VERSION = '0.3.0'
+VERSION = '0.4.0'
+
+def generate_formula(sess: utils.Session_, length: int, vars: int) -> Sentence:
+    f = utils.generate_wff(length, {
+        2 : [], # Spójniki jednoargumentowe
+        1 : []  # Spójniki dwuargumentowe
+    }, vars, '') # Typ zmiennej domyślnej
+    assert (p := check_syntax(f)) is None, f"Formuła jest niepoprawna: {p}"
+    return f
 
 def get_tags() -> tuple[str]:
     pass

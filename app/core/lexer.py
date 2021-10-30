@@ -60,17 +60,14 @@ class BuiltLexer(object):
         self.LITERALS = lex.LITERALS
         self.find_new = self._get_find_new(lex)
 
-        lex_re = ((i, j) for i, j, _ in self._filter_constraints(lex, kwargs))
-        gen_re = ((i, j) for i, j, for_generation in lex_re if for_generation)
+        l = list(self._filter_constraints(lex, kwargs))
+        lex_re = [(i, j) for i, j, _ in l]
+        gen_re = [(i, j) for i, j, for_generation in l if for_generation]
 
         self.lexer_regexes = {key: self._regex_from_list(
             val) for key, val in self._join_rules(lex_re).items()}
         self.generator_regexes = {key: self._regex_from_list(
             val) for key, val in self._join_rules(gen_re).items()}
-
-        if set(self.lexer_regexes).issubset(self.generator_regexes):
-            raise LrchLexerError(
-                "Zbiór leksemów nie pozwala na generowanie nowych zmiennych")
 
         class _Lex:
             _master_re = re
@@ -110,7 +107,7 @@ class BuiltLexer(object):
         for def_constr, type_, lexems in lex.rules:
             rewritten_satisfied = sep_items(satisfied)
             if all((i in rewritten_satisfied for i in def_constr if i[0] != 'find_new')):
-                yield type_, lexems, any((i[0] == 'no_generation' for i in rewritten_satisfied))
+                yield type_, lexems, all((i[0] != 'no_generation' for i in rewritten_satisfied))
 
     @staticmethod
     def _get_find_new(lex: Lexicon) -> set[str]:
@@ -167,10 +164,10 @@ class BuiltLexer(object):
             used_lexems = sentence.getLexems()
 
             try:
-                while (new_lex := next(new_lexems)) not in used_lexems:
+                while (new_lex := next(new_lexems)) in used_lexems:
                     pass
             except StopIteration:
-                return None
+                raise LexError(f"Need more lexems for the {type_} type")
             else:
                 return f"{type_}_{new_lex}"
 
@@ -180,7 +177,7 @@ class BuiltLexer(object):
             try:
                 new_lex = max(counted, key=lambda x: x[1])[0]
             except ValueError:
-                return getone(self.generator_regexes[type_])
+                return f"{type_}_{getone(self.generator_regexes[type_])}"
             else:
                 return f"{type_}_{new_lex}"
 

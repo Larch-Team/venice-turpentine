@@ -540,6 +540,15 @@ def do_access_colors(session: engine.Session, val: int) -> str:
     session.change_accessibility(val)
     return "Color accessibility changed"
 
+def do_gen_form(session: engine.Session, length: int, variable_amount: int):
+    """Generates a random formula
+
+    Arguments:
+        - Formula length [int]
+        - Amount of variables in the formula [int]
+    """
+    return " ".join(session.gen_formula(length, variable_amount).getLexems())
+
 command_dict = OrderedDict({
     # Navigation
     'exit': {'comm': do_exit, 'args': []},
@@ -555,6 +564,7 @@ command_dict = OrderedDict({
     # 'redo': {'comm': do_redo, 'args': [int]},
     'leave': {'comm': do_leave, 'args': []},
     'prove': {'comm': do_prove, 'args': 'multiple_strings'},
+    'gen': {'comm': do_gen_form, 'args': [int, int]},
     'hint': {'comm': do_hint, 'args': []},
     'solve': {'comm': do_solve, 'args': []},
     'check': {'comm': do_check, 'args': []},

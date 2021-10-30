@@ -9,10 +9,11 @@ from exceptions import FormalError
 from rule import Rule, ParameterContext, SentenceID, TokenID, ContextDef
 from tree import HistoryTupleStructure, ProofNode, SentenceTupleStructure
 from usedrule import UsedRule
+from random import choice as rchoice, choices as rchoices, shuffle
 
 ContextDef = namedtuple(
     'ContextDef', ('variable', 'official', 'docs', 'type_'))
-
+Session_ = tp.NewType('Session_', tp.Any)
 
 # Rule decorators
 
@@ -311,12 +312,11 @@ def add_prefix(sentence: Sentence, prefix: str, lexem: str = None) -> Sentence:
     :return: Zmieniony prefiks
     :rtype: Sentence
     """
-    if not lexem:
-        lexem = sentence.S.lexe.generate(sentence, prefix)
+    token = sentence.generate(prefix) if not lexem else f"{prefix}_{lexem}"
     if len(sentence) == 1:
-        return Sentence([f"{prefix}_{lexem}", *sentence], sentence.S)
+        return Sentence([token, *sentence], sentence.S)
     new_record = {0:sentence.calcPrecedenceVal(prefix)}
-    return Sentence([f"{prefix}_{lexem}", '(', *sentence, ')'], sentence.S, {i+2:j+1 for i,j in sentence.precedenceBaked.values()} | new_record)
+    return Sentence([token, '(', *sentence, ')'], sentence.S, {i+2:j+1 for i,j in sentence.precedenceBaked.values()} | new_record)
 
 
 @Modifier
@@ -445,6 +445,8 @@ class Smullyan(Rule):
         if sentenceID < 0 or sentenceID >= len(branch):
             raise FormalError("No such sentence")
         sentence = branch[sentenceID] 
+        if tokenID < 0 or tokenID >= len(sentence):
+            raise FormalError("No such token")
         if sentence[tokenID].startswith('sentvar'):
             raise FormalError("You can't divide a sentence by a variable")
         elif sentence[tokenID].startswith('not'):
@@ -470,3 +472,54 @@ class Smullyan(Rule):
                 branch1 if self.comp1 else add_prefix(branch1, 'not', '~'),
                 branch2 if self.comp2 else add_prefix(branch2, 'not', '~')
             ),)
+            
+def random_sets(l: int, conns: tp.Iterable[int]):
+    r = rchoices(conns, k=l)
+    r += (sum(r) + 1 - l)*[0]
+    shuffle(r)
+    return r
+
+def generate_tree(l: int, conns: tp.Iterable[int]) -> list[int]:
+    A = random_sets(l, list(conns))
+    n, k = 0, 0
+    for i, Ai in enumerate(A):
+        n = n + 1 - Ai
+        if n == 1:
+            n = 0
+            k = i
+    return A[k+1:]+A[:k+1]
+
+def into_sentence(prefix: list[int], conn_dict: dict[int, tp.Iterable[str]], var_amount: int, var_type: str, sess) -> Sentence:
+    s = Sentence([], sess)
+    variables = []
+    for _ in range(var_amount):
+        t = s.generate(var_type)
+        s.append(t)
+        variables.append(t)
+
+    s = Sentence([], sess)
+    _into_sentence(s, prefix, conn_dict, variables)
+    return s
+    
+def _into_sentence(s: Sentence, prefix: list[int], conn_dict: dict[int, tp.Iterable[str]], variables: list[str]):
+    l = prefix[0]
+    if l == 0:
+        s.append(rchoice(variables))
+    else:
+        possible_main = conn_dict[l]
+        main = s.generate(rchoice(possible_main))
+        if l == 2:
+            # INFIX
+            s.append('(')
+            _into_sentence(s, prefix[1:], conn_dict, variables)
+            s.append(main)
+            _into_sentence(s, prefix[1:], conn_dict, variables)
+            s.append(')')
+        else:
+            s.append(main)
+            for _ in range(l):
+                _into_sentence(s, prefix[1:], conn_dict, variables)
+            
+def generate_wff(sess, length: int, conn_dict: dict[int, tp.Iterable[str]], var_amount: int, var_type: str):
+    prefix = generate_tree(length, conn_dict.keys())
+    return into_sentence(prefix, conn_dict, var_amount, var_type, sess)

@@ -8,6 +8,10 @@ VERSION = '0.0.1'
 
 Lex = Lexicon()
 
+with use_language('signed'):
+    Lex['signtrue'] = 'P', 'T'
+    Lex['signfalse'] = 'F'
+
 with use_language('propositional'):
     with use_language('uses negation'):
         Lex['not'] = 'not', '~', r'\!'
