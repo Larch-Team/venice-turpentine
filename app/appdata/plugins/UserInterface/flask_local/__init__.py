@@ -43,7 +43,8 @@ def do_branch_name():
 
 @app.route('/API/allbranch', methods=['GET'])
 def do_all_branches():
-    return session.getbranches()
+    hjk = session.getbranches()
+    return str(len(hjk))
 
 @app.route('/API/jump', methods=['POST'])
 def do_jump():

@@ -483,6 +483,16 @@ mark {
     max-width: 10em;
 }
 
+#hint-window3 {
+    max-width: 22em;
+    text-align: center;
+}
+
+#ok {
+    margin-top: 10%;
+    width: 80%;
+}
+
 button:disabled {
     background-color: #d7d7d7;
 }
@@ -512,4 +522,9 @@ button:disabled {
 
 .material-icons {
     font-size: 1.5em !important;
+}
+
+.current-branch-container {
+    display: inline-flex;
+    grid-gap: 0.5em;
 }

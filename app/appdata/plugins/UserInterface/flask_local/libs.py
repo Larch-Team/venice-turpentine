@@ -16,11 +16,11 @@ def symbol_HTML(rule: str, symbolic: str, tID: int, sID: int, tooltip: str):
     <hr>
     <div class="symbolic"><div>{result}</div></div></button>'''
 
-Tag = Template('<button type="button" class="$branch" onclick="getRules($tID, $sID)">$symbol</button>')
+Tag = Template('<button type="button" class="$branch" id="btn$sID$tID$branch" onclick="getRules($tID, $sID, \'$branch\')">$symbol</button>')
 
 def _clickable(sentence: Sentence, sentenceID: int, branches: list[str], isleaf) -> Iterator[str]:
     for tID, symbol in enumerate(sentence.getReadableList()):
-        yield Tag.substitute(tID=tID, sID=sentenceID, branch="branch-"+" branch-".join(branches)+isleaf, symbol=symbol)
+        yield Tag.substitute(tID=tID, sID=sentenceID, branch=""+" ".join(branches)+isleaf, symbol=symbol)
 
 def get_clickable(sentence: Sentence, sentenceID: int, branch: str, isleaf=''):
     return " ".join(_clickable(sentence, sentenceID, branch, isleaf))

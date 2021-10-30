@@ -42,12 +42,13 @@ function new_proof(e) {
             document.getElementById('clickable-container').innerHTML = text;
         });
         nextPage();
+        getCurrentBranch();
     } else {
         window.alert(ret["content"])
     }
 }
 
-function getRules(tokenID, sentenceID) {
+function getRules(tokenID, sentenceID, branch) {
     var xhr = new XMLHttpRequest();
     xhr.open("GET", 'API/rules?tokenID='+tokenID+'&sentenceID='+sentenceID);
     xhr.responseType = 'text';
@@ -56,15 +57,23 @@ function getRules(tokenID, sentenceID) {
         if (xhr.readyState === 4) {
             rules = xhr.response;
             document.getElementById('rules-container').innerHTML = rules;   
+            if (branchNumber > 1) {
+                var currentLeaf = document.getElementById("btn"+sentenceID+tokenID+branch);
+                console.log(currentLeaf);
+                var classNames = currentLeaf.getAttribute("class").match(/[\w-]*leaf[\w-]*/g);
+                if (typeof classNames != "undefined" && classNames != null && classNames.length != null && classNames.length > 0) {
+                    branchName = currentLeaf.classList[0];
+                    jump(branchName);
+                }
+            }
         }
     }
 }
 
-function use_rule(rule_name, branch, tokenID, sentenceID) {
+function use_rule(rule_name, tokenID, sentenceID) {
     var xhr = new XMLHttpRequest();
     var jsonData= {
         "rule":rule_name,
-        "branch":branch,
         "context": {
             "tokenID":tokenID,
             "sentenceID":sentenceID
@@ -80,6 +89,50 @@ function use_rule(rule_name, branch, tokenID, sentenceID) {
             });
         }
     };
+    getBranchesNumber();
+}
+
+var branchNumber;
+var branchNumberCounter = 0;
+
+function getBranchesNumber() {
+    xhr = new XMLHttpRequest();
+    xhr.open('GET', '/API/allbranch');
+    xhr.send();
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            branchNumber = parseInt(xhr.responseText);
+            console.log(branchNumber);
+            if (branchNumber == 2 && branchNumberCounter == 0) {
+                showHint2();
+                branchNumberCounter++;
+            };
+        };
+    };
+}
+
+function getCurrentBranch() {
+    xhr = new XMLHttpRequest();
+    xhr.open('GET', '/API/branchname');
+    xhr.send();
+    xhr.onreadystatechange = function() {
+        branchName = xhr.responseText;
+        console.log(branchName);
+        document.getElementById("current-branch").innerHTML = branchName;
+        document.getElementById("current-branch").style.color = branchName;
+    }
+}
+
+function jump(branchName) {
+    var xhr = new XMLHttpRequest();
+    var jsonData= {
+        "branch":branchName
+        };
+    xhr.open('POST', 'API/jump', true);
+    xhr.setRequestHeader("Content-type", "application/json");
+    xhr.send(JSON.stringify(jsonData));
+    document.getElementById('current-branch').innerHTML = branchName;
+    document.getElementById("current-branch").style.color = branchName;
 }
 
 function branchCheckPage() {
@@ -203,6 +256,7 @@ function tautologyCheck() {
     };
 }
 
+document.getElementById("ok").addEventListener('click', hideHint2)
 document.getElementById("hint-x2").addEventListener('click', hideHintRules)
 document.getElementById("rules-hint").addEventListener('click', showHintRules)
 document.getElementById("hint-x").addEventListener('click', hideHint)
@@ -272,6 +326,16 @@ function showHint() {
 
 function hideHint() {
     document.getElementById("hint-window").classList.remove("active");
+    document.getElementById("overlay").classList.remove("active");
+}
+
+function showHint2() {
+    document.getElementById("hint-window3").classList.add("active");
+    document.getElementById("overlay").classList.add("active");
+}
+
+function hideHint2() {
+    document.getElementById("hint-window3").classList.remove("active");
     document.getElementById("overlay").classList.remove("active");
 }
 
