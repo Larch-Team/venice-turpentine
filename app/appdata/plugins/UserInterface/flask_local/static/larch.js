@@ -4,6 +4,8 @@ const progress = document.getElementById("progress");
 const progressSteps = document.querySelectorAll(".circle");
 const formula = document.getElementById("formula");
 
+var branchName;
+
 let larchStepsNum = 0;
 
 
@@ -62,8 +64,8 @@ function getRules(tokenID, sentenceID, branch) {
                 console.log(currentLeaf);
                 var classNames = currentLeaf.getAttribute("class").match(/[\w-]*leaf[\w-]*/g);
                 if (typeof classNames != "undefined" && classNames != null && classNames.length != null && classNames.length > 0) {
-                    branchName = currentLeaf.classList[0];
-                    jump(branchName);
+                    var leafName = currentLeaf.classList[0];
+                    jump(leafName);
                 }
             }
         }
@@ -86,6 +88,7 @@ function use_rule(rule_name, tokenID, sentenceID) {
         if (xhr.readyState === 4) {
             getProof('/API/worktree', function(text) {
                 document.getElementById('clickable-container').innerHTML = text;
+                toggleBtns();
             });
         }
     };
@@ -123,16 +126,47 @@ function getCurrentBranch() {
     }
 }
 
-function jump(branchName) {
+function toggleBtns() {
+    if (document.getElementById("switch-check").checked == true) {
+        var treeBtns = document.querySelectorAll('.tree-btn');
+        getCurrentBranch();
+        console.log(branchName);
+        for (var i = 0; i < treeBtns.length; i++) {
+            if (treeBtns[i].classList.contains(branchName.toLowerCase()) || treeBtns[i].classList.contains(branchName)) {
+                treeBtns[i].style.color = branchName;
+                treeBtns[i].style.opacity = 0.3;
+                if (treeBtns[i].classList.contains('leaf')) {
+                    treeBtns[i].style.opacity = 1;
+                }
+            }
+        }
+    }
+    else if (document.getElementById("switch-check").checked == false) {
+        var treeBtns = document.querySelectorAll('.tree-btn');
+        for (var i = 0; i < treeBtns.length; i++) {
+            treeBtns[i].style.color = "black";
+        }
+    }
+}
+
+function jump(leafName) {
     var xhr = new XMLHttpRequest();
     var jsonData= {
-        "branch":branchName
+        "branch":leafName
         };
     xhr.open('POST', 'API/jump', true);
     xhr.setRequestHeader("Content-type", "application/json");
     xhr.send(JSON.stringify(jsonData));
-    document.getElementById('current-branch').innerHTML = branchName;
-    document.getElementById("current-branch").style.color = branchName;
+    document.getElementById('current-branch').innerHTML = leafName;
+    document.getElementById("current-branch").style.color = leafName;
+    if (document.getElementById("switch-check").checked == true) {
+        var treeBtns = document.querySelectorAll('.tree-btn');
+        for (var i = 0; i < treeBtns.length; i++) {
+            if (treeBtns[i].classList.contains(leafName.toLowerCase()) || treeBtns[i].classList.contains(leafName)) {
+                treeBtns[i].style.color = leafName;
+            }
+        }
+    };
 }
 
 function branchCheckPage() {
@@ -256,6 +290,7 @@ function tautologyCheck() {
     };
 }
 
+document.getElementById("switch").addEventListener('click', toggleBtns)
 document.getElementById("ok").addEventListener('click', hideHint2)
 document.getElementById("hint-x2").addEventListener('click', hideHintRules)
 document.getElementById("rules-hint").addEventListener('click', showHintRules)
@@ -279,6 +314,7 @@ document.getElementById("rules-undo").addEventListener("click", function (){
     if (ret["type"] == "success") {
         getProof('/API/worktree', function(text) {
             document.getElementById('clickable-container').innerHTML = text;
+            toggleBtns();
         });
     } else {
         window.alert(ret["content"])
