@@ -118,7 +118,7 @@ def do_hint() -> str:
     except EngineError as e:
         return JSONResponse(type_='error', content=str(e))
     if hints is not None:
-        return JSONResponse(type_='success', content=hints)
+        return JSONResponse(type_='success', content="".join(hints))
     else:
         return JSONResponse(type_='error', content="Podpowiedzi nie ma, trzymaj się tam")
 

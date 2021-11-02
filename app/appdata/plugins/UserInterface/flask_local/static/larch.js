@@ -82,14 +82,19 @@ function use_rule(rule_name, tokenID, sentenceID) {
             }
         };
     xhr.open('POST', 'API/use_rule', true);
+    xhr.responseType = 'json';
     xhr.setRequestHeader("Content-type", "application/json");
     xhr.send(JSON.stringify(jsonData));
     xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
-            getProof('/API/worktree', function(text) {
-                document.getElementById('clickable-container').innerHTML = text;
-                toggleBtns();
-            });
+            if (xhr.response['type']=='success') {
+                getProof('/API/worktree', function(text) {
+                    document.getElementById('clickable-container').innerHTML = text;
+                    toggleBtns();
+                });
+            } else {
+                window.alert(xhr.response["content"])
+            }
         }
     };
     getBranchesNumber();

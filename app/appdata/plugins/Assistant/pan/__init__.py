@@ -34,7 +34,7 @@ def hint_command(proof: Union[Proof, None]) -> Union[list[str], None]:
     :rtype: list[str] | None
     """
     if len(proof.nodes.children) == 0:
-        return ["<p>Po prostu kliknij główny spójnik i używaj reguł dla tworzenia tabel analitycznych.</p>"]
+        return ["<p>Jak zacząć? Kliknij główny spójnik i zacznij rozkładać formuły.</p>"]
     try:
         mistakes = proof.check()
     except EngineError:
@@ -42,12 +42,13 @@ def hint_command(proof: Union[Proof, None]) -> Union[list[str], None]:
     if mistakes:
         return mistake_check(mistakes[0])
     moves = proof.copy().solve()
-    while moves and moves[0] == proof.metadata['usedrules'][0]:
+    while moves and not moves[0].auto:
         moves.pop(0)
     if moves:
-        return [articles['main']['rule'], f"Spójrz na zdanie: <code>{moves[0].get_premisses()['sentenceID']}</code>"]
+        s = moves[0].get_premisses()['sentenceID']
+        return [f"<p>Teraz rozłóż formułę {s.getReadable()}.", "<p><details><summary>Spróbuj zrobić to samodzielnie, a jeśli masz wątpliwości jak to zrobić, kliknij tutaj</summary>", f"Spróbuj rozłożyć spójnik {s.getLexems()[moves[0].context['tokenID']]}</details></p>"]
     else:
-        return ['To koniec! Wszystkie formuły zostały rozłożone.']
+        return ['<p>To koniec! Wszystkie formuły są rozłożone. Możesz przejść dalej.</p>']
 
 
 def hint_start() -> Union[list[str], None]:
@@ -71,7 +72,10 @@ def mistake_userule(mistake: UserMistake) -> Union[list[str], None]:
     :return: Lista podpowiedzi, jeden str na odpowiedź
     :rtype: list[str] | None
     """
-    pass
+    if mistake.name == 'already used':
+        return ['<p>Ta formuła jest już rozłożona. Wybierz inną.</p>']
+    elif mistake.name == 'cannot perform':
+        return ['<p>Nie możesz teraz usunąć tej negacji. Najpierw rozłóż inną formułę, później wróć do negacji.</p>']        
 
 
 def mistake_check(mistake: UserMistake) -> Union[list[str], None]:
