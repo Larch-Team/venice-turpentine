@@ -251,7 +251,7 @@ def do_finish() -> str:  # sourcery skip: merge-else-if-into-elif
             return JSONResponse(type_='success', content='wrong rule')
 
         test_proof = session.proof.copy()
-        closed_branches = [i.branch for i in session.proof.nodes.getopen()]
+        closed_branches = [i.branch for i in session.proof.nodes.getleaves() if i.closed and i.closed.success]
         
         # Check branch closure
         for i in test_proof.nodes.getopen():
