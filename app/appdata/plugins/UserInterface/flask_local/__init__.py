@@ -31,6 +31,9 @@ def index():
     session.reset_proof()
     return render_template('index.html')
 
+@app.route('/knowledge', methods=['GET'])
+def knowledge():
+    return render_template('knowledge-base.html', title="Baza wiedzy", text=session.acc('Assistant').get_articles()['Baza wiedzy'].text())
 
 @app.route('/run', methods=['GET'])
 def larch():

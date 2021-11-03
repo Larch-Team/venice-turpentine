@@ -86,6 +86,6 @@ class Article(object):
         return "".join(lines).strip('\n ')
     
     def text(self) -> str:
-        with open(self.file) as f:
+        with open(self.file, encoding='utf8') as f:
             t = f.read()
         return t

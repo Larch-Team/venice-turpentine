@@ -9,7 +9,7 @@ SOCKET = 'Assistant'
 VERSION = '0.0.1'
 
 articles = Article.read(get_plugin_path(__file__, 'articles'),
-                        'main.html'                        
+                        'Baza wiedzy.html'                        
 )
 
 # Knowledge base
