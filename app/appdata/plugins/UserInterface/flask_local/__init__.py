@@ -4,7 +4,7 @@ Tutaj umieść dokumentację swojego pluginu
 from datetime import datetime
 import enum
 from typing import Any
-from close import Contradiction
+from close import Contradiction, Emptiness
 from manager import FileManager
 import plugins.UserInterface.__utils__ as utils
 from flask import Flask, render_template, request
@@ -189,15 +189,6 @@ def do_get_rules():
 
     rules = session.getrulessymbol()
     return "".join(symbol_HTML(key, rules[key], tokenID, sentenceID, docs[key]) for key in docs)
-
-
-@app.route('/API/used', methods=['GET'])
-def do_used():
-    branch = request.args.get('branch', default=None, type=str)
-    
-    leaf = session.proof.nodes.getleaf(branch)
-    l, _ = leaf.getbranch_sentences()
-    return l[sentenceID] in leaf.history
     
 
 @app.route('/API/undo', methods=['POST'])
@@ -209,6 +200,19 @@ def do_undo() -> str:
     except EngineError as e:
         return JSONResponse(type_='error', content=str(e))
 
+
+@app.route('/API/no_contra', methods=['POST'])
+def do_no_contra() -> str:
+    branch_name = request.json['branch']
+    try:
+        _, closed = session.proof.nodes.getleaf(
+            branch_name).getbranch_sentences()
+        if closed:
+            return JSONResponse(type_='error', content="Branch already closed")
+        session.proof.nodes.getleaf(branch_name).close(Emptiness)
+        return JSONResponse(type_='success')
+    except EngineError as e:
+        return JSONResponse(type_='error', content=str(e))
 
 @app.route('/API/contra', methods=['POST'])
 def do_contra() -> str:
