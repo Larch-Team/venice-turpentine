@@ -44,7 +44,7 @@ function new_proof(e) {
             document.getElementById('clickable-container').innerHTML = text;
         });
         nextPage();
-        getCurrentBranch();
+        toggleBtns();
     } else {
         window.alert(ret["content"])
     }
@@ -132,24 +132,41 @@ function getCurrentBranch() {
 }
 
 function toggleBtns() {
-    if (document.getElementById("switch-check").checked == true) {
-        var treeBtns = document.querySelectorAll('.tree-btn');
-        getCurrentBranch();
+    var treeBtns = document.querySelectorAll('.tree-btn');
+    xhr = new XMLHttpRequest();
+    xhr.open('GET', '/API/branchname');
+    xhr.send();
+    xhr.onreadystatechange = function() {
+        branchName = xhr.responseText;
         console.log(branchName);
-        for (var i = 0; i < treeBtns.length; i++) {
-            if (treeBtns[i].classList.contains(branchName.toLowerCase()) || treeBtns[i].classList.contains(branchName)) {
-                treeBtns[i].style.color = branchName;
-                treeBtns[i].style.opacity = 0.3;
-                if (treeBtns[i].classList.contains('leaf')) {
-                    treeBtns[i].style.opacity = 1;
+        document.getElementById("current-branch").innerHTML = branchName;
+        document.getElementById("current-branch").style.color = branchName;
+        if (document.getElementById("switch-check").checked == true) {
+            for (var i = 0; i < treeBtns.length; i++) {
+                if (treeBtns[i].classList.contains(branchName.toLowerCase()) || treeBtns[i].classList.contains(branchName)) {
+                    treeBtns[i].style.color = branchName;
+                    if (treeBtns[i].classList.contains(`used-${branchName.toLowerCase()}`)) {
+                        treeBtns[i].style.opacity = 0.3;
+                    }
+                    else {
+                        treeBtns[i].style.opacity = 1;
+                    }
+                }
+                else {
+                    treeBtns[i].style.color = 'black';
                 }
             }
         }
-    }
-    else if (document.getElementById("switch-check").checked == false) {
-        var treeBtns = document.querySelectorAll('.tree-btn');
-        for (var i = 0; i < treeBtns.length; i++) {
-            treeBtns[i].style.color = "black";
+        else if (document.getElementById("switch-check").checked == false) {
+            for (var i = 0; i < treeBtns.length; i++) {
+                treeBtns[i].style.color = "black";
+                if (treeBtns[i].classList.contains(`used-${branchName.toLowerCase()}`)) {
+                    treeBtns[i].style.opacity = 0.3;
+                }
+                else {
+                    treeBtns[i].style.opacity = 1;
+                }
+            }
         }
     }
 }
@@ -164,18 +181,7 @@ function jump(leafName) {
     xhr.send(JSON.stringify(jsonData));
     document.getElementById('current-branch').innerHTML = leafName;
     document.getElementById("current-branch").style.color = leafName;
-    if (document.getElementById("switch-check").checked == true) {
-        var treeBtns = document.querySelectorAll('.tree-btn');
-        for (var i = 0; i < treeBtns.length; i++) {
-            if (treeBtns[i].classList.contains(leafName.toLowerCase()) || treeBtns[i].classList.contains(leafName)) {
-                treeBtns[i].style.color = leafName;
-            }
-            else
-            {
-                treeBtns[i].style.color = '#333333'
-            }
-        }
-    };
+    toggleBtns();
 }
 
 function branchCheckPage() {
