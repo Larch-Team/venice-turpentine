@@ -197,6 +197,10 @@ function getBranch(branch_name) {
             document.getElementById("overlay").classList.add("active");
             document.getElementById('check-branch-name').innerHTML = `Gałąź "${branch_name}"`
             document.getElementById("branch-container").innerHTML = branch;
+            document.getElementById("close-window-btn").addEventListener("click", function _f() {  
+                closeBranch(branch_name);
+                this.removeEventListener('click', _f);
+            })
         }
     };
 }
@@ -237,10 +241,40 @@ function checkBranch() {
         };
     xhr.open('POST', 'API/contra', true);
     xhr.setRequestHeader("Content-type", "application/json");
+    xhr.responseType = 'json';
     xhr.send(JSON.stringify(jsonData));
-    getProof('API/contratree', function(text) {
-        document.getElementById('checking-container').innerHTML = text;
-    });
+    xhr.onreadystatechange = function() {
+        if (xhr.response['type']=='success') {
+            getProof('API/contratree', function(text) {
+                document.getElementById('checking-container').innerHTML = text;
+            });
+        }
+        else {
+            window.alert(xhr.response["content"])
+        }
+    }
+}
+
+function closeBranch(branch) {
+    closeWindow();
+    var xhr = new XMLHttpRequest();
+    var jsonData= {
+        "branch":branch,
+        };
+    xhr.open('POST', 'API/no_contra', true);
+    xhr.setRequestHeader("Content-type", "application/json");
+    xhr.responseType = 'json';
+    xhr.send(JSON.stringify(jsonData));
+    xhr.onreadystatechange = function() {
+        if (xhr.response['type']=='success') {
+            getProof('API/contratree', function(text) {
+                document.getElementById('checking-container').innerHTML = text;
+            });
+        }
+        else {
+            window.alert(xhr.response["content"])
+        }
+    }
 }
 
 function closeWindow() {
@@ -310,7 +344,6 @@ document.getElementById("start").addEventListener("click", nextPage)
 document.getElementById("finish-proof").addEventListener("click", finishProofPage)
 document.getElementById("check").addEventListener("click", branchCheckPage)
 document.getElementById("check-branch-btn").addEventListener("click", checkBranch)
-document.getElementById("close-window-btn").addEventListener("click", closeWindow)
 document.getElementById("btn-check").addEventListener("click", tautologyCheck)
 document.getElementById("rules-report").addEventListener("click", function () {
     window.open('https://szymanski.notion.site/4a180f6826464e9dac60dd9c18c5ac0b?v=56fec8f735024f94ab421aa97cab3dc8','_blank')
