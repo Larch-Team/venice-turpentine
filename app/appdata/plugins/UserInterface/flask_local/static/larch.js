@@ -297,7 +297,7 @@ function tautologyCheck() {
         tautology = document.getElementById("is-tautology").checked;
     }
     else {
-        return; // TODO: DOPISAĆ JAKĄŚ PROŚBĘ O ZAZNACZENIE CZY COŚ
+        window.alert("Podejmij decyzję, czy formuła jest tautologią.")
     };
     var jsonData = {
         "tautology":tautology
