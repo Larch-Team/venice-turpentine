@@ -79,15 +79,20 @@ button {
 .main-container {
     display: flex;
     padding: 0 5%;
+    margin-top: 5%;
 }
 
 .main-column {
-    width: 60%;
+    max-width: 60%;
     background-color: white;
 }
 
+.side-column {
+    max-width: 60%;
+}
+
 .column-container {
-    padding: 5%;
+    padding: 0 5%;
 }
 
 .main-column-sub {
@@ -131,6 +136,7 @@ button {
     padding: 10%;
     margin-top: 10%;
     font-family: 'Work-sans', sans-serif;
+    max-width: 80%;
 }
 
 .column-sub h2 {

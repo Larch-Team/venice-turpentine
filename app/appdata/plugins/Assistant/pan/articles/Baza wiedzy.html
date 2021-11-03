@@ -1,6 +1,6 @@
 <div class="main-container">
     <div class="column-container">
-        <div class="column-sub">
+        <div class="column-sub side-column">
             <h2>
                 Spis treści
             </h2>
@@ -17,8 +17,28 @@
                         </a>
                     </li>
                     <li>
+                        <a href="zal">
+                            Założenia
+                        </a>
+                    </li>
+                    <li>
+                        <a href="what-h2">
+                            Czego używamy w dowodzie przeprowadzanym w tabeli
+                        </a>
+                    </li>
+                    <li>
+                        <a href="structure">
+                            Struktura drzewa w dowodzie metodą tabel analitycznych
+                        </a>
+                    </li>
+                    <li>
                         <a href="#krz">
                             Reguły dla tabel analitycznych KRZ
+                        </a>
+                    </li>
+                    <li>
+                        <a href="end">
+                            Jak kończymy dowód?
                         </a>
                     </li>
                     <li>
@@ -50,7 +70,7 @@
             </p>
         </div>
     </div>
-    <div class="column-container main-coulmn">
+    <div class="column-container main-column">
         <div class="main-column-sub">
         <h1 class="h1-main" id="basics">
             Podstawy
@@ -72,7 +92,7 @@
             Jak właściwie działa taki dowód?
         </h1>
 
-        <h2 class="h2-main">
+        <h2 class="h2-main" id="zal">
             Założenia
         </h2>
         <p>
@@ -82,7 +102,7 @@
             Dowodzimy metodą nie wprost, a więc rozpoczynamy od kontrintuicyjnego założenia, że formuła A jest fałszywa w jakimś wartościowaniu. Oczywiście, jeśli nasza formuła jest tautologią, takie założenie doprowadzi nas do sprzeczności. Tabele analityczne pozwalają nam wykazać tą sprzeczność.
         </p>
 
-        <h2 class="h2-main">
+        <h2 class="h2-main" id="what-h2">
             Czego używamy w dowodzie przeprowadzanym w tabeli
         </h2>
         <p>
@@ -94,7 +114,7 @@
             <li><b>reguły</b> - pozwalają one na przekształcanie formuł sygnowanych i "budowanie" naszego dowodu. Reguły pozwalają nam na rozbicie wyjściowej formuły na coraz mniejsze elementy. Stąd też "analityczność" w nazwie metody, dokonujemy bowiem analizy (rozkładu). Reguły zostaną dokładnie omówione niżej.</li>
         </ul>
 
-        <h2 class="h2-main">
+        <h2 class="h2-main" id="structure">
             Struktura drzewa w dowodzie metodą tabel analitycznych
         </h2>
         <p>
@@ -103,7 +123,7 @@
         <ul>
             <li>Całość dowodu ma formę <b>drzewa</b>, drzewo to "rośnie" z góry na dół.</li>
             <li>Każda obecna w dowodzie formuła sygnowana będzie <b>węzłem</b>. Węzeł jest podstawowym elementem drzewa. Używając reguł, będziemy dodawać do drzewa nowe węzły.</li>
-            <li>Formuła wyjściowa jest szczególnym węzłem - <b><korzeniem/b>. Korzeń nie posiada żadnych węzłów nad nim</li>
+            <li>Formuła wyjściowa jest szczególnym węzłem - <b>korzeniem</b>. Korzeń nie posiada żadnych węzłów nad nim</li>
             <li>Węzły, pod którymi nie znajdują się żadne inne wezły, są <b>liśćmi</b></li>
             <li><b>Gałąź</b> jest ciągiem węzłów od korzenia do liścia</li>
             <li>Jeśli pod jednym węzłem pojawiają się dwa węzły, mamy do czynienia z <b>rozgałęzieniem</b></li>
@@ -129,7 +149,7 @@
         <p>
             Jeśli spojrzymy teraz na reguły dla implikacji, możemy zauważyć, że reprezentują one powyższe intuicje.
         </p>
-        <h2 class="h2-main">
+        <h2 class="h2-main" id="end">
             Jak kończymy dowód?
         </h2>
         <p>
