@@ -40,13 +40,11 @@ li a, li p {
     font-family: 'Work Sans', sans-serif;
 }
 
-#graphic-section {
-    background-image: url("logo.png");
-    background-repeat: no-repeat;
+.graphic-section {
     background-color:  #f2f2f2;
-    background-position: center;
-    height: 500px;
-    margin-bottom: 15px; 
+    display: flex;
+    justify-content: center;
+    max-height: 30em;
 }
 
 h1 {
@@ -111,11 +109,8 @@ p {
 }
 
 #about {
-    display: grid;
-    justify-content: space-evenly;
-    grid-template-columns: 35% 35%;
-    padding: 4em;
-    grid-gap: 1.2em;
+    padding: 5% 12%;
+    display: flex;
 }
 
 .sub-container-about p {
@@ -123,6 +118,7 @@ p {
     font-family: 'Spectral', 'Spectral', sans-serif;
     line-height: 2em;
     margin-top: 1.2em;
+    width: 75%;
 }
 
 #how-to {
