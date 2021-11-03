@@ -467,7 +467,7 @@ document.addEventListener('keydown', (event) => {
                     document.getElementById("new_proof").click()
                     break;
                 case 2:
-                    document.getElementById("finish-proof").click()
+                    // document.getElementById("finish-proof").click()
                     break;
                 case 3:
                     document.getElementById("btn-check").click()
