@@ -18,12 +18,15 @@ def symbol_HTML(rule: str, symbolic: str, tID: int, sID: int, tooltip: str):
 
 Tag = Template('<button type="button" class="$branch tree-btn" id="btn$sID$tID$branch" onclick="getRules($tID, $sID, \'$branch\')">$symbol</button>')
 
-def _clickable(sentence: Sentence, sentenceID: int, branches: list[str], isleaf) -> Iterator[str]:
+def _clickable(sentence: Sentence, sentenceID: int, branches: list[str], add) -> Iterator[str]:
     for tID, symbol in enumerate(sentence.getReadableList()):
-        yield Tag.substitute(tID=tID, sID=sentenceID, branch=""+" ".join(branches)+isleaf, symbol=symbol)
+        yield Tag.substitute(tID=tID, sID=sentenceID, branch=""+" ".join(branches)+add, symbol=symbol)
 
-def get_clickable(sentence: Sentence, sentenceID: int, branch: str, isleaf=''):
-    return " ".join(_clickable(sentence, sentenceID, branch, isleaf))
+def get_clickable(sentence: Sentence, sentenceID: int, branch: str, add=''):
+    return " ".join(_clickable(sentence, sentenceID, branch, add))
+
+def getused(node: ProofNode):
+    return {i.branch.lower() for i in node.leaves if node.sentence in i.history}
 
 def get_tree_clickable(node: ProofNode):
     if node.children:
@@ -32,6 +35,7 @@ def get_tree_clickable(node: ProofNode):
                 node.sentence,
                 len(node.ancestors),
                 {i.branch.lower() for i in node.leaves},
+                add=" used-"+" used-".join(getused(node))
             ),
             '<div class="symbolic2">',
         ]
@@ -39,7 +43,7 @@ def get_tree_clickable(node: ProofNode):
             table.append(''.join(['<div>', get_tree_clickable(child), '</div>']))
         table.append('</div>')
     else:
-        table = [get_clickable(node.sentence, len(node.ancestors), {node.branch}, isleaf=f' leaf-{node.branch} leaf')]
+        table = [get_clickable(node.sentence, len(node.ancestors), {node.branch}, add=f' leaf-{node.branch} leaf')]
     return "".join(table)
 
 def get_tree_contra(node: ProofNode):

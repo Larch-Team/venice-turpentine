@@ -170,6 +170,10 @@ function jump(leafName) {
             if (treeBtns[i].classList.contains(leafName.toLowerCase()) || treeBtns[i].classList.contains(leafName)) {
                 treeBtns[i].style.color = leafName;
             }
+            else
+            {
+                treeBtns[i].style.color = '#333333'
+            }
         }
     };
 }

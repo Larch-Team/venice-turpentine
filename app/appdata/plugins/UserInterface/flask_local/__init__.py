@@ -191,6 +191,15 @@ def do_get_rules():
     return "".join(symbol_HTML(key, rules[key], tokenID, sentenceID, docs[key]) for key in docs)
 
 
+@app.route('/API/used', methods=['GET'])
+def do_used():
+    branch = request.args.get('branch', default=None, type=str)
+    
+    leaf = session.proof.nodes.getleaf(branch)
+    l, _ = leaf.getbranch_sentences()
+    return l[sentenceID] in leaf.history
+    
+
 @app.route('/API/undo', methods=['POST'])
 def do_undo() -> str:
     """Undos last action"""
