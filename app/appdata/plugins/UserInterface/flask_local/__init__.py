@@ -254,7 +254,8 @@ def do_finish() -> str:  # sourcery skip: merge-else-if-into-elif
         closed_branches = [i.branch for i in session.proof.nodes.getleaves() if i.closed and i.closed.success]
         
         # Check branch closure
-        for i in test_proof.nodes.getopen():
+        for i in test_proof.nodes.leaves:
+            test_proof.closed = None
             test_proof.deal_closure(i.branch)
             if i.closed and i.closed.success and i.branch not in closed_branches:
                 return JSONResponse(type_='success', content='not all closed')
