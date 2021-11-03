@@ -89,7 +89,11 @@ class SignedSmullyan(utils.Smullyan):
         return convert_to_signed(super()._strict(convert_from_signed(sentence)))
     
     def _naive(self, branch: list[Sentence], sentenceID: SentenceID, tokenID: TokenID) -> tp.Union[None, SentenceTupleStructure]:
-        return convert_to_signed(super()._naive([convert_from_signed(i) for i in branch], sentenceID, tokenID-int(branch[sentenceID][0].startswith('signtrue_'))))
+        if len(branch[sentenceID]) == 1:
+            addID = 0 if branch[sentenceID][0].startswith('signfalse_') else -1
+        else:
+            addID = 1 if branch[sentenceID][0].startswith('signfalse_') else -1
+        return convert_to_signed(super()._naive([convert_from_signed(i) for i in branch], sentenceID, tokenID+addID))
     
 # RULES
 

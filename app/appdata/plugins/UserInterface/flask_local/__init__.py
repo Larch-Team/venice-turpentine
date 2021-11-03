@@ -211,7 +211,7 @@ def do_no_contra() -> str:
         _, closed = session.proof.nodes.getleaf(
             branch_name).getbranch_sentences()
         if closed:
-            return JSONResponse(type_='error', content="Branch already closed")
+            return JSONResponse(type_='error', content="Ta gałąź została już wcześniej zamknięta. Spróbuj inną.")
         session.proof.nodes.getleaf(branch_name).close(Emptiness)
         return JSONResponse(type_='success')
     except EngineError as e:
@@ -227,13 +227,31 @@ def do_contra() -> str:
         branch, closed = session.proof.nodes.getleaf(
             branch_name).getbranch_sentences()
         if closed:
-            return JSONResponse(type_='error', content="Branch already closed")
-        elif (branch[sID1].getNonNegated() == branch[sID2].getNonNegated() and
-              (len(branch[sID1].reduceBrackets()) - len(branch[sID2].reduceBrackets())) % 2 == 1):
+            return JSONResponse(type_='error', content="Ta gałąź została już wcześniej zamknięta. Spróbuj inną.")
+        elif session.sockets['Formal'].plugin_name == 'analytic_freedom':
+            if (
+                branch[sID1].getNonNegated() != branch[sID2].getNonNegated()
+                or (
+                    len(branch[sID1].reduceBrackets())
+                    - len(branch[sID2].reduceBrackets())
+                )
+                % 2
+                != 1
+            ):
+                return JSONResponse(type_='error', content="Podane formuły nie są ze sobą sprzeczne. Poszukaj innych, bądź uznaj gałąź za niesprzeczną.")
+            session.proof.nodes.getleaf(branch_name).close(Contradiction(sentenceID1 = sID1+1, sentenceID2 = sID2+1))
+            return JSONResponse(type_='success')
+        elif session.sockets['Formal'].plugin_name == 'analytic_signed':
+            if branch[sID1][1:] != branch[sID2][1:] or {
+                branch[sID1].getTypes()[0],
+                branch[sID2].getTypes()[0],
+            } != {'signtrue', 'signfalse'}:
+                return JSONResponse(type_='error', content="Podane formuły nie są ze sobą sprzeczne. Poszukaj innych, bądź uznaj gałąź za niesprzeczną.")
             session.proof.nodes.getleaf(branch_name).close(Contradiction(sentenceID1 = sID1+1, sentenceID2 = sID2+1))
             return JSONResponse(type_='success')
         else:
-            return JSONResponse(type_='error', content="Branch couldn't be closed")
+            session.proof.nodes.getleaf(branch_name).close(Contradiction(sentenceID1 = sID1+1, sentenceID2 = sID2+1))
+            return JSONResponse(type_='success')
     except EngineError as e:
         return JSONResponse(type_='error', content=str(e))
 
