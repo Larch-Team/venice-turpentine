@@ -52,6 +52,15 @@ function new_proof(e) {
 
 function getRules(tokenID, sentenceID, branch) {
     var xhr = new XMLHttpRequest();
+    if (branchNumber > 1) {
+        var currentLeaf = document.getElementById("btn"+sentenceID+tokenID+branch);
+        console.log(currentLeaf);
+        var classNames = currentLeaf.getAttribute("class").match(/[\w-]*leaf[\w-]*/g);
+        if (typeof classNames != "undefined" && classNames != null && classNames.length != null && classNames.length > 0) {
+            var leafName = currentLeaf.classList[0];
+            jump(leafName);
+        }
+    }
     xhr.open("GET", 'API/rules?tokenID='+tokenID+'&sentenceID='+sentenceID);
     xhr.responseType = 'text';
     xhr.send();
@@ -59,15 +68,6 @@ function getRules(tokenID, sentenceID, branch) {
         if (xhr.readyState === 4) {
             rules = xhr.response;
             document.getElementById('rules-container').innerHTML = rules;   
-            if (branchNumber > 1) {
-                var currentLeaf = document.getElementById("btn"+sentenceID+tokenID+branch);
-                console.log(currentLeaf);
-                var classNames = currentLeaf.getAttribute("class").match(/[\w-]*leaf[\w-]*/g);
-                if (typeof classNames != "undefined" && classNames != null && classNames.length != null && classNames.length > 0) {
-                    var leafName = currentLeaf.classList[0];
-                    jump(leafName);
-                }
-            }
         }
     }
 }
@@ -82,14 +82,19 @@ function use_rule(rule_name, tokenID, sentenceID) {
             }
         };
     xhr.open('POST', 'API/use_rule', true);
+    xhr.responseType = 'json';
     xhr.setRequestHeader("Content-type", "application/json");
     xhr.send(JSON.stringify(jsonData));
     xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
-            getProof('/API/worktree', function(text) {
-                document.getElementById('clickable-container').innerHTML = text;
-                toggleBtns();
-            });
+            if (xhr.response['type']=='success') {
+                getProof('/API/worktree', function(text) {
+                    document.getElementById('clickable-container').innerHTML = text;
+                    toggleBtns();
+                });
+            } else {
+                window.alert(xhr.response["content"])
+            }
         }
     };
     getBranchesNumber();
@@ -164,6 +169,10 @@ function jump(leafName) {
         for (var i = 0; i < treeBtns.length; i++) {
             if (treeBtns[i].classList.contains(leafName.toLowerCase()) || treeBtns[i].classList.contains(leafName)) {
                 treeBtns[i].style.color = leafName;
+            }
+            else
+            {
+                treeBtns[i].style.color = '#333333'
             }
         }
     };

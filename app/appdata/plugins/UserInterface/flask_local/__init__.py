@@ -4,7 +4,7 @@ Tutaj umieść dokumentację swojego pluginu
 from datetime import datetime
 import enum
 from typing import Any
-from close import Contradiction
+from close import Contradiction, Emptiness
 from manager import FileManager
 import plugins.UserInterface.__utils__ as utils
 from flask import Flask, render_template, request
@@ -118,7 +118,7 @@ def do_hint() -> str:
     except EngineError as e:
         return JSONResponse(type_='error', content=str(e))
     if hints is not None:
-        return JSONResponse(type_='success', content=hints)
+        return JSONResponse(type_='success', content="".join(hints))
     else:
         return JSONResponse(type_='error', content="Podpowiedzi nie ma, trzymaj się tam")
 
@@ -189,7 +189,7 @@ def do_get_rules():
 
     rules = session.getrulessymbol()
     return "".join(symbol_HTML(key, rules[key], tokenID, sentenceID, docs[key]) for key in docs)
-
+    
 
 @app.route('/API/undo', methods=['POST'])
 def do_undo() -> str:
@@ -200,6 +200,19 @@ def do_undo() -> str:
     except EngineError as e:
         return JSONResponse(type_='error', content=str(e))
 
+
+@app.route('/API/no_contra', methods=['POST'])
+def do_no_contra() -> str:
+    branch_name = request.json['branch']
+    try:
+        _, closed = session.proof.nodes.getleaf(
+            branch_name).getbranch_sentences()
+        if closed:
+            return JSONResponse(type_='error', content="Branch already closed")
+        session.proof.nodes.getleaf(branch_name).close(Emptiness)
+        return JSONResponse(type_='success')
+    except EngineError as e:
+        return JSONResponse(type_='error', content=str(e))
 
 @app.route('/API/contra', methods=['POST'])
 def do_contra() -> str:
@@ -238,7 +251,7 @@ def do_finish() -> str:  # sourcery skip: merge-else-if-into-elif
             return JSONResponse(type_='success', content='wrong rule')
 
         test_proof = session.proof.copy()
-        closed_branches = [i.branch for i in session.proof.nodes.getopen()]
+        closed_branches = [i.branch for i in session.proof.nodes.getleaves() if i.closed and i.closed.success]
         
         # Check branch closure
         for i in test_proof.nodes.getopen():
