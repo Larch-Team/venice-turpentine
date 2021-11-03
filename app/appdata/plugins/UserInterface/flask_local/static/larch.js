@@ -52,6 +52,15 @@ function new_proof(e) {
 
 function getRules(tokenID, sentenceID, branch) {
     var xhr = new XMLHttpRequest();
+    if (branchNumber > 1) {
+        var currentLeaf = document.getElementById("btn"+sentenceID+tokenID+branch);
+        console.log(currentLeaf);
+        var classNames = currentLeaf.getAttribute("class").match(/[\w-]*leaf[\w-]*/g);
+        if (typeof classNames != "undefined" && classNames != null && classNames.length != null && classNames.length > 0) {
+            var leafName = currentLeaf.classList[0];
+            jump(leafName);
+        }
+    }
     xhr.open("GET", 'API/rules?tokenID='+tokenID+'&sentenceID='+sentenceID);
     xhr.responseType = 'text';
     xhr.send();
@@ -59,15 +68,6 @@ function getRules(tokenID, sentenceID, branch) {
         if (xhr.readyState === 4) {
             rules = xhr.response;
             document.getElementById('rules-container').innerHTML = rules;   
-            if (branchNumber > 1) {
-                var currentLeaf = document.getElementById("btn"+sentenceID+tokenID+branch);
-                console.log(currentLeaf);
-                var classNames = currentLeaf.getAttribute("class").match(/[\w-]*leaf[\w-]*/g);
-                if (typeof classNames != "undefined" && classNames != null && classNames.length != null && classNames.length > 0) {
-                    var leafName = currentLeaf.classList[0];
-                    jump(leafName);
-                }
-            }
         }
     }
 }
