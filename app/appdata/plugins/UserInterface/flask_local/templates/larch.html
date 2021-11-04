@@ -73,12 +73,14 @@
                         <button type="button" class="qm" id="qm">&#10067;</button>
                     </p>
                 </div>
+                <div class="larch-subcontainer">
                 <div class="hints">
                     {{ hint_start | safe }}
                     <a href="/knowledge" target="_blank">Kliknij aby dowiedzieć się więcej</a>
                 </div>
                 <div class="button-container btn-main">
                     <button type="button" class="btn btn-larch" id="new_proof" disabled>Dalej: Rozłóż formuły</button>
+                </div>
                 </div>
             </div>
         </form>
@@ -100,12 +102,17 @@
                         <p id="clickable-container">
                             
                         </p>
-                        <div class="switch-container">
-                            <p>Podświetlenie gałęzi:</p>
-                            <label class="switch" id="switch">
-                                <input type="checkbox" id="switch-check">
-                                <span class="slider"></span>
-                              </label>
+                        <div class="switch-btn">
+                            <div class="switch-container">
+                                <p>Podświetlenie gałęzi:</p>
+                                <label class="switch" id="switch">
+                                    <input type="checkbox" id="switch-check">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="back">
+                                <button type="button" class="btn btn-back">Wstecz</button>
+                            </div>
                         </div>
                     </div>
                     <div class="larch-subcontainer">
@@ -128,11 +135,10 @@
                                 <i class="material-icons">undo</i>Cofnij
                             </button>
                         </div>
-    
+                        <div class="button-container btn-main" id="check-div">
+                            <button type="button" class="btn btn-larch" id="check">Dalej: Sprawdź gałęzie</button>
+                        </div>
                     </div>
-                <div class="button-container btn-main" id="check-div">
-                    <button type="button" class="btn btn-larch" id="check">Dalej: Sprawdź gałęzie</button>
-                </div>
             </div>
         </form>
         </div>
@@ -150,7 +156,11 @@
                     <div id="checking-container">
                             
                     </div>
+                    <div class="back switch-btn">
+                        <button type="button" class="btn btn-back">Wstecz</button>
+                    </div>
                 </div>
+                <div class="larch-subcontainer">
                 <div class="hints">
                     <p>
                         Dowodzisz nie wprost, więc poszukaj sprzeczności w gałęziach, aby udowodnić, że formuła jest tautologią.
@@ -165,6 +175,7 @@
                 <div class="button-container btn-main">
                     <button type="button" class="btn btn-larch" id="finish-proof">Dalej: Rozstrzygnij dowód</button>
                 </div>
+            </div>
             </div> 
         </form>
         </div>

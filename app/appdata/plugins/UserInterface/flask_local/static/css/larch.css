@@ -166,16 +166,21 @@ h1 {
 .btn-main {
    grid-column-end: -1;
    text-align: right;
-   position: fixed;
-   bottom: 11%;
-   right: 11%;
+   margin-top: 55%;
+}
+
+.back {
+    margin-top: 2%;
+}
+
+.btn-back {
+    width: 10em;
+    padding: 1em;
 }
 
 .switch-container {
     display: inline-flex;
     grid-gap: 1em;
-    position: fixed;
-    bottom: 11%;
 }
 
  .switch {
@@ -232,7 +237,7 @@ h1 {
   }
 
 .btn-larch {
-    padding: 10% 7%;
+    padding: 1em;
     width: max-content
 }
 
@@ -364,10 +369,15 @@ h1 {
     margin: 2px;
 }
 
+#checking-container {
+    min-height: 20em;
+}
+
 #clickable-container {
     font-size: 1em;
     text-align: center;
     margin-top: 2em;
+    min-height: 20em;
 }
 
 .symbolic2 {
