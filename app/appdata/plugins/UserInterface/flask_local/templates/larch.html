@@ -233,41 +233,69 @@
         <div class="larch-container">
         <form>
             <div class="main-larch3" id="right">
-                <div>
-                    <img src="static/normal_u95.png" alt="choinka" width="86px" height="86px">
+                <div class="end-title">
+                    <h1>Podsumowanie dowodu</h1>
                 </div>
-                <div>
-                    <h1>
+                <div class="sub-container-end">
+                    <h2>
                         To dobra odpowiedz!
-                    </h1>
+                    </h2>
                     <p>
-                        Bardzo sprawnie Ci poszło! Możesz teraz zapisać swój dowód lub zacząć od początku i przeprowadzić inny.
+                        Twój dowód jest wykonany poprawnie, wszystko poszło zgodnie z planem. Możesz zapisać dowód do PDFa lub TeXu.
                     </p>
-                    <div class="button-container">
-                        <button type="button" class="btn" id="save_end">Zapisz dowód</button>
-                        <button type="button" class="btn" id="new_end">Nowy dowód</button>
+                </div>
+                <div class="sub-container-end">
+                    <h2>Drzewo dowodu</h2>
+                    <div id="tree-end">
+
                     </div>
                 </div>
+                <div class="sub-container-end">
+                    <h2>Rozstrzygnięcie</h2>
+                    <p id="tautology-end">Twoje rozstrzygnięcie:</p>
+                </div>
+                <div class="button-container btn-container-end">
+                    <button type="button" class="btn" id="save_end">Zapisz dowód</button>
+                    <button type="button" class="btn" id="tex">Wyeksportuj do TeX</button>
+                    <button type="button" class="btn" id="new_end">Nowy dowód</button>
+                </div>
+            </div>
             </div>
         </form>
         </div>
         <div class="larch-container">
         <form>
             <div class="main-larch3" id="wrong">
-                <div>
-                    <img src="static/normal_u95.png" alt="choinka" width="86px" height="86px">
+                <div class="end-title">
+                    <h1>Podsumowanie Twojego dowodu</h1>
                 </div>
-                <div>
+                <div class="sub-container-end">
                     <h1>
-                        To nie jest poprawna odpowiedź
+                        Niestety to błędna odpowiedź
                     </h1>
                     <p>
-                        Możesz dowiedzieć się więcej o dowodzeniu nie wprost lub zacząć od początku.
+                        Poniżej znajdziesz drzewo, podsumowanie dowodu i informację o błędach w dowodzie. Możesz zapisać dowód do PDFa lub TeXu.
                     </p>
-                    <div class="button-container">
-                        <button type="button" class="btn" id="more">
-                            Dowiedz się więcej o dowodzeniu
-                        </button>
+                </div>
+                    <div class="sub-container-end">
+                        <h2>Drzewo dowodu</h2>
+                        <div id="tree-end">
+    
+                        </div>
+                    </div>
+                    <div class="sub-container-end">
+                        <h2>Rozstrzygnięcie</h2>
+                        <p id="tautology-end">Twoje rozstrzygnięcie:</p>
+                    </div>
+                    <div class="sub-container-end">
+                        <h2>Informacje o błędach w dowodzie</h2>
+                        <div class="feedback-wrong">
+
+                        </div>
+                    </div>
+                    <div class="button-container btn-container-end">
+                        <button type="button" class="btn" id="save_end">Zapisz dowód</button>
+                        <button type="button" class="btn" id="tex">Wyeksportuj do TeX</button>
                         <button type="button" class="btn" id="new_end">Nowy dowód</button>
                     </div>
                 </div>
