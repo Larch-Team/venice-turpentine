@@ -337,8 +337,45 @@ function tautologyCheck() {
             }
         };
     };
+    if (document.getElementById("is-tautology").checked) {
+        document.getElementById("tautology-end") = "Twoje rozstrzygnięcie: Formuła jest tautologią.";
+    }
+    else {
+        document.getElementById("tautology-end") = "Twoje rozstrzygnięcie: Formuła nie jest tautologią."
+    }
+    getProof('API/contratree', function(text) {
+        document.getElementById('tree-end').innerHTML = text;
+    });
 }
 
+function generate_formula() {
+    xhr = new XMLHttpRequest();
+    xhr.open('GET', '/API/randform');
+    xhr.responseType = 'json';
+    xhr.send();
+    xhr.onreadystatechange = function() {
+        if (xhr.response['type']=='success') {
+            document.getElementById("formula").value = xhr.response['content'];
+            disableBtn();
+        }
+        else {
+            window.alert(xhr.response["content"])
+        }
+    }
+}
+
+document.getElementById("back-to-1").addEventListener('click', function () {
+    prevPage();
+})
+document.getElementById("back-to-2").addEventListener('click', function () {
+    getProof('/API/worktree', function(text) {
+        document.getElementById('clickable-container').innerHTML = text;
+    });
+    toggleBtns();
+    prevPage();
+})
+
+document.getElementById("generate").addEventListener('click', generate_formula)
 document.getElementById("switch").addEventListener('click', toggleBtns)
 document.getElementById("ok").addEventListener('click', hideHint2)
 document.getElementById("hint-x2").addEventListener('click', hideHintRules)
@@ -353,9 +390,6 @@ document.getElementById("check-branch-btn").addEventListener("click", checkBranc
 document.getElementById("btn-check").addEventListener("click", tautologyCheck)
 document.getElementById("rules-report").addEventListener("click", function () {
     window.open('https://szymanski.notion.site/4a180f6826464e9dac60dd9c18c5ac0b?v=56fec8f735024f94ab421aa97cab3dc8','_blank')
-})
-document.getElementById("more").addEventListener("click", function () {
-    window.open('/knowledge','_blank')
 })
 document.getElementById("new_end").addEventListener("click", function () {
     window.location.reload(true)
@@ -374,6 +408,20 @@ document.getElementById("rules-undo").addEventListener("click", function (){
 
 function nextPage() {
     larchStepsNum++;
+    updateLarchSteps();
+    if(larchStepsNum > 1) {
+        updateProgressBar();
+    }
+    if(larchStepsNum >=1) {
+        document.getElementById("progressbar").style.display = "block";
+    }
+    if(larchStepsNum >= 5) {
+        document.getElementById("progressbar").style.display = "none";
+    }
+}
+
+function prevPage() {
+    larchStepsNum--;
     updateLarchSteps();
     if(larchStepsNum > 1) {
         updateProgressBar();
@@ -467,9 +515,12 @@ document.addEventListener('keydown', (event) => {
                     document.getElementById("new_proof").click()
                     break;
                 case 2:
-                    // document.getElementById("finish-proof").click()
+                    document.getElementById("check").click()
                     break;
                 case 3:
+                    document.getElementById("finish-proof").click()
+                    break;
+                case 4:
                     document.getElementById("btn-check").click()
                     break;
                 default:

@@ -80,7 +80,7 @@ class BuiltLexer(object):
                 self.build()
 
             def t_error(self, t):
-                raise LrchLexerError(f'{t} is not tokenizable')
+                raise LrchLexerError(f'{t.value} is not tokenizable')
 
             def build(self, **kwargs):
                 self.lexer = plex.lex(object=self, **kwargs)

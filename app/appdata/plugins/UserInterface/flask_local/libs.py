@@ -26,7 +26,7 @@ def get_clickable(sentence: Sentence, sentenceID: int, branch: str, add=''):
     return " ".join(_clickable(sentence, sentenceID, branch, add))
 
 def getused(node: ProofNode):
-    return {i.branch.lower() for i in node.leaves if node.sentence in i.history}
+    return {f' used-{i.branch.lower()}' for i in node.leaves if node.sentence in i.history}
 
 def get_tree_clickable(node: ProofNode):
     if node.children:
@@ -35,7 +35,7 @@ def get_tree_clickable(node: ProofNode):
                 node.sentence,
                 len(node.ancestors),
                 {i.branch.lower() for i in node.leaves},
-                add=" used-"+" used-".join(getused(node))
+                add="".join(getused(node))
             ),
             '<div class="symbolic2">',
         ]

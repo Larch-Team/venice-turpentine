@@ -10,7 +10,7 @@ import plugins.UserInterface.__utils__ as utils
 from flask import Flask, render_template, request
 import webbrowser
 from engine import Session, contextdef_translate
-from exceptions import EngineError
+from exceptions import EngineError, LrchLexerError
 from collections import namedtuple
 from flask_local.libs import JSONResponse, get_clickable, symbol_HTML, get_tree_clickable, get_preview
 from plugins.UserInterface.flask_local.libs import get_tree_contra
@@ -66,7 +66,7 @@ def do_new_proof():
         session.reset_proof()
     try:
         text = session.new_proof(sentence)
-    except EngineError as e:
+    except (LrchLexerError, EngineError) as e:
         print(str(e))
         return JSONResponse(type_='error', content=str(e))
     else:
@@ -187,7 +187,11 @@ def do_get_rules():
     docs = session.getrules()
     if session.sockets['Formal'].plugin_name in ('analytic_freedom', 'analytic_signed') and session.proof is not None and sentenceID is not None and tokenID is not None:
         b, _ = session.proof.get_node().getbranch_sentences()
-        token = b[sentenceID].getTypes()[tokenID]
+        br = b[sentenceID]
+        try:
+            token = br.getTypes()[tokenID]
+        except IndexError:
+            return ""
         docs = {i: j for i, j in docs.items() if i.endswith(token)}
 
     rules = session.getrulessymbol()
@@ -221,8 +225,12 @@ def do_no_contra() -> str:
 def do_contra() -> str:
     """Check contradiction"""
     branch_name = request.json['branch']
-    sID1 = request.json['sentenceID1']
-    sID2 = request.json['sentenceID2']
+    try:
+        sID1 = request.json['sentenceID1']
+        sID2 = request.json['sentenceID2']
+    except KeyError:
+        return JSONResponse(type_='error', content="Musisz zaznaczyć formułę oraz jej negację, aby wykazać sprzeczność.")
+        
     try:
         branch, closed = session.proof.nodes.getleaf(
             branch_name).getbranch_sentences()
