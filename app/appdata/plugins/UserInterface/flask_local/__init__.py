@@ -273,44 +273,46 @@ def do_save() -> str:
 def do_finish() -> str:  # sourcery skip: merge-else-if-into-elif
     try:
         is_tautology = request.json['tautology']
-        problems = session.check()
+        problems = [f"<p>{i}</p>" for i in session.check()]
         
-        # Check proof
         if problems:
-            return JSONResponse(type_='success', content='wrong rule')
+            return JSONResponse(type_='error', content="\n".join(problems))
 
         test_proof = session.proof.copy()
         closed_branches = [i.branch for i in session.proof.nodes.getleaves() if i.closed and i.closed.success]
         
         # Check branch closure
+        branches = []
         for i in test_proof.nodes.leaves:
             test_proof.closed = None
             test_proof.deal_closure(i.branch)
             if i.closed and i.closed.success and i.branch not in closed_branches:
-                return JSONResponse(type_='success', content='not all closed')
+                branches.append(f'<p>Gałąź "{i.branch}" powinna zostać zamknięta.</p>')
+        if branches:
+            return JSONResponse(type_='error', content="\n".join(branches))
 
         # Check decision
         test_proof.solve()
         if is_tautology:
             if session.proof.nodes.is_successful():
                 # Zaznaczono tautologię i poprawny dowód to wykazuje
-                return JSONResponse(type_='success', content='correct')
+                return JSONResponse(type_='success')
             elif test_proof.nodes.is_successful():
                 # Zaznaczono tautologię, ale z dowodu to nie wynika, gdyż nie został dokończony
-                return JSONResponse(type_='success', content='not finished')
+                return JSONResponse(type_='error', content='Ta formuła jest tautologią, choć może być tego nie widać z aktualnego dowodu. Spróbuj na przyszłość rozłożyć wszystkie formuły.')
             else:
                 # Zaznaczono tautologię, gdy nie jest to tautologia i dowód to wykazuje
-                return JSONResponse(type_='success', content='wrong decision')
+                return JSONResponse(type_='error', content='Ta formuła nie jest tautologią, a mimo to uznałeś ją za taką. Pamiętaj, że wszystkie gałęzie muszą być sprzeczne, aby dowieść formułę.')
         else:
             if session.proof.nodes.is_successful():
                 # Zaznaczono nie-tautologię, gdy jest to tautologia i dowód to wykazuje
-                return JSONResponse(type_='success', content='wrong decision')
+                return JSONResponse(type_='error', content='Ta formuła jest tautologią, a mimo to uznałeś ją za nietautologię. Pamiętaj, że wszystkie gałęzie muszą być sprzeczne, aby dowieść formułę.')
             elif test_proof.nodes.is_successful():
                 # Zaznaczono nie-tautologię, ale formuła jest tautologią, ale dowód nie został dokończony
-                return JSONResponse(type_='success', content='not finished')
+                return JSONResponse(type_='error', content='Ta formuła faktycznie nie jest tautologią, ale na przyszłość postaraj się wykazać to wyczerpując rozłożenia na wszystkich gałęziach.')
             else:
                 # Zaznaczono nie-tautologię i poprawny dowód to wykazuje
-                return JSONResponse(type_='success', content='correct')
+                return JSONResponse(type_='success')
         
     except EngineError as e:
         return JSONResponse(type_='error', content=str(e))

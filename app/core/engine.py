@@ -530,7 +530,7 @@ class Session(object):
         mistakes = proof.check()
         l = []
         for i in mistakes:
-            if v := self.acc('Assistant').mistake_check(i) is not None:
+            if (v := self.acc('Assistant').mistake_check(i)) is not None:
                 l.extend(v)
             else:
                 l.append(i.default)

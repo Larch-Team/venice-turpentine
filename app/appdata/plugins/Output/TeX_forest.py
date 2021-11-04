@@ -50,7 +50,10 @@ def write_tree(tree: utils.PrintedProofNode) -> list[str]:
     return [style, r'\begin{forest}', 'smullyan tableaux', _write_tree(tree.sentence, tree.children, tree.closer), r'\end{forest}']
 
 def _write_tree(sentence, children, close) -> str:
-    if children is None:
+    if children is not None:
+        return "[%s\n%s]" % (get_readable(sentence), "\n".join((_write_tree(i.sentence, i.children, i.closer) for i in children)))
+
+    if close:
         return "[%s [%s]]" % (get_readable(sentence), close.replace('XXX', '\\times').replace(',', '{,}'))
     else:
-        return "[%s\n%s]" % (get_readable(sentence), "\n".join((_write_tree(i.sentence, i.children, i.closer) for i in children)))
+        return "[%s]" % (get_readable(sentence))

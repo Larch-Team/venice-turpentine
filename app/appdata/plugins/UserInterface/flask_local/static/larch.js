@@ -315,37 +315,35 @@ function tautologyCheck() {
     xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
             var lastPage = JSON.parse(xhr.responseText);
-            if (lastPage["content"] == "correct") {
+            if (lastPage["type"] == "success") {
                 document.getElementById("decision").appendChild(document.getElementById("right"));
+                if (document.getElementById("is-tautology").checked) {
+                    document.getElementById("tautology-end1").innerHTML = "Twoje rozstrzygnięcie: Formuła jest tautologią.";
+                }
+                else {
+                    document.getElementById("tautology-end1").innerHTML = "Twoje rozstrzygnięcie: Formuła nie jest tautologią."
+                }
+                getProof('API/contratree', function(text) {
+                    document.getElementById('tree-end1').innerHTML = text;
+                });
                 nextPage();
             }
-            else if (lastPage["content"] == "not all closed") {
+            else {
                 document.getElementById("decision").appendChild(document.getElementById("wrong"));
+                document.getElementById("feedback-wrong").innerHTML = lastPage["content"]
+                if (document.getElementById("is-tautology").checked) {
+                    document.getElementById("tautology-end2").innerHTML = "Twoje rozstrzygnięcie: Formuła jest tautologią.";
+                } 
+                else {
+                    document.getElementById("tautology-end2").innerHTML = "Twoje rozstrzygnięcie: Formuła nie jest tautologią."
+                }
+                getProof('API/contratree', function(text) {
+                    document.getElementById('tree-end2').innerHTML = text;
+                });
                 nextPage();
             }
-            else if (lastPage["content"] == "wrong decision") {
-                document.getElementById("decision").appendChild(document.getElementById("wrong"));
-                nextPage();
-            }
-            else if (lastPage["content"] == "wrong rule") {
-                document.getElementById("decision").appendChild(document.getElementById("wrong"));
-                nextPage();
-            }
-            else if (lastPage["content"] == "not finished") {
-                document.getElementById("decision").appendChild(document.getElementById("wrong"));
-                nextPage();
-            }
-        };
-    };
-    if (document.getElementById("is-tautology").checked) {
-        document.getElementById("tautology-end") = "Twoje rozstrzygnięcie: Formuła jest tautologią.";
+        }
     }
-    else {
-        document.getElementById("tautology-end") = "Twoje rozstrzygnięcie: Formuła nie jest tautologią."
-    }
-    getProof('API/contratree', function(text) {
-        document.getElementById('tree-end').innerHTML = text;
-    });
 }
 
 function generate_formula() {
@@ -394,6 +392,35 @@ document.getElementById("rules-report").addEventListener("click", function () {
 document.getElementById("new_end").addEventListener("click", function () {
     window.location.reload(true)
 })
+
+document.getElementById("save_end").addEventListener("click", function () {
+    hide = [
+        "save_end",
+        "new_end",
+        "tex",
+        "leave"
+    ];
+    hide.forEach(element => {
+        document.getElementById(element).hidden = true;
+    });
+    window.print();
+    hide.forEach(element => {
+        document.getElementById(element).hidden = false;
+    });
+})
+
+document.getElementById("tex").addEventListener("click", function () {
+    xhr = new XMLHttpRequest();
+    xhr.open('GET', '/API/print');
+    xhr.send();
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            navigator.clipboard.writeText(xhr.response)
+            window.alert("Skopiowano dowód do schowka");
+        }
+    }  
+});
+
 document.getElementById("rules-undo").addEventListener("click", function (){
     ret = sendPOST('API/undo', null);
     if (ret["type"] == "success") {
