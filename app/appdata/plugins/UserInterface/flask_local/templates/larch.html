@@ -26,8 +26,7 @@
                         </p>
                     </li>
                     <li>
-                        <button id="leave" onclick="if (confirm('Czy jesteś pewny, że chcesz opuścić stronę?')) window.location.href='/';
-                        ">Wyjdź</button>
+                        <button id="leave">Wyjdź</button>
                     </li>
                 </ul>
             </div>
@@ -355,6 +354,21 @@
                 Masz pierwsze rozgałęzienie. Jeśli chcesz się przełączyć między gałęziami, kliknij na pierwszy wyraz po rozgałęzieniu.
             </p>
             <button type="button" class="btn" id="ok">OK</button>
+        </div>
+        <div class="new-window" id="leave-window">
+            <p>
+                Czy jesteś pewny, że chcesz opuścić stronę?
+            </p>
+            <div class="btn-leave-container">
+                <button type="button" class="btn" id="stay">Zostań</button>
+                <a href="/" class="btn" id="confirmation">Wyjdź</a>
+            </div>     
+        </div>
+        <div class="new-window" id="general-modal">
+            <p id="hints-p">
+                
+            </p>
+            <button type="button" class="btn" id="ok2">OK</button>
         </div>
         <div id="overlay"></div>
     </body>

@@ -46,7 +46,8 @@ function new_proof(e) {
         nextPage();
         toggleBtns();
     } else {
-        window.alert(ret["content"])
+        showHintModal();
+        document.getElementById("hints-p").innerHTML = xhr.response["content"];
     }
 }
 
@@ -93,7 +94,8 @@ function use_rule(rule_name, tokenID, sentenceID) {
                     toggleBtns();
                 });
             } else {
-                window.alert(xhr.response["content"])
+                showHintModal();
+                document.getElementById("hints-p").innerHTML = xhr.response["content"];
             }
         }
     };
@@ -256,7 +258,8 @@ function checkBranch() {
             });
         }
         else {
-            window.alert(xhr.response["content"])
+            showHintModal();
+            document.getElementById("hints-p").innerHTML = xhr.response["content"];
         }
     }
 }
@@ -278,7 +281,8 @@ function closeBranch(branch) {
             });
         }
         else {
-            window.alert(xhr.response["content"])
+            showHintModal();
+            document.getElementById("hints-p").innerHTML = xhr.response["content"];
         }
     }
 }
@@ -303,7 +307,8 @@ function tautologyCheck() {
         tautology = document.getElementById("is-tautology").checked;
     }
     else {
-        window.alert("Podejmij decyzję, czy formuła jest tautologią.")
+        showHintModal();
+        document.getElementById("hints-p").innerHTML = "Podejmij decyzję czy dana formuła jest tautologią.";
     };
     var jsonData = {
         "tautology":tautology
@@ -357,7 +362,8 @@ function generate_formula() {
             disableBtn();
         }
         else {
-            window.alert(xhr.response["content"])
+            showHintModal();
+            document.getElementById("hints-p").innerHTML = xhr.response["content"];
         }
     }
 }
@@ -373,6 +379,9 @@ document.getElementById("back-to-2").addEventListener('click', function () {
     prevPage();
 })
 
+document.getElementById("ok2").addEventListener('click', hideHintModal)
+document.getElementById("stay").addEventListener('click', hideLeave)
+document.getElementById("leave").addEventListener('click', showLeave)
 document.getElementById("generate").addEventListener('click', generate_formula)
 document.getElementById("switch").addEventListener('click', toggleBtns)
 document.getElementById("ok").addEventListener('click', hideHint2)
@@ -416,7 +425,8 @@ document.getElementById("tex").addEventListener("click", function () {
     xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
             navigator.clipboard.writeText(xhr.response)
-            window.alert("Skopiowano dowód do schowka");
+            showHintModal();
+            document.getElementById("hints-p").innerHTML = "Skopiowano dowód do schowka";
         }
     }  
 });
@@ -429,7 +439,8 @@ document.getElementById("rules-undo").addEventListener("click", function (){
             toggleBtns();
         });
     } else {
-        window.alert(ret["content"])
+        showHintModal();
+        document.getElementById("hints-p").innerHTML = xhr.response["content"];
     }
 })
 
@@ -504,6 +515,25 @@ function hideHint2() {
     document.getElementById("overlay").classList.remove("active");
 }
 
+function showLeave() {
+    document.getElementById("leave-window").classList.add("active");
+    document.getElementById("overlay").classList.add("active");
+}
+
+function hideLeave() {
+    document.getElementById("leave-window").classList.remove("active");
+    document.getElementById("overlay").classList.remove("active");
+}
+
+function showHintModal() {
+    document.getElementById("general-modal").classList.add("active");
+    document.getElementById("overlay").classList.add("active");
+}
+
+function hideHintModal() {
+    document.getElementById("general-modal").classList.remove("active");
+    document.getElementById("overlay").classList.remove("active");
+}
 function showHintRules() {
     var xhr = new XMLHttpRequest();
     xhr.open("GET", 'API/hint', true);

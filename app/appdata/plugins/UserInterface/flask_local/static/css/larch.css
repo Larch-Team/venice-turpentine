@@ -558,12 +558,12 @@ mark {
     max-width: 10em;
 }
 
-#hint-window3 {
+#hint-window3, #general-modal {
     max-width: 22em;
     text-align: center;
 }
 
-#ok {
+#ok, #ok2 {
     margin-top: 10%;
     width: 80%;
 }
@@ -583,6 +583,11 @@ button:disabled {
     display: grid;
     grid-template-columns: auto auto auto;
     grid-gap: 0.5em;
+    margin-top: 5%;
+}
+
+.btn-leave-container {
+    text-align: center;
     margin-top: 5%;
 }
 
