@@ -315,7 +315,6 @@ h1 {
     margin-top: 2em;
     margin-bottom: 5em;
     min-height: 20em;
-    min-width: max-content;
     background-color: #ffffff;
     border-radius: 1.5em;
     text-align: left;
@@ -373,6 +372,10 @@ h1 {
 
 #checking-container {
     min-height: 20.1em;
+}
+
+.checking-sub {
+    max-width: 32em;
 }
 
 #clickable-container {
