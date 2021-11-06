@@ -558,6 +558,20 @@ mark {
     max-width: 10em;
 }
 
+#hint-window2 h2 {
+    font-family: 'Spectral', sans-serif;
+    margin-bottom: 5%;
+}
+
+details {
+    font-style: italic;
+}
+
+summary {
+    margin-bottom: 5%;
+    font-style: normal;
+}
+
 #hint-window3, #general-modal {
     max-width: 22em;
     text-align: center;
@@ -632,4 +646,8 @@ button:disabled {
     margin: auto;
     text-align: center;
     width: 45%;
+}
+
+#confirmation {
+    background-color: #ad0a0a;
 }
