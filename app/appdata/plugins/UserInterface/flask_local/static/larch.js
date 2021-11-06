@@ -398,38 +398,6 @@ document.getElementById("btn-check").addEventListener("click", tautologyCheck)
 document.getElementById("rules-report").addEventListener("click", function () {
     window.open('https://szymanski.notion.site/4a180f6826464e9dac60dd9c18c5ac0b?v=56fec8f735024f94ab421aa97cab3dc8','_blank')
 })
-document.getElementById("new_end").addEventListener("click", function () {
-    window.location.reload(true)
-})
-
-document.getElementById("save_end").addEventListener("click", function () {
-    hide = [
-        "save_end",
-        "new_end",
-        "tex",
-        "leave"
-    ];
-    hide.forEach(element => {
-        document.getElementById(element).hidden = true;
-    });
-    window.print();
-    hide.forEach(element => {
-        document.getElementById(element).hidden = false;
-    });
-})
-
-document.getElementById("tex").addEventListener("click", function () {
-    xhr = new XMLHttpRequest();
-    xhr.open('GET', '/API/print');
-    xhr.send();
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4) {
-            navigator.clipboard.writeText(xhr.response)
-            showHintModal();
-            document.getElementById("hints-p").innerHTML = "Skopiowano dowód do schowka";
-        }
-    }  
-});
 
 document.getElementById("rules-undo").addEventListener("click", function (){
     ret = sendPOST('API/undo', null);
@@ -443,6 +411,39 @@ document.getElementById("rules-undo").addEventListener("click", function (){
         document.getElementById("hints-p").innerHTML = xhr.response["content"];
     }
 })
+
+document.getElementById("new_end").addEventListener("click", function () {
+    window.location.reload(true)
+})
+
+// document.getElementById("save_end").addEventListener("click", function () {
+//     hide = [
+//         "save_end",
+//         "new_end",
+//         "tex",
+//         "leave"
+//     ];
+//     hide.forEach(element => {
+//         document.getElementById(element).hidden = true;
+//     });
+//     window.print();
+//     hide.forEach(element => {
+//         document.getElementById(element).hidden = false;
+//     });
+// })
+
+document.getElementById("tex").addEventListener("click", function () {
+    xhr = new XMLHttpRequest();
+    xhr.open('GET', '/API/print');
+    xhr.send();
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            navigator.clipboard.writeText(xhr.response)
+            showHintModal();
+            document.getElementById("hints-p").innerHTML = "Skopiowano dowód do schowka";
+        }
+    }  
+});
 
 function nextPage() {
     larchStepsNum++;
