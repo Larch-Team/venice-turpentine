@@ -127,6 +127,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
 .vscode
-app/config.json
-crashes/.
+app/appdata/crashes
+app/appdata/config
+app/appdata/saved_proofs
+app/core_temp
+app/larch.pyz
+app/appdata/manifest.json

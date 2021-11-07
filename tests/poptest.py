@@ -3,7 +3,7 @@ from importlib import import_module
 import os
 import sys
 
-sys.path.append('../app')
+sys.path.extend([os.path.abspath(i) for i in ['../app/appdata', '../app/core']])
 import pop_engine
 import example1
 
@@ -195,8 +195,7 @@ class TestMisc(test.TestCase):
         self.socket = pop_engine.Socket(
             'example_project', exampleproject_path, "0.0.0", funcs)
         tested = self.socket.find_plugins()
-        self.assertSetEqual(set(tested), {
-                            'example2', 'example2_', 'example_compatible', 'example_wrong_ver_for'})
+        self.assertSetEqual(set(tested), {'example2', 'example2_', 'example_compatible', 'example_wrong_ver_for', 'test_folder', 'example_utils'})
 
     def test_create_plugin(self):
         funcs = dict((
@@ -233,7 +232,29 @@ class TestPlugging(test.TestCase):
         self.socket = pop_engine.Socket(
             'example_project', exampleproject_path, "0.0.0", funcs)
         self.socket.plug("example2")
-        self.assertTrue(self.socket().__name__ == 'example2')
+        self.assertEqual(self.socket.get_plugin_name(), 'example2')
+        
+
+    def test_import_with_utils(self):
+        funcs = dict((
+            pop_engine.gen_functionDS('add', int, int, int),
+            pop_engine.gen_functionDS('sub', int, int, int),
+        ))
+        self.socket = pop_engine.Socket(
+            'example_project', exampleproject_path, "0.0.0", funcs)
+        self.socket.plug("example_utils")
+        self.assertEqual(self.socket.get_plugin_name(), 'example_utils')
+        
+
+    def test_import_folder(self):
+        funcs = dict((
+            pop_engine.gen_functionDS('add', int, int, int),
+            pop_engine.gen_functionDS('sub', int, int, int),
+        ))
+        self.socket = pop_engine.Socket(
+            'example_project', exampleproject_path, "0.0.0", funcs)
+        self.socket.plug("test_folder")
+        self.assertEqual(self.socket.get_plugin_name(), 'test_folder')
 
     def test_partial_compatibility(self):
         funcs = dict((
@@ -243,7 +264,7 @@ class TestPlugging(test.TestCase):
         self.socket = pop_engine.Socket(
             'example_project', exampleproject_path, "0.0.0", funcs)
         self.socket.plug("example_compatible")
-        self.assertTrue(self.socket().__name__ == 'example_compatible')
+        self.assertEqual(self.socket.get_plugin_name(), 'example_compatible')
 
     def test_plugin_change(self):
         funcs = dict((
@@ -254,7 +275,7 @@ class TestPlugging(test.TestCase):
             'example_project', exampleproject_path, "0.0.0", funcs)
         self.socket.plug("example2")
         self.socket.plug("example2_")
-        self.assertTrue(self.socket().__name__ == "example2_")
+        self.assertEqual(self.socket.get_plugin_name(), "example2_")
 
     def test_plugin_doesnt_exist(self):
         funcs = dict((
@@ -304,7 +325,7 @@ class TestPlugging(test.TestCase):
         ))
         self.socket = pop_engine.Socket(
             'example_project', exampleproject_path, "0.0.0", funcs)
-        with self.assertRaises(SyntaxError):
+        with self.assertRaises(pop_engine.PluginError):
             self.socket.plug("example_wrong_ver_for")
 
     def test_wrong_folder(self):

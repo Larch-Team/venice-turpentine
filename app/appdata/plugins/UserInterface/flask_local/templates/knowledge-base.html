@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pl">
+    <head>
+        <title>Baza wiedzy</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+        <link rel="stylesheet" type="text/css" href="static/css/knowledge-base.css"/>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,700;1,700&display=swap" rel="stylesheet"> 
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,700;1,700&family=Work+Sans&display=swap" rel="stylesheet"> 
+    </head>
+<body>
+    <nav id="navigation-bar">
+        <div class="container">
+            <ul>
+                <li style="float:left">
+                    <p>Larch</p>
+                </li>
+                <li>
+                    <a href="run" id="try-now">Zacznij dowód</a>
+                </li>
+                <li>
+                    <a href="/">Strona Główna</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <header>
+        <h1>
+            {{ title | safe }}
+        </h1>
+    </header>
+    {{ text | safe }}
+</body>

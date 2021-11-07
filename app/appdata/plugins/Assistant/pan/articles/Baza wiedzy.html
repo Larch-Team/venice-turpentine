@@ -1,0 +1,224 @@
+<div class="main-container">
+    <div class="column-container">
+        <div class="column-sub side-column">
+            <h2>
+                Spis treści
+            </h2>
+            <nav class="content-nav">
+                <ul class="content-list">
+                    <li>
+                        <a href="#basics">
+                            Podstawy
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#how-to">
+                            Jak właściwie działa taki dowód?
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#zal">
+                            Założenia
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#what-h2">
+                            Czego używamy w dowodzie przeprowadzanym w tabeli
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#structure">
+                            Struktura drzewa w dowodzie metodą tabel analitycznych
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#krz">
+                            Reguły dla tabel analitycznych KRZ
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#end">
+                            Jak kończymy dowód?
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#what-how">
+                            Co można dowieść w tabeli i jak to zinterpretować?
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#in-larch">
+                            Jak działają tabele w Larchu?
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#tips">
+                            Wskazówki, heurystyki i inne porady dla wykorzystywania tabel w KRZ
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div class="column-sub">
+            <h2>
+                Źródła
+            </h2>
+            <p>
+                Dla zainteresowanych pełniejszym i bardziej systematycznym, 
+                sformalizowanym wprowadzeniem polecamy jak zawsze materiały
+                prof. Andrzeja Wiśniewskiego.
+            </p>
+        </div>
+    </div>
+    <div class="column-container main-column">
+        <div class="main-column-sub">
+        <h1 class="h1-main" id="basics">
+            Podstawy
+        </h1>
+            <p>
+            Tabele analityczne są metodą dowodzenia używaną m.in. w klasycznym rachunku zdań oraz klasycznym rachunku predykatów. Przeprowadzane dowody mają postać drzewa - "rośnie" ono i rozgałęzia się w przebiegu dowodu. W tabelach działamy przy pomocy ustalonego zestawu reguł. Metoda tabel pozwala nam m.in. na:
+            </p>
+        <ul>
+            <li>sprawdzenie tautologiczności formuły</li>
+            <li>sprawdzenie kontrtautologiczności formuły</li>
+            <li>sprawdzenie czy formuła wynika ze zbioru formuł</li>
+        </ul>
+        <p>
+            Dowód przeprowany w tabelach jest dowodem nie wprost (reductio ad absurdum).
+        </p>
+        </div>
+        <div class="main-column-sub">
+        <h1 class="h1-main" id="how-to">
+            Jak właściwie działa taki dowód?
+        </h1>
+
+        <h2 class="h2-main" id="zal">
+            Założenia
+        </h2>
+        <p>
+            Posłużymy się przykładem sprawdzania, czy formuła A jest tautologią - formułą zawsze prawdziwą, niezależnie od jej wartościowania (a więc niezależnie od tego, jakie wartości logiczne przyporządkujemy do użytych w niej zmiennych zdaniowych).
+        </p>
+        <p>
+            Dowodzimy metodą nie wprost, a więc rozpoczynamy od kontrintuicyjnego założenia, że formuła A jest fałszywa w jakimś wartościowaniu. Oczywiście, jeśli nasza formuła jest tautologią, takie założenie doprowadzi nas do sprzeczności. Tabele analityczne pozwalają nam wykazać tą sprzeczność.
+        </p>
+
+        <h2 class="h2-main" id="what-h2">
+            Czego używamy w dowodzie przeprowadzanym w tabeli
+        </h2>
+        <p>
+            Tabele analityczne pozwalają nam na przeprowadzenie dowodu, dając nam następujące narzędzia:
+        </p>
+        <ul>
+            <li><b>oznaczenia prawdziwościowe</b> - T (True) oraz F (False), są one konwencją służącą ułatwieniu dowodzenia. Możemy myśleć o nich jako o założonym wartościowaniu.</li>
+            <li><b>formuły sygnowane</b> - jeśli A jest formułą, to TA oraz FA są formułami sygnowanymi. Formuł sygnowanych nie łączymy spójnikami, ani ich nie negujemy!</li>
+            <li><b>reguły</b> - pozwalają one na przekształcanie formuł sygnowanych i "budowanie" naszego dowodu. Reguły pozwalają nam na rozbicie wyjściowej formuły na coraz mniejsze elementy. Stąd też "analityczność" w nazwie metody, dokonujemy bowiem analizy (rozkładu). Reguły zostaną dokładnie omówione niżej.</li>
+        </ul>
+
+        <h2 class="h2-main" id="structure">
+            Struktura drzewa w dowodzie metodą tabel analitycznych
+        </h2>
+        <p>
+            Zrozumienie jak działa przeprowadzanie dowodu metodą tabel jest łatwiejsze, jeśli zaznajomimy się z pojęciem drzewa i terminami z nim związanymi. Poniższych informacji nie musimy traktować jako definicji do zapamiętania (struktura drzewa stanie się intuicyjna), ale będą one pomocne. 
+        </p>
+        <ul>
+            <li>Całość dowodu ma formę <b>drzewa</b>, drzewo to "rośnie" z góry na dół.</li>
+            <li>Każda obecna w dowodzie formuła sygnowana będzie <b>węzłem</b>. Węzeł jest podstawowym elementem drzewa. Używając reguł, będziemy dodawać do drzewa nowe węzły.</li>
+            <li>Formuła wyjściowa jest szczególnym węzłem - <b>korzeniem</b>. Korzeń nie posiada żadnych węzłów nad nim</li>
+            <li>Węzły, pod którymi nie znajdują się żadne inne wezły, są <b>liśćmi</b></li>
+            <li><b>Gałąź</b> jest ciągiem węzłów od korzenia do liścia</li>
+            <li>Jeśli pod jednym węzłem pojawiają się dwa węzły, mamy do czynienia z <b>rozgałęzieniem</b></li>
+        </ul>
+
+        <h2 class="h2-main" id="krz">
+            Reguły dla tabel analitycznych KRZ
+        </h2>
+        <p>
+            Poniżej przedstawione zostały reguły dla tabel analitycznych KRZ. Każda reguła mówi nam, jakie nowe elementy (węzły) drzewa powstają w trakcie rozkładania danego typu złożonej formuły. Część z nich jest regułami rozgalęziającymi (konwencja zapisu: A | B).
+        </p>
+
+        <h3 class="h3-main">
+            Intuicyjne rozumienie reguł
+        </h3>
+        <p>
+            Regułom warto przyjrzeć się uważnie. Korzystanie z tabel przyjdzie nam łatwiej, jeśli nie będziemy brać ich "na wiarę". <b>Reguły reprezentują proste intuicje związane z działaniem spójników logicznych. Jeśli powstające elementy nie ulegają rozgałęzieniu, możemy je rozumieć jako "oraz"</b>. <b>Jeśli rozgałęzienie zachodzi, możemy rozumieć to jako "lub"</b>. Możemy więc patrzeć na reguły następująco, <b>biorąc przykład reguł dla implikacji</b>:
+        </p>
+        <ul>
+            <li>Kiedy implikacja jest fałszywa? <b>Implikacja jest fałszywa, gdy jej poprzednik jest prawdziwy ORAZ następnik jest fałszywy</b>.</li>
+            <li>Kiedy implikacja jest prawdziwa? Kiedy nie jest fałszywa, a więc kiedy nie jest tak, że jej poprzednik jest prawdziwy oraz jej następnik jest fałszywy. Możemy więc zauważyć, że jeśli poprzednik jest fałszywy, informacja o następniku nie jest dla nas istotna. Analogicznie jeśli wiemy, że prawdziwy jest następnik, nie potrzebujemy informacji o następniku. Dochodzimy więc do wniosku: <b>implikacja jest prawdziwa, gdy jej poprzednik jest fałszywy LUB jej następnik jest prawdziwy</b>.</li>
+        </ul>
+        <p>
+            Jeśli spojrzymy teraz na reguły dla implikacji, możemy zauważyć, że reprezentują one powyższe intuicje.
+        </p>
+        <h2 class="h2-main" id="end">
+            Jak kończymy dowód?
+        </h2>
+        <p>
+            Wiemy już, że w przebiegu dowodu rozkładamy formuły sygnowane, dodając do drzewa kolejne węzły. Wiemy też, że nasze drzewo składa się z co najmniej jednej gałęzi. Aby zrozumieć jak należy dowód zakończyć, należy znać dwa pojęcia:
+        </p>
+        <ul>
+            <li><b>gałąź zamknięta</b> - jest to gałąź, w której znajdziemy <b>sprzeczność</b>. Ze sprzecznością mamy do czynienia, kiedy na tej samej gałęzi możemy wskazać tę samą formułę A zarówno w postaci FA jak i TA. Najczęściej spotkamy się ze sprzecznościami dotyczącymi formuł sygnowanych zawierających podstawowe zmienne zdaniowe np. Fq Tq. <b>Wskazanie sprzeczności uznajemy za zamknięcie gałęzi.</b></li>
+            <li><b>gałąź otwarta</b> - gałąź, na której nie znajduje się sprzeczność. Jak można zauważyć, każda gałąź jest otwarta, dopóki jej nie zamkniemy.</li>
+        </ul>
+        <p>
+            <b>Przeprowadzając dowód dążymy do zamknięcia każdej gałęzi</b>. Nie zawsze jest to jednak możliwe. W przypadku tabel analitycznych KRZ <b>gałąź możemy uznać za "ostatecznie" otwartą, kiedy wykonany wszystkie możliwe operacje rozkładania formuł przy pomocy reguł</b> (Uwaga: taka heurystyka nie sprawdzi się niestety w KRP, ponieważ niektóre reguły dotyczące kwantyfikatorów mogą być teoretycznie używane "w nieskończoność").
+        </p>
+        
+        <h3 class="h3-main">
+            Jak interpretujemy wynik dowodu?
+        </h3>
+        <p>
+            Dowód ma zasadniczo dwa wyniki:
+        </p>
+        <ol>
+            <li><b>Wszystkie gałęzie są zamknięte</b>. Oznacza to, że nasze założenie okazało się sprzeczne (przypominamy: przeprowadzamy dowód nie wprost). <b>Udowodniliśmy naszą tezę</b>. Przykład: badamy, czy A jest tautologią. Dowód rozpoczęty od formuły FA zakończyliśmy zamykając wszystkie gałęzie. Pokazaliśmy więc, że nie istnieje takie wartościowanie, w którym A jest fałszywe. Udowodniliśmy tezę, że A jest tautologią.</li>
+            <li><b>Co najmniej jedna gałąź pozostała otwarta</b>. Nasze założenie nie okazało się więc sprzeczne, a <b>nasza teza okazała się nieprawdziwa</b>. Jeśli udowadnialiśmy więc, że A jest tautologią, znaleźliśmy takie wartościowanie dla A, w którym jest ono fałszywe. A nie jest więc tautologią. Uwaga jednak - nie udowodniliśmy tezy przeciwnej! A nie jest tautologią, nie wiemy jednak, czy jest kontrtautologią.</li>
+        </ol>
+
+        <h2 class="h2-main" id="what-how">
+            Co można dowieść w tabeli i jak to zinterpretować?
+        </h2>
+        <ol>
+            <li>Teza: A jest tautologią
+                <ol>
+                    <li>Dowód zaczynamy od FA</li>
+                    <li>Wszystkie gałęzie zamknięte: A jest tautologią</li>
+                    <li>Istnieje gałąź otwarta: A nie jest tautologią (ale nie wiemy czy jest kontrtautologią)</li>
+                </ol>
+            </li>
+            <li>Teza: A jest kontrtautologią
+                <ol>
+                    <li>Dowód zaczynamy od TA. Alternatywnie: F~A</li>
+                    <li>Wszystkie gałęzie zamknięte: A jest kontrtautologią</li>
+                    <li>Istnieje gałąź otwarta: A nie jest kontrtautologią (ale nie wiemy czy jest tautologią</li>
+                </ol>
+            </li>
+            <li>Teza: formuła B wynika ze zbioru formuł A
+                <ol>
+                    <li>Dowód zaczynamy od TA1, TA2 itd., FB (ustawiając te formuły pod sobą). Alternatywnie: F(A1 ^A2 ^  ... → B)</li>
+                    <li>Wszystkie gałęzie zamknięte: zachodzi wynikanie</li>
+                    <li>Istnieje gałąź otwarta: nie zachodzi wynikanie</li>
+                </ol>
+            </li>
+        </ol>
+  </div>  
+  <div class="main-column-sub">
+    <h1 class="h1-main" id="in-larch">
+        Jak działają tabele w Larchu?
+    </h1>
+    
+    Todo
+  </div>
+
+<div class="main-column-sub">
+    <h1 class="h1-main" id="tips">
+        Wskazówki, heurystyki i inne porady dla wykorzystywania tabel w KRZ
+    </h1>
+    <ul>
+        <li>Upewnij się, że dowodzisz tego, co chcesz dowieść - czy formuła jest dobrze przepisana? Czy została dobrze oznaczona?</li>
+        <li>Uważnie czytaj formuły i uważaj na nawiasy - szczególnie ważne jest poprawne rozpoznanie głównego spójnika formuły</li>
+        <li>Staraj się używać reguł nierozgałęziających przed rozgałęziającymi - dowód będzie krótszy</li>
+    </ul>
+</div>
+
+    </div>
+</div>

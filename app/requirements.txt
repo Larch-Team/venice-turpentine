@@ -1,4 +1,0 @@
-anytree==2.8.0
-prompt-toolkit==3.0.18
-six==1.15.0
-wcwidth==0.2.5
