@@ -8,7 +8,7 @@ NEED = [
         'plugins/Assistant/basic.py',
         # Assistant/pan
         'plugins/Assistant/pan/__init__.py',
-        'plugins/Assistant/pan/articles/main.html',
+        'plugins/Assistant/pan/articles/Baza wiedzy.html',
         
         # Formal
         'plugins/Formal/__template__.py',
@@ -41,11 +41,14 @@ NEED = [
         # UserInterface/flask_local
         "plugins/UserInterface/flask_local/libs.py", 
         "plugins/UserInterface/flask_local/__init__.py", 
+        "plugins/UserInterface/flask_local/app.py", 
         "plugins/UserInterface/flask_local/static/larch.js", 
         "plugins/UserInterface/flask_local/static/logo.png", 
         "plugins/UserInterface/flask_local/static/normal_u95.png", 
         "plugins/UserInterface/flask_local/static/css/larch.css", 
         "plugins/UserInterface/flask_local/static/css/styles.css", 
+        "plugins/UserInterface/flask_local/static/favicon.ico", 
         "plugins/UserInterface/flask_local/templates/index.html", 
         "plugins/UserInterface/flask_local/templates/larch.html",
+        "plugins/UserInterface/flask_local/templates/knowledge-base.html",
     ]

@@ -426,7 +426,10 @@ document.getElementById("rules-undo").addEventListener("click", function (){
     }
 })
 
-document.getElementById("new_end").addEventListener("click", function () {
+document.getElementById("new_end1").addEventListener("click", function () {
+    window.location.reload(true)
+})
+document.getElementById("new_end2").addEventListener("click", function () {
     window.location.reload(true)
 })
 
@@ -446,7 +449,7 @@ document.getElementById("new_end").addEventListener("click", function () {
 //     });
 // })
 
-document.getElementById("tex").addEventListener("click", function () {
+function tex_export() {
     xhr = new XMLHttpRequest();
     xhr.open('GET', '/API/print');
     xhr.send();
@@ -457,7 +460,9 @@ document.getElementById("tex").addEventListener("click", function () {
             document.getElementById("hints-p").innerHTML = "Skopiowano dowód do schowka";
         }
     }  
-});
+};
+document.getElementById("tex1").addEventListener("click", tex_export);
+document.getElementById("tex2").addEventListener("click", tex_export);
 
 function nextPage() {
     larchStepsNum++;

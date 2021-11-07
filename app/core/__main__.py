@@ -40,7 +40,7 @@ if __name__ == "__main__":
         if not configs:
             UI.plug('CLI')
         else:
-            p = 'config/config.json' if 'config.json' in configs else config[0]
+            p = 'config/config.json' if 'config.json' in configs else configs[0]
             with open(p, 'r') as file:
                 config = json.load(file)
             UI.plug(config['chosen_plugins']['UserInterface'])

@@ -1,6 +1,6 @@
 from datetime import datetime
 from close import Contradiction, Emptiness
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 from colors import COLORS, DEFAULT_COLOR
 from engine import Session, contextdef_translate
 from exceptions import EngineError, LrchLexerError
@@ -9,6 +9,11 @@ from random import randint
 
 app = Flask('flask_local', static_url_path='/static')
 session = Session('main', 'config.json')
+
+@app.route('/favicon.ico', methods=['GET'])
+def favicon():
+    return redirect('/static/favicon.ico')
+
 
 @app.route('/API/colors', methods=['GET'])
 def colors():

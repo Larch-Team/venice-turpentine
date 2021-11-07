@@ -131,7 +131,7 @@ class FileManager(object):
         self.prepare_dirs(os.path.dirname(file))
         url = f"{REPO_URL}/{file}"
         try:
-            response = web_request.urlopen(url, context=self.context())
+            response = web_request.urlopen(url.replace(' ', '%20'), context=self.context())
         except URLError as e:
             return f'Couldn\'t download {file}, because "{e.reason}"'
         webContent = response.read()

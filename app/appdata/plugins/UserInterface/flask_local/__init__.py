@@ -1,6 +1,6 @@
 import webbrowser
 from flask_local.app import app
-from gevent.pywsgi import WSGIServer
+from wsgiserver import WSGIServer
 
 SOCKET = 'UserInterface'
 VERSION = '0.0.1'
@@ -19,5 +19,5 @@ def run() -> int:
     :rtype: int
     """
     webbrowser.open('http://127.0.0.1:5000', 2, autoraise=True)
-    http_server = WSGIServer(('127.0.0.1', 5000), app)
-    http_server.serve_forever()
+    http_server = WSGIServer(app, host='127.0.0.1', port=5000)
+    http_server.start()
