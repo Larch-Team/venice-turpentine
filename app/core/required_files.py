@@ -30,7 +30,7 @@ NEED = [
         'plugins/Output/__utils__.py',
         
         'plugins/Output/actual_tree.py',
-        'plugins/Output/TeX_infer.py',
+        'plugins/Output/TeX_forest.py',
         
         # UserInterface
         'plugins/UserInterface/__template__.py',
