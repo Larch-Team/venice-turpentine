@@ -219,20 +219,12 @@ def solver(proof: Proof) -> bool:
 
 def check_closure(branch: list[Sentence], used: History) -> tp.Union[None, tuple[utils.close.Close, str]]:
     """Sprawdza możliwość zamknięcia gałęzi, zwraca obiekty zamknięcia oraz komunikat do wyświetlenia"""
-    branch = [convert_from_signed(i) for i in branch]
     for num1, statement_1 in enumerate(branch):
-        for num2, statement_2 in enumerate(branch):
-            if statement_1[0].startswith('not') and not statement_2[0].startswith('not'):
-                negated, statement = statement_1, statement_2
-            elif statement_2[0].startswith('not') and not statement_1[0].startswith('not'):
-                negated, statement = statement_2, statement_1
-            else:
-                continue
-
-            if utils.reduce_prefix(negated, 'not') == statement:
+        for num2, statement_2 in enumerate(branch[num1+1:]):
+            if statement_1[1:] == statement_2[1:] and statement_1[0] != statement_2[0]:
                 return utils.close.Contradiction(sentenceID1=num1+1, sentenceID2=num2+1), "Sentences contradict. The branch was closed."
 
-    if all(i in used or i.isLiteral() for i in branch):
+    if all(i in used or len(i)==2 for i in branch):
         return utils.close.Emptiness, "Nothing else to be done, branch was closed."
     return None
 

@@ -543,7 +543,9 @@ class Session(object):
         if not proof:
             raise EngineError(
                 "There is no proof started")
-
+            
+        for i in proof.nodes.getbranchnames():
+            proof.deal_closure(i)
         if self.acc('Formal').solver(proof):
             return ("Udało się zakończyć dowód", f"Formuła {'nie '*(not proof.nodes.is_successful())}jest tautologią")
         else:

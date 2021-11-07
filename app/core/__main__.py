@@ -4,7 +4,8 @@ import sys
 from datetime import datetime
 from manager import FileManager
 from engine import Session
-from constants import DEBUG, VERSION
+from constants import DEBUG, FORCE_DOWNLOAD, VERSION
+import platform
 
 import pop_engine as pop
 
@@ -13,6 +14,12 @@ import pop_engine as pop
 
 if __name__ == "__main__":
     try:
+        v1, v2, _ = platform.python_version().split('.')
+        if v1 != '3' or int(v2)<9:
+            print('Larch wymaga co najmniej Pythona 3.9 do działania. Zainstaluj go ze strony https://www.python.org/downloads/')
+            input()
+            sys.exit()
+            
         manager = FileManager(DEBUG, VERSION)
         manager.download_required()
 

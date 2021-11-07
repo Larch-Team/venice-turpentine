@@ -1,6 +1,7 @@
 from collections import OrderedDict
 from typing import Callable, Union, NewType
 from exceptions import SentenceError
+from constants import DEBUG
 
 _Sentence = NewType('Sentence', list[str])
 Session = NewType('Session', object)

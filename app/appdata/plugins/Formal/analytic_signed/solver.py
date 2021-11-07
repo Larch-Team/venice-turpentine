@@ -5,6 +5,7 @@ from proof import Proof
 import plugins.Formal.__utils__ as utils
 from analytic_signed.signed import *
 from tree import ProofNode
+from usedrule import UsedRule
 
 def find_rule(sentence: Sentence) -> str:
     """
@@ -78,9 +79,42 @@ def multiply_for_branches(containers: dict[str, list[utils.SignedSentence]], tar
 def change_branch_container(container: list[utils.SignedSentence], branches: Iterable[str]) -> list[utils.SignedSentence]:
     return [utils.SignedSentence(i.sentence, j, i.id) for i in container for j in branches]
 
+def strict_filler(func: Callable[..., SentenceTupleStructure]) -> Callable[..., tuple[ProofNode]]:
+    """
+    Dekorator uzupełniający funkcję wykonującą regułę dowodzenia strict o otoczkę techniczną
 
+    :param func: Funkcja wykonująca operacje, pierwszym argumentem powinno być Rule, a drugim Sentence
+    :type func: tp.Callable[..., SentenceTupleStructure]
+    :return: Nowa funkcja z dodatkowym argumentem Proof na początku
+    :rtype: tp.Callable[..., tuple[ProofNode]]
+    """
+    def wrapper(proof: Proof, rule: Rule, sentence: utils.SignedSentence, *args, **kwargs):
+        old = proof.nodes.getleaf(sentence.branch)
 
-@utils.strict_filler
+        # Rule usage
+        fin = func(rule, sentence, *args, **kwargs)
+        assert fin is not None, "Reguła nie zwróciła nic"
+
+        layer = proof.append(fin, sentence.branch)
+        ProofNode.insert_history(
+            len(fin)*([[0]] if rule.reusable else [[convert_to_signed(sentence.sentence)]]), old.children)
+
+        if rule.name.startswith('false'):
+            _, (_, a) = sentence.sentence.getComponents()
+            tid = a.getMainConnective() +2
+        else:
+            tid = sentence.sentence.getMainConnective()
+        context = {
+            'sentenceID': sentence.id,
+            'tokenID': tid
+        }
+
+        proof.metadata['usedrules'].append(
+            UsedRule(layer, sentence.branch, rule.name, proof, context=context, auto=True))
+        return old.descendants
+    return wrapper
+
+@strict_filler
 def use_strict(rule: Rule, sentence: utils.SignedSentence) -> SentenceTupleStructure:
     """Funkcja ma de facto inne parametry ze względu na działanie dekoratora - pierwszym jest Proof. Funkcja wykonuje regułę dowodzenia w formie strict na zdaniu"""
     return rule.strict(sentence.sentence)

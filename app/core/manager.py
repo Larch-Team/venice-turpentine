@@ -144,13 +144,13 @@ class FileManager(object):
             #         self.write_manifest(man)
         return None
 
-    def download_required(self):
+    def download_required(self, force: bool = False):
         """Downloads all the required files according to `required_files.py`"""
         desc = 'Please wait while we download required plugins'
         pbar = tqdm(NEED, desc, unit='file(s)', position=0, leave=True)
         for i in pbar:
             pbar.write(f"Downloading {i}")
-            if not isfile(f'{self.directory}/{i}'):
+            if not isfile(f'{self.directory}/{i}') or force:
                 for error in self.download_file(i, required=True):
                     pbar.write(error)
         os.system('cls')

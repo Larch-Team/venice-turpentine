@@ -8,7 +8,23 @@ var branchName;
 
 let larchStepsNum = 0;
 
+var COLORS;
+function colors() {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", '/API/colors', true);
+    xhr.responseType = 'json';
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            COLORS = xhr.response;
+        }
+    };
+    xhr.send(null);
+}
+colors();
 
+function getColor(color) {
+    return COLORS[color] ? COLORS[color]['rgb'] : "Black";
+}
 
 function sendPOST(url, body) {
     let xmlHttp = new XMLHttpRequest();
@@ -47,7 +63,7 @@ function new_proof(e) {
         toggleBtns();
     } else {
         showHintModal();
-        document.getElementById("hints-p").innerHTML = xhr.response["content"];
+        document.getElementById("hints-p").innerHTML = ret["content"];
     }
 }
 
@@ -55,7 +71,6 @@ function getRules(tokenID, sentenceID, branch) {
     var xhr = new XMLHttpRequest();
     if (branchNumber > 1) {
         var currentLeaf = document.getElementById("btn"+sentenceID+tokenID+branch);
-        console.log(currentLeaf);
         var classNames = currentLeaf.getAttribute("class").match(/[\w-]*leaf[\w-]*/g);
         if (typeof classNames != "undefined" && classNames != null && classNames.length != null && classNames.length > 0) {
             var leafName = currentLeaf.classList[0];
@@ -112,7 +127,6 @@ function getBranchesNumber() {
     xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
             branchNumber = parseInt(xhr.responseText);
-            console.log(branchNumber);
             if (branchNumber == 2 && branchNumberCounter == 0) {
                 showHint2();
                 branchNumberCounter++;
@@ -127,9 +141,8 @@ function getCurrentBranch() {
     xhr.send();
     xhr.onreadystatechange = function() {
         branchName = xhr.responseText;
-        console.log(branchName);
         document.getElementById("current-branch").innerHTML = branchName;
-        document.getElementById("current-branch").style.color = branchName;
+        document.getElementById("current-branch").style.color = getColor(branchName);
     }
 }
 
@@ -140,13 +153,12 @@ function toggleBtns() {
     xhr.send();
     xhr.onreadystatechange = function() {
         branchName = xhr.responseText;
-        console.log(branchName);
         document.getElementById("current-branch").innerHTML = branchName;
-        document.getElementById("current-branch").style.color = branchName;
+        document.getElementById("current-branch").style.color = getColor(branchName);
         if (document.getElementById("switch-check").checked == true) {
             for (var i = 0; i < treeBtns.length; i++) {
                 if (treeBtns[i].classList.contains(branchName.toLowerCase()) || treeBtns[i].classList.contains(branchName)) {
-                    treeBtns[i].style.color = branchName;
+                    treeBtns[i].style.color = getColor(branchName);
                     if (treeBtns[i].classList.contains(`used-${branchName.toLowerCase()}`)) {
                         treeBtns[i].style.opacity = 0.3;
                     }
@@ -182,7 +194,7 @@ function jump(leafName) {
     xhr.setRequestHeader("Content-type", "application/json");
     xhr.send(JSON.stringify(jsonData));
     document.getElementById('current-branch').innerHTML = leafName;
-    document.getElementById("current-branch").style.color = leafName;
+    document.getElementById("current-branch").style.color = getColor(leafName);
     toggleBtns();
 }
 
@@ -357,13 +369,15 @@ function generate_formula() {
     xhr.responseType = 'json';
     xhr.send();
     xhr.onreadystatechange = function() {
-        if (xhr.response['type']=='success') {
-            document.getElementById("formula").value = xhr.response['content'];
-            disableBtn();
-        }
-        else {
-            showHintModal();
-            document.getElementById("hints-p").innerHTML = xhr.response["content"];
+        if (xhr.readyState === 4) {
+            if (xhr.response['type']=='success') {
+                document.getElementById("formula").value = xhr.response['content'];
+                disableBtn();
+            }
+            else {
+                showHintModal();
+                document.getElementById("hints-p").innerHTML = xhr.response["content"];
+            }
         }
     }
 }
@@ -408,7 +422,7 @@ document.getElementById("rules-undo").addEventListener("click", function (){
         });
     } else {
         showHintModal();
-        document.getElementById("hints-p").innerHTML = xhr.response["content"];
+        document.getElementById("hints-p").innerHTML = ret["content"];
     }
 })
 
