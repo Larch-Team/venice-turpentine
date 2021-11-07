@@ -81,6 +81,7 @@ Jeśli chcesz się zaangażować, możesz skontaktować się z dowolnym z autor�
 - Robert Szymański (@rsxxi) - PM/UX unicorn :unicorn:
 - Ola Draszewska (@nerdolo) - Confused coder :space_invader:
 - Łukasz Abramowicz (@ghostbuster265) - I arise from depths of my parents basement to code or sth :octopus:
+- Dominika Juszczak (@antykwariat) - frontend develoops i did it again :lizard:
 
 Oraz wszyscy, którzy bacznie przyglądali się rozwojowi aplikacji.
 
