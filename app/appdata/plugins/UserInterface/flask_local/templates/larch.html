@@ -48,7 +48,7 @@
         </div>
         <div class="larch-container larch-container-active" id="central-container">
             <div>
-                <img src="static/normal_u95.png" alt="choinka" width="86px" height="86px">
+                <img src="static/szyszka.png" alt="choinka" width="86px" height="86px">
             </div>
             <div>
                 <h1>
@@ -71,18 +71,20 @@
                         <input type="text" id="formula" oninput="disableBtn()" placeholder="np. p->p & q">
                         <button type="button" class="qm" id="qm">&#10067;</button>
                     </p>
-                    <div class="generate">
-                        <button type="button" class="btn btn-larch" id="generate">Generuj formułę</button>
-                    </div>
                 </div>
                 <div class="larch-subcontainer">
                 <div class="hints">
                     {{ hint_start | safe }}
                     <a href="/knowledge" target="_blank">Kliknij aby dowiedzieć się więcej</a>
                 </div>
-                <div class="button-container btn-main">
-                    <button type="button" class="btn btn-larch" id="new_proof" disabled>Dalej: Rozłóż formuły</button>
                 </div>
+                <div class="two-btns">
+                    <div class="generate">
+                        <button type="button" class="btn btn-larch" id="generate">Generuj formułę</button>
+                    </div>
+                    <div class="button-container btn-main">
+                        <button type="button" class="btn btn-larch" id="new_proof" disabled>Dalej: Rozłóż formuły</button>
+                    </div>
                 </div>
             </div>
         </form>
@@ -112,9 +114,6 @@
                                     <span class="slider"></span>
                                 </label>
                             </div>
-                            <div class="back">
-                                <button type="button" class="btn btn-back" id="back-to-1">Wstecz</button>
-                            </div>
                         </div>
                     </div>
                     <div class="larch-subcontainer">
@@ -137,6 +136,11 @@
                                 <i class="material-icons">undo</i>Cofnij
                             </button>
                         </div>
+                    </div>
+                    <div class="two-btns">
+                        <div class="back">
+                            <button type="button" class="btn btn-back" id="back-to-1">Wstecz</button>
+                        </div>
                         <div class="button-container btn-main" id="check-div">
                             <button type="button" class="btn btn-larch" id="check">Dalej: Sprawdź gałęzie</button>
                         </div>
@@ -153,13 +157,10 @@
                         Sprawdź gałęzie
                     </h2>
                     <p>
-                        Kliknij na ostatni wyraz w dowolnej z gałęzi, aby poszukać sprzeczności.
+                        Kliknij na ostatni wyraz w dowolnej gałęzi, aby poszukać sprzeczności.
                     </p>
                     <div id="checking-container">
                             
-                    </div>
-                    <div class="back switch-btn">
-                        <button type="button" class="btn btn-back" id="back-to-2">Wstecz</button>
                     </div>
                 </div>
                 <div class="larch-subcontainer">
@@ -173,6 +174,11 @@
                     <a href="/knowledge" target="_blank">
                         Kliknij, aby dowiedzieć się więcej
                         </a>
+                </div>
+            </div>
+            <div class="two-btns">
+                <div class="back switch-btn">
+                    <button type="button" class="btn btn-back" id="back-to-2">Wstecz</button>
                 </div>
                 <div class="button-container btn-main">
                     <button type="button" class="btn btn-larch" id="finish-proof">Dalej: Rozstrzygnij dowód</button>
@@ -237,7 +243,7 @@
                 </div>
                 <div class="sub-container-end">
                     <h2>
-                        To dobra odpowiedz!
+                        To dobra odpowiedź!
                     </h2>
                     <p>
                         Twój dowód jest wykonany poprawnie, wszystko poszło zgodnie z planem. Możesz zapisać dowód do PDFa lub TeXu.
@@ -302,6 +308,9 @@
         </form>
         </div>
         <div class="new-window" id="checking-window">
+            <div class="btn-div">
+                <button type="button" class="hint-x" id="hint-x3">&#10005;</button>
+            </div>
             <h2 id="check-branch-name">
                 Gałąź
             </h2>
@@ -358,7 +367,7 @@
         </div>
         <div class="new-window" id="leave-window">
             <p>
-                Czy jesteś pewny, że chcesz opuścić stronę?
+                Czy na pewno chcesz opuścić tę stronę?
             </p>
             <div class="btn-leave-container">
                 <button type="button" class="btn" id="stay">Zostań</button>
