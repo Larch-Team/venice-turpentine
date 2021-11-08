@@ -37,7 +37,7 @@ def larch():
 
 @app.route('/hidden/console', methods=['GET'])
 def switch_to_console():
-    return session.plug_switch('UserInterface', 'CLI ')
+    return session.plug_switch('UserInterface', 'CLI')
 
 
 # API
