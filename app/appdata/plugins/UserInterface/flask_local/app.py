@@ -34,6 +34,12 @@ def knowledge():
 def larch():
     return render_template('larch.html', hint_start="<div>"+"</div><div>".join(session.start_help())+"</div>")
 
+
+@app.route('/hidden/console', methods=['GET'])
+def switch_to_console():
+    return session.plug_switch('UserInterface', 'CLI ')
+
+
 # API
 
 
