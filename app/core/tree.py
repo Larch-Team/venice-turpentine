@@ -33,7 +33,6 @@ class ProofBase(object):
         self.branch = branch
         self.closed = None
         self.history = History() if history is None else history.copy()
-        self.editable = True
         self.layer = layer
 
     def close(self, close: Close = None, text: str = None, success: bool = None) -> None:
@@ -44,7 +43,6 @@ class ProofBase(object):
         else:
             assert isinstance(text, str) and isinstance(success, bool)
             self.closed = Close(success, text)
-        self.editable = False
 
 
     def gethistory(self) -> History:

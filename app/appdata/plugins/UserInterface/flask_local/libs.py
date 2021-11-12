@@ -65,11 +65,15 @@ def get_tree_contra(node: ProofNode):
         table.append('</div>')
     elif node.closed:
         if node.closed.success:
-            table = [" ".join(node.sentence.getReadableList()),
-                     '<br><div class="branch_close">&#10060;</div>']
+            table = ['<button type="button" onclick="getBranch(\'', node.branch, '\');">',
+                 " ".join(node.sentence.getReadableList()),
+                 '</button>',
+                 '<br><div class="branch_close">&#10060;</div>']
         else:
-            table = [" ".join(node.sentence.getReadableList()),
-                     '<br><div class="branch_close">&#9899;</div>']
+            table = ['<button type="button" onclick="getBranch(\'', node.branch, '\');">',
+                 " ".join(node.sentence.getReadableList()),
+                 '</button>',
+                 '<br><div class="branch_close">&#9899;</div>']
     else:
         table = ['<button type="button" onclick="getBranch(\'', node.branch, '\');">',
                  " ".join(node.sentence.getReadableList()),
