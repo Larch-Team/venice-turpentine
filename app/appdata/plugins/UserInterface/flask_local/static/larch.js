@@ -450,20 +450,33 @@ document.getElementById("new_end2").addEventListener("click", function () {
 //     });
 // })
 
-function tex_export() {
+function tex_export(has_mistakes) {
     xhr = new XMLHttpRequest();
     xhr.open('GET', '/API/print');
     xhr.send();
     xhr.onreadystatechange = function() {
         if (xhr.readyState === 4) {
-            navigator.clipboard.writeText(xhr.response)
+            if (has_mistakes) {
+                decision = document.getElementById("tautology-end2").textContent
+                mistakes = '\\subsection{Informacje o błędach w dowodzie}\n' + 
+                document.getElementById("feedback-wrong").textContent;
+            } else {
+                decision = document.getElementById("tautology-end1").textContent;
+                mistakes = '';
+            }
+            proof = [xhr.response, 
+                '\\subsection{Rozstrzygnięcie dowodu}',
+                decision,
+                mistakes
+            ];
+            navigator.clipboard.writeText(proof.join('\n'))
             showHintModal();
-            document.getElementById("hints-p").innerHTML = "Skopiowano dowód do schowka";
+            document.getElementById("hints-p").innerHTML = "Skopiowano dowód do schowka. Pamiętaj, aby przed <code>\\begin{document}</code> umieścić <code>\\usepackage{forest}</code>.";
         }
     }  
 };
-document.getElementById("tex1").addEventListener("click", tex_export);
-document.getElementById("tex2").addEventListener("click", tex_export);
+document.getElementById("tex1").addEventListener("click", function () {tex_export(false)});
+document.getElementById("tex2").addEventListener("click", function () {tex_export(true)});
 
 function nextPage() {
     larchStepsNum++;

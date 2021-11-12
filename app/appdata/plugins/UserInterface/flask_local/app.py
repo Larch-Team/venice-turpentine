@@ -37,7 +37,12 @@ def larch():
 
 @app.route('/hidden/console', methods=['GET'])
 def switch_to_console():
-    return session.plug_switch('UserInterface', 'CLI')
+    try:
+        session.plug_switch('UserInterface', 'CLI')
+    except Exception as e:
+        return f"Nie udało się: {e}"
+    else:
+        return "Udało się"
 
 
 # API
@@ -336,7 +341,12 @@ def do_print() -> str:
     try:
         session.plug_switch('Output', request.args.get(
             'plugin', default='TeX_forest', type=str))
-        t = "\n".join(session.gettree())
+        t = [
+                '\\section{Dowód formuły $%s$}'
+                % session.proof.sentence.getReadable(),
+                '\\subsection{Drzewo dowodu}',
+                *session.gettree()
+            ]
     finally:
         session.plug_switch('Output', old_plug)
-    return t
+    return "\n".join(t)
