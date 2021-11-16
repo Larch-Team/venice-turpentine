@@ -32,7 +32,10 @@ def knowledge():
 
 @app.route('/run', methods=['GET'])
 def larch():
-    return render_template('larch.html', hint_start="<div>"+"</div><div>".join(session.start_help())+"</div>")
+    formula = request.args.get('formula', default=None, type=str)
+    assert formula is None or '"' not in formula
+    formula = "" if formula is None else f'value="{formula.replace("_", " ")}"'
+    return render_template('larch.html', hint_start="<div>"+"</div><div>".join(session.start_help())+"</div>", formula=formula)
 
 
 @app.route('/hidden/console', methods=['GET'])

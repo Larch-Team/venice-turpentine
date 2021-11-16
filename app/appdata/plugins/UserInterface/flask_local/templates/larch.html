@@ -68,7 +68,7 @@
                         Wpisz formułę, którą chcesz zbadać
                     </h2>
                     <p class="formula-container">
-                        <input type="text" id="formula" oninput="disableBtn()" placeholder="np. p->p & q">
+                        <input type="text" id="formula" oninput="disableBtn()" placeholder="np. p->p & q" {{ formula | safe }}>
                         <button type="button" class="qm" id="qm">&#10067;</button>
                     </p>
                 </div>
