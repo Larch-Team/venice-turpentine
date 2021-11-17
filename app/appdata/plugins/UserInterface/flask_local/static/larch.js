@@ -279,6 +279,9 @@ function checkBranch() {
         else {
             showBranchModal();
             document.getElementById("hint-branch-p").innerHTML = xhr.response["content"];
+            document.getElementById("btn"+sentenceID1).disabled = false;
+            document.getElementById("btn"+sentenceID2).disabled = false;
+            i = 0;
         }
     }
 }
@@ -302,6 +305,9 @@ function closeBranch(branch) {
         else {
             showHintModal();
             document.getElementById("hints-p").innerHTML = xhr.response["content"];
+            document.getElementById("btn"+sentenceID1).disabled = false;
+            document.getElementById("btn"+sentenceID2).disabled = false;
+            i = 0;
         }
     }
 }
