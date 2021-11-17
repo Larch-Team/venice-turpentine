@@ -401,8 +401,8 @@ document.getElementById("back-to-1").addEventListener('click', function () {
 document.getElementById("back-to-2").addEventListener('click', function () {
     getProof('/API/worktree', function(text) {
         document.getElementById('clickable-container').innerHTML = text;
+        toggleBtns();
     });
-    toggleBtns();
     prevPage();
 })
 
