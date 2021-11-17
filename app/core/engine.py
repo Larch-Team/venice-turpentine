@@ -339,8 +339,6 @@ class Session(object):
             p = self.acc('Assistant').mistake_syntax(problem)
             return p or [problem.default]
         else:
-            tokenized = self.acc('Formal').prepare_for_proving(tokenized)
-
             self.proof = BranchCentric(tokenized, self.config)
             self.deal_closure(self.proof.nodes.getbranchnames()[0])
 

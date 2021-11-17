@@ -103,16 +103,16 @@ def mistake_syntax(mistake: UserMistake) -> Union[list[str], None]:
     :rtype: list[str] | None
     """
     if mistake.name == 'no variables':
-        return ['<p>Zdanie nie zawiera żadnych zmiennych. Sprawdź, czy Twoja formuła ma zmienne (np. p, a, x) i spójniki logiczne (np. and, or, implikacja).</p>']
+        return ['<p>Zdanie nie zawiera żadnych zmiennych. Sprawdź, czy Twoja formuła ma zmienne (np. p, a, x) i spójniki logiczne (np. and, or, ->).</p>']
     elif mistake.name == 'nothing between formulas':
-        return ['<p>Nie możesz teraz usunąć tej negacji. Najpierw rozłóż inną formułę, później wróć do negacji.</p>']
+        return ['<p>W zdaniu znajdują się dwie zmienne lub formuły niepołączone spójnikiem. Sprawdź, czy między każdą parą zmiennych znajduje się spójnik.</p>']
     elif mistake.name == 'bracket left open':
         return ['<p>Brakuje prawego nawiasu. Popraw formułę.</p>']
     elif mistake.name == 'bracket not opened':
         return ['<p>Brakuje lewego nawiasu. Popraw formułę.</p>']
     elif mistake.name == 'no right':
-        return ['<p>Brakuje drugiej zmiennej dla spójnika and, or, lub implikacji, który wymaga dwóch argumentów. Popraw formułę.</p>']
+        return ['<p>Brakuje drugiej zmiennej dla spójnika and, or, lub ->, który wymaga dwóch argumentów. Popraw formułę.</p>']
     elif mistake.name == 'no left':
-        return ['<p>Brakuje pierwszej zmiennej dla spójnika and, or, lub implikacji, który wymaga dwóch argumentów. Popraw formułę.</p>']
+        return ['<p>Brakuje pierwszej zmiennej dla spójnika and, or, lub ->, który wymaga dwóch argumentów. Popraw formułę.</p>']
     elif mistake.name == 'no sign symbols':
         return ['<p>Wpisz tylko formułę, którą chcesz udowodnić, bez symboli sygnowania (T, F)</p>']

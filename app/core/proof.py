@@ -22,7 +22,8 @@ class Proof(object):
         self.S = sentence.S # Session
         self.config = config or self.S.get_config()
         self.sentence = sentence
-        self.nodes = ProofNode(sentence, next(get_branch_name(self.config['accessibility'], [])))
+        to_prove = self.S.acc('Formal').prepare_for_proving(sentence)
+        self.nodes = ProofNode(to_prove, next(get_branch_name(self.config['accessibility'], [])))
         self.metadata = dict(
             usedrules = [],
             decision_points = [],
