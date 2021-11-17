@@ -224,12 +224,9 @@ function getBranch(branch_name) {
             document.getElementById("overlay").classList.add("active");
             document.getElementById('check-branch-name').innerHTML = `Gałąź "${branch_name}"`
             document.getElementById("branch-container").innerHTML = branch;
-            document.getElementById("close-window-btn").addEventListener("click", function _f() {  
-                closeBranch(branch_name);
-                this.removeEventListener('click', _f);
-            })
+            document.getElementById("close-window-btn").onclick = function () {closeBranch(branch_name)};
         }
-    };
+    }
 }
 
 var sentenceID1;
