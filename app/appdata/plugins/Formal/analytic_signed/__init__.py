@@ -106,37 +106,37 @@ RULES = {
     ),
     'true and': SignedSmullyan(
         name='true and',
-        symbolic="TA and B / TA; TB",
+        symbolic="T(A and B) / TA; TB",
         docs="Rozkładanie prawdziwej koniunkcji. Wymaga wskazania zdania w gałęzi oraz rozkładanego spójnika.",
         reusable=False
     ),
     'false or': SignedSmullyan(
         name='false or',
-        symbolic="FA or B / FA; FB",
+        symbolic="F(A or B) / FA; FB",
         docs="Rozkładanie fałszywej alternatywy. Wymaga wskazania zdania w gałęzi oraz rozkładanego spójnika.",
         reusable=False
     ),
     'false imp': SignedSmullyan(
         name='false imp',
-        symbolic="FA -> B / TA; FB",
+        symbolic="F(A -> B) / TA; FB",
         docs="Rozkładanie fałszywej implikacji. Wymaga wskazania zdania w gałęzi oraz rozkładanego spójnika.",
         reusable=False
     ),
     'true or': SignedSmullyan(
         name='true or',
-        symbolic="TA or B / TA | TB",
+        symbolic="T(A or B) / TA | TB",
         docs="Rozkładanie prawdziwej alternatywy. Wymaga wskazania zdania w gałęzi oraz rozkładanego spójnika.",
         reusable=False
     ),
     'false and': SignedSmullyan(
         name='false and',
-        symbolic="FA and B / FA | FB",
+        symbolic="F(A and B) / FA | FB",
         docs="Rozkładanie fałszywej koniunkcji. Wymaga wskazania zdania w gałęzi oraz rozkładanego spójnika.",
         reusable=False
     ),
     'true imp': SignedSmullyan(
         name='true imp',
-        symbolic="TA -> B / FA | TB",
+        symbolic="T(A -> B) / FA | TB",
         docs="Rozkładanie prawdziwej implikacji. Wymaga wskazania zdania w gałęzi oraz rozkładanego spójnika.",
         reusable=False
     )
