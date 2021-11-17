@@ -101,7 +101,7 @@ def strict_filler(func: Callable[..., SentenceTupleStructure]) -> Callable[..., 
 
         if rule.name.startswith('false'):
             _, (_, a) = sentence.sentence.getComponents()
-            tid = a.getMainConnective() + 2
+            tid = a.getMainConnective() + 1
         else:
             tid = sentence.sentence.getMainConnective() + 1
         context = {

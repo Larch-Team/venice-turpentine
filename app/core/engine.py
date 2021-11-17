@@ -302,7 +302,7 @@ class Session(object):
         if not os.path.isfile(f"config/{self.config_name}"):
             with open(f"config/{self.config_name}", 'w') as target:
                 target.write(
-                    r'{"chosen_plugins": {"Assistant": "pan", "UserInterface": "CLI", "Lexicon": "classic", "Formal": "analytic_freedom", "Output": "actual_tree"}, "accessibility": 4}')
+                    r'{"chosen_plugins": {"Assistant": "pan", "UserInterface": "flask_local", "Lexicon": "classic", "Formal": "analytic_signed", "Output": "actual_tree"}, "accessibility": 4}')
         with open(f"config/{self.config_name}", 'r') as target:
             self.config = json.load(target)
 

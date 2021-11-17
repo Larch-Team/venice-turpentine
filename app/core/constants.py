@@ -1,7 +1,7 @@
 DEBUG = True
-VERSION = '1.0-pre2'
+VERSION = '1.0-course'
 
 ALLOW_DOWNLOAD = True
 FORCE_DOWNLOAD = False
-BRANCH = "prerelease-2"
+BRANCH = "course-release"
 REPO_URL = f"https://raw.githubusercontent.com/Larch-Team/larch-plugins/{BRANCH}"
