@@ -47,7 +47,7 @@ function getProof(url, callback) {
 function disableBtn() {
     if(document.getElementById("formula").value==="") { 
            document.getElementById("new_proof").disabled = true; 
-       } 
+    }
     else { 
        document.getElementById("new_proof").disabled = false;
     }
@@ -86,6 +86,12 @@ function getRules(tokenID, sentenceID, branch) {
             document.getElementById('rules-container').innerHTML = rules;   
         }
     }
+}
+
+function repeatFormula() {
+    var str = formula.value;
+    var replacedSpaces = str.split(' ').join('_');
+    window.location.href = "run?formula="+replacedSpaces;
 }
 
 function use_rule(rule_name, tokenID, sentenceID) {
@@ -270,8 +276,8 @@ function checkBranch() {
             });
         }
         else {
-            showHintModal();
-            document.getElementById("hints-p").innerHTML = xhr.response["content"];
+            showBranchModal();
+            document.getElementById("hint-branch-p").innerHTML = xhr.response["content"];
         }
     }
 }
@@ -393,6 +399,7 @@ document.getElementById("back-to-2").addEventListener('click', function () {
     prevPage();
 })
 
+document.getElementById("ok3").addEventListener('click', hideBranchModal)
 document.getElementById("ok2").addEventListener('click', hideHintModal)
 document.getElementById("stay").addEventListener('click', hideLeave)
 document.getElementById("leave").addEventListener('click', showLeave)
@@ -413,6 +420,7 @@ document.getElementById("btn-check").addEventListener("click", tautologyCheck)
 document.getElementById("rules-report").addEventListener("click", function () {
     window.open('https://szymanski.notion.site/4a180f6826464e9dac60dd9c18c5ac0b?v=56fec8f735024f94ab421aa97cab3dc8','_blank')
 })
+document.getElementById("repeat").addEventListener('click', repeatFormula)
 
 document.getElementById("rules-undo").addEventListener("click", function (){
     ret = sendPOST('API/undo', null);
@@ -567,6 +575,18 @@ function showHintModal() {
 function hideHintModal() {
     document.getElementById("general-modal").classList.remove("active");
     document.getElementById("overlay").classList.remove("active");
+}
+
+function showBranchModal() {
+    document.getElementById("branch-modal").classList.add("active");
+    document.getElementById("overlay").classList.add("active");
+}
+
+function hideBranchModal() {
+    document.getElementById("branch-modal").classList.remove("active");
+    document.getElementById("overlay").classList.remove("active");
+    document.getElementById("checking-window").classList.add("active");
+    document.getElementById("overlay").classList.add("active");
 }
 function showHintRules() {
     var xhr = new XMLHttpRequest();

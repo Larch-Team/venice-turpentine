@@ -564,12 +564,12 @@ summary {
     font-style: normal;
 }
 
-#hint-window3, #general-modal {
+#hint-window3, #general-modal, #branch-modal {
     max-width: 22em;
     text-align: center;
 }
 
-#ok, #ok2 {
+#ok, #ok2, #ok3 {
     margin-top: 10%;
     width: 80%;
 }
