@@ -91,7 +91,8 @@ function getRules(tokenID, sentenceID, branch) {
 function repeatFormula() {
     var str = formula.value;
     var replacedSpaces = str.split(' ').join('_');
-    window.location.href = "run?formula="+replacedSpaces;
+    var replacedAnds = replacedSpaces.split('&').join('and');
+    window.location.href = "run?formula="+replacedAnds;
 }
 
 function use_rule(rule_name, tokenID, sentenceID) {
