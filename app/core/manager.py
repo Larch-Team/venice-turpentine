@@ -150,7 +150,7 @@ class FileManager(object):
         pbar = tqdm(NEED, desc, unit='file(s)', position=0, leave=True)
         for i in pbar:
             pbar.write(f"Downloading {i}")
-            if not isfile(f'{self.directory}/{i}') or force:
+            if not isfile(f'{self.directory}/{i}') or (force and ALLOW_DOWNLOAD):
                 for error in self.download_file(i, required=True):
                     pbar.write(error)
         os.system('cls')

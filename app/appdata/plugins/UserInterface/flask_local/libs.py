@@ -73,7 +73,7 @@ def get_tree_contra(node: ProofNode):
             table = ['<button type="button" onclick="getBranch(\'', node.branch, '\');">',
                  " ".join(node.sentence.getReadableList()),
                  '</button>',
-                 '<br><div class="branch_close">&#9899;</div>']
+                 '<br><div class="branch_close">&#11093;</div>']
     else:
         table = ['<button type="button" onclick="getBranch(\'', node.branch, '\');">',
                  " ".join(node.sentence.getReadableList()),
