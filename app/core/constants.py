@@ -1,5 +1,5 @@
 DEBUG = True
-VERSION = '1.0-pre2'
+VERSION = '1.0-main'
 
 ALLOW_DOWNLOAD = False
 FORCE_DOWNLOAD = False
