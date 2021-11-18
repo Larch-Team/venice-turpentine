@@ -25,7 +25,7 @@
 1. Upewnij się, że masz zainstalowany co najmniej **Python 3.9**
 2. Pobierz **release** (larch.zip) programu z [tego miejsca](https://github.com/PogromcaPapai/Larch/releases). Zalecamy wybór wersji GUI, gdyż uruchamia się ona domyślnie w formie aplikacji webowej.
 3. Wypakuj zawartość.
-4. Uruchom plik `install.sh`. Na da on temu plikowi uprawnienia do bycia wykonywanym.
+4. Uruchom plik `install.sh` w terminalu (w katalogu z plikami programu). Nada on temu plikowi uprawnienia do bycia wykonywanym.
 5. Program możesz uruchamiać wpisując w terminalu (w katalogu z plikami programu) `larch.sh`, bądź uruchamiając ten skrypt w dowolny inny sposób.
 6. Nalej sobie bezalkoholowego szampana, gdy Larch pobiera automatycznie wszystkie potrzebne pliki.
 
