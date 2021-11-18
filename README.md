@@ -2,40 +2,52 @@
 
 ## Opis dla każdego
 
-*Larch* jest składającym się z **modułów** systemem służącym do **wspomagania dowodzenia**. W tym projekcie skupiamy się na poprawie metod **dydaktyki logiki** chcąc doprowadzić do możliwości **dowodzenia tylko i wyłącznie myszką**.
+*Larch* jest składającym się z **modułów** systemem służącym do **wspomagania dowodzenia**. W tym projekcie skupiamy się na poprawie metod **dydaktyki logiki** chcąc doprowadzić do możliwości **dowodzenia tylko i wyłącznie myszką**. Aktualnie wspieramy tabele analityczne KRZ (sygnowane i niesygnowane) oraz oferujemy konsolową implementację rachunku sekwentów.
 
 > The truth is only one click away!
 
 ## Opis dla niektórych
 
-*Larch* jest silnikiem wspomagania dowodzenia opartym na silnej implementacji Plugin Oriented Programming. Projekt rozwijany jest w celach dydaktycznych - aby odciążyć studentów od przepisywania zdań oraz rozpisywania reguł, dając tym samym możliwość skupienie się na strategii dowodu. Zaawansowanym użytkownikom oferowana jest możliwość tworzenia systemów dowodzenia, parserów, form wydruku, a nawet interfejsów.
+*Larch* jest silnikiem wspomagania dowodzenia opartym na silnej implementacji Plugin Oriented Programming. Projekt rozwijany jest w celach dydaktycznych - aby odciążyć studentów od przepisywania zdań oraz rozpisywania reguł, dając tym samym możliwość skupienie się na strategii dowodu. Zaawansowanym użytkownikom oferowana jest możliwość tworzenia systemów dowodzenia, parserów, form wydruku, podpowiedzi, a nawet interfejsów.
 
 ## Instalacja
 
-Larch *jeszcze* nie posiada profesjonalnych metod instalacji, w związku z czym możesz skorzystać z poniższego tutorialu.
+### Windows
 
 1. Upewnij się, że masz zainstalowany co najmniej **Python 3.9**
-2. Uruchom konsolę swojego systemu operacyjnego.
-3. Zainstaluj wymagane paczki. Możesz to zrobić komendą `python -m pip install -r requirements.txt` będąc w folderze z programem (`cd [ścieżka do folderu]` może się przydać). Możesz też zainstalować wszystkie paczki oddzielnie:
-   1. Zainstaluj paczkę `prompt-toolkit` za pomocą komendy `python -m pip install prompt_toolkit`. Istnieje duża szansa, że już go posiadasz (korzysta z niego chociażby ipython).
-   2. Zainstaluj paczkę `anytree` za pomocą komendy `python -m pip install prompt_toolkit`
-4. Pobierz **release** programu z [tego miejsca](https://github.com/PogromcaPapai/Larch/releases)
+2. Pobierz **release** programu z [tego miejsca](https://github.com/PogromcaPapai/Larch/releases). Zalecamy wybór wersji GUI, gdyż uruchamia się ona domyślnie w formie aplikacji webowej.
+3. Uruchom aplikację przez plik `.cmd`, lub `.pyz`.
+4. Nalej sobie bezalkoholowego szampana, gdy Larch pobiera automatycznie wszystkie potrzebne pliki.
 
-Aplikacja powinna być zainstalowana, w razie problemów zapraszamy do kontaktu przez [podane tutaj platformy](https://www.notion.so/szymanski/Contributing-fca3bb2330794dc682732a08752a1fb8#3dc32cec72874db48f40b2601540b01f)
+### Mac
+
+1. Upewnij się, że masz zainstalowany co najmniej **Python 3.9**
+2. Pobierz **release** programu z [tego miejsca](https://github.com/PogromcaPapai/Larch/releases). Zalecamy wybór wersji GUI, gdyż uruchamia się ona domyślnie w formie aplikacji webowej.
+3. Uruchom aplikację przez plik `.sh`.
+4. Nalej sobie bezalkoholowego szampana, gdy Larch pobiera automatycznie wszystkie potrzebne pliki.
+
+### Linux
+
+1. Upewnij się, że masz zainstalowany co najmniej **Python 3.9**
+2. Pobierz **release** programu z [tego miejsca](https://github.com/PogromcaPapai/Larch/releases). Zalecamy wybór wersji GUI, gdyż uruchamia się ona domyślnie w formie aplikacji webowej.
+3. W terminalu otwartym wewnątrz folderu instalacji wpisz komendę `python larch.pyz`.
+4. Nalej sobie bezalkoholowego szampana, gdy Larch pobiera automatycznie wszystkie potrzebne pliki.
 
 ## Użycie i uruchamianie
 
 ### Uruchamianie
 
-Dostępne są 3 metody uruchamiania:
+Powtórz kroki od 3. w instrukcji instalacji. Wersja GUI dla bezpieczeństwa wymaga dostępu do internetu, aby przeprowadzać redownload wszystkich potrzebnych plików. W razie potrzeby możemy Ci jednak dostarczyć wersję nie korzystającą z niego.
 
-1. Jeżeli używasz Windowsa, kliknij dwukrotnie na plik `start.bat`. Jeśli używasz Linuxa/Maca, użyj `start.sh` (nie miałem okazji testować, ale powinno działać).
-2. `cd [FOLDER Z PROGRAMEM]`; `python start.py`
-3. `python [FOLDER Z PROGRAMEM]\start.py`
+### Użycie GUI
 
-### Użycie
+Interfejs jest dość prosty ;)
+Kilka podpowiedzi:
+1. Możesz zmieniać gałęzie klikając na ich liście.
+2. Możesz rozkładać formuły w ramach różnych gałęzi przez kliknięcie na liść i wybór formuły do rozłożenia.
+3. Musisz kliknąc regułę dowodzenia.
 
-Aktualnie *Larch* oferuje tylko interfejs oparty na komendach. Na poniższym zrzucie ekranu możesz zapoznać się z jego schematem:
+### Użycie CLI
 
 ![Zrzut ekranu z interfejsem](media/CLI_image.png)
 
@@ -50,15 +62,13 @@ Najważniejsze komendy dostępne w interfejsie:
 
 *Larch* oferuje też wewnętrzny system pluginów, ich listę możesz wyświetlić komendą `plugin list [nazwa gniazda/all]`. Pluginy możesz zmieniać komendą `plugin switch [gniazdo/aktualnie podłączony plugin] [nowy plugin]`.
 
-Więcej informacji na temat uruchomienia znajdziesz w dokumentacji (tu będzie link, gdy taka powstanie).
-
 ## Contributing
 
 Zapraszamy do zapoznania się z naszą [dokumentacją](https://www.notion.so/szymanski/Contributing-fca3bb2330794dc682732a08752a1fb8#f3fb30b566cf4ecb9a1173b578229736) na ten temat!
 
 ### Zgłaszanie błędów
 
-Błędy (oraz propozycje) można zgłaszać za pomocą [Notion](https://www.notion.so/szymanski/4a180f6826464e9dac60dd9c18c5ac0b?v=56fec8f735024f94ab421aa97cab3dc8). Na powyższej stronie możesz znaleźć przycisk New. Powinna wyświetlić Ci się pusta strona z możliwością wyboru wzoru. Wybierz odpowiedni i wypełnij formularz. Postaraj się wyjaśnić jak najdokładniej, co się stało - każdy szczegół może okazać się przydatny! Jeśli masz pomysł, co mogło spowodować błąd, możesz spróbować samemu go naprawić!
+Błędy (oraz propozycje) można zgłaszać za pomocą [Notion](https://www.notion.so/szymanski/4a180f6826464e9dac60dd9c18c5ac0b?v=56fec8f735024f94ab421aa97cab3dc8) oraz w [formularzu](https://www.notion.so/szymanski/Larch-971b20f6b2a4442bacc7b4b153c808d9#16b52f988d1941eda325ed6a70023045). Na powyższej stronie możesz znaleźć przycisk New. Powinna wyświetlić Ci się pusta strona z możliwością wyboru wzoru. Wybierz odpowiedni i wypełnij formularz. Postaraj się wyjaśnić jak najdokładniej, co się stało - każdy szczegół może okazać się przydatny! Jeśli masz pomysł, co mogło spowodować błąd, możesz spróbować samemu go naprawić!
 
 Bardzo przydatne jest dla nas dołączenie crash reportu, który możesz znaleźć w folderze `crashes`. Chętnie przyjmiemy też plik `config.json`!
 
@@ -88,3 +98,4 @@ Oraz wszyscy, którzy bacznie przyglądali się rozwojowi aplikacji.
 ### Autorzy pluginów
 
 - Michał Gajdziszewski - algorytm printujący w `actual_tree`
+- Aleksander Kiryk - algorytm generowania formuł
