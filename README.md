@@ -36,7 +36,7 @@
 4. Program możesz uruchamiać wpisując w terminalu (w katalogu z plikami programu) `python3.9 larch.pyz` lub używając skryptu `larch.sh`
 5. Nalej sobie bezalkoholowego szampana, gdy Larch pobiera automatycznie wszystkie potrzebne pliki.
 
-Aby móc używać skryptu w terminalu w katalogu z plikami programu wpisz komendę chmod +x larch.sh
+Aby móc używać skryptu w terminalu w katalogu z plikami programu wpisz komendę `chmod +x larch.sh`.
 
 ## Użycie i uruchamianie
 
