@@ -20,12 +20,22 @@
 4. Uruchom aplikację przez plik `.cmd`, lub `.pyz`.
 5. Nalej sobie bezalkoholowego szampana, gdy Larch pobiera automatycznie wszystkie potrzebne pliki.
 
-### Mac oraz Linux
+### Mac 
 
 1. Upewnij się, że masz zainstalowany co najmniej **Python 3.9**
 2. Pobierz **release** (larch.zip) programu z [tego miejsca](https://github.com/PogromcaPapai/Larch/releases). Zalecamy wybór wersji GUI, gdyż uruchamia się ona domyślnie w formie aplikacji webowej.
 3. Wypakuj zawartość.
-4. Uruchom plik `install.sh` w terminalu (w katalogu z plikami programu). Nada on temu plikowi uprawnienia do bycia wykonywanym.
+4. Uruchom plik `install.sh` w terminalu (w katalogu z plikami programu). Nada on plikom uprawnienia do bycia wykonywanym.
+5. Program możesz uruchamiać klikając dwukrotnie plik `larch.command`, wpisując w terminalu (w katalogu z plikami programu) `sh larch.sh`, bądź uruchamiając ten skrypt w dowolny inny sposób.
+6. Nalej sobie bezalkoholowego szampana, gdy Larch pobiera automatycznie wszystkie potrzebne pliki.
+
+
+### Linux
+
+1. Upewnij się, że masz zainstalowany co najmniej **Python 3.9**
+2. Pobierz **release** (larch.zip) programu z [tego miejsca](https://github.com/PogromcaPapai/Larch/releases). Zalecamy wybór wersji GUI, gdyż uruchamia się ona domyślnie w formie aplikacji webowej.
+3. Wypakuj zawartość.
+4. Uruchom plik `install.sh` w terminalu (w katalogu z plikami programu). Nada plikom uprawnienia do bycia wykonywanym.
 5. Program możesz uruchamiać wpisując w terminalu (w katalogu z plikami programu) `larch.sh`, bądź uruchamiając ten skrypt w dowolny inny sposób.
 6. Nalej sobie bezalkoholowego szampana, gdy Larch pobiera automatycznie wszystkie potrzebne pliki.
 
