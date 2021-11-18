@@ -15,23 +15,28 @@
 ### Windows
 
 1. Upewnij się, że masz zainstalowany co najmniej **Python 3.9**
-2. Pobierz **release** programu z [tego miejsca](https://github.com/PogromcaPapai/Larch/releases). Zalecamy wybór wersji GUI, gdyż uruchamia się ona domyślnie w formie aplikacji webowej.
-3. Uruchom aplikację przez plik `.cmd`, lub `.pyz`.
-4. Nalej sobie bezalkoholowego szampana, gdy Larch pobiera automatycznie wszystkie potrzebne pliki.
+2. Pobierz **release** (larch.zip) programu z [tego miejsca](https://github.com/PogromcaPapai/Larch/releases). Zalecamy wybór wersji GUI, gdyż uruchamia się ona domyślnie w formie aplikacji webowej.
+3. Wypakuj zawartość.
+4. Uruchom aplikację przez plik `.cmd`, lub `.pyz`.
+5. Nalej sobie bezalkoholowego szampana, gdy Larch pobiera automatycznie wszystkie potrzebne pliki.
 
 ### Mac
 
 1. Upewnij się, że masz zainstalowany co najmniej **Python 3.9**
-2. Pobierz **release** programu z [tego miejsca](https://github.com/PogromcaPapai/Larch/releases). Zalecamy wybór wersji GUI, gdyż uruchamia się ona domyślnie w formie aplikacji webowej.
-3. Uruchom aplikację przez plik `.sh`.
-4. Nalej sobie bezalkoholowego szampana, gdy Larch pobiera automatycznie wszystkie potrzebne pliki.
+2. Pobierz **release** (larch.zip) programu z [tego miejsca](https://github.com/PogromcaPapai/Larch/releases). Zalecamy wybór wersji GUI, gdyż uruchamia się ona domyślnie w formie aplikacji webowej.
+3. Wypakuj zawartość.
+4. Uruchom aplikację przez plik `.sh`.
+5. Nalej sobie bezalkoholowego szampana, gdy Larch pobiera automatycznie wszystkie potrzebne pliki.
 
 ### Linux
 
 1. Upewnij się, że masz zainstalowany co najmniej **Python 3.9**
-2. Pobierz **release** programu z [tego miejsca](https://github.com/PogromcaPapai/Larch/releases). Zalecamy wybór wersji GUI, gdyż uruchamia się ona domyślnie w formie aplikacji webowej.
-3. W terminalu otwartym wewnątrz folderu instalacji wpisz komendę `python larch.pyz`.
-4. Nalej sobie bezalkoholowego szampana, gdy Larch pobiera automatycznie wszystkie potrzebne pliki.
+2. Pobierz **release** (larch.zip) programu z [tego miejsca](https://github.com/PogromcaPapai/Larch/releases). Zalecamy wybór wersji GUI, gdyż uruchamia się ona domyślnie w formie aplikacji webowej.
+3. Wypakuj zawartość.
+4. Program możesz uruchamiać wpisując w terminalu (w katalogu z plikami programu) `python3.9 larch.pyz` lub używając skryptu `larch.sh`
+5. Nalej sobie bezalkoholowego szampana, gdy Larch pobiera automatycznie wszystkie potrzebne pliki.
+
+Aby móc używać skryptu w terminalu w katalogu z plikami programu wpisz komendę chmod +x larch.sh
 
 ## Użycie i uruchamianie
 
