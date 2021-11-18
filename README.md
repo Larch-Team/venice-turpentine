@@ -98,3 +98,4 @@ Oraz wszyscy, którzy bacznie przyglądali się rozwojowi aplikacji.
 ### Autorzy pluginów
 
 - Michał Gajdziszewski - algorytm printujący w `actual_tree`
+- Aleksander Kiryk - algorytm generowania formuł
