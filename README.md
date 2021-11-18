@@ -20,29 +20,20 @@
 4. Uruchom aplikację przez plik `.cmd`, lub `.pyz`.
 5. Nalej sobie bezalkoholowego szampana, gdy Larch pobiera automatycznie wszystkie potrzebne pliki.
 
-### Mac
+### Mac oraz Linux
 
 1. Upewnij się, że masz zainstalowany co najmniej **Python 3.9**
 2. Pobierz **release** (larch.zip) programu z [tego miejsca](https://github.com/PogromcaPapai/Larch/releases). Zalecamy wybór wersji GUI, gdyż uruchamia się ona domyślnie w formie aplikacji webowej.
 3. Wypakuj zawartość.
-4. Uruchom aplikację przez plik `.sh`.
-5. Nalej sobie bezalkoholowego szampana, gdy Larch pobiera automatycznie wszystkie potrzebne pliki.
-
-### Linux
-
-1. Upewnij się, że masz zainstalowany co najmniej **Python 3.9**
-2. Pobierz **release** (larch.zip) programu z [tego miejsca](https://github.com/PogromcaPapai/Larch/releases). Zalecamy wybór wersji GUI, gdyż uruchamia się ona domyślnie w formie aplikacji webowej.
-3. Wypakuj zawartość.
-4. Program możesz uruchamiać wpisując w terminalu (w katalogu z plikami programu) `python3.9 larch.pyz` lub używając skryptu `larch.sh`
-5. Nalej sobie bezalkoholowego szampana, gdy Larch pobiera automatycznie wszystkie potrzebne pliki.
-
-Aby móc używać skryptu w terminalu w katalogu z plikami programu wpisz komendę chmod +x larch.sh
+4. Uruchom plik `install.sh`. Na da on temu plikowi uprawnienia do bycia wykonywanym.
+5. Program możesz uruchamiać wpisując w terminalu (w katalogu z plikami programu) `larch.sh`, bądź uruchamiając ten skrypt w dowolny inny sposób.
+6. Nalej sobie bezalkoholowego szampana, gdy Larch pobiera automatycznie wszystkie potrzebne pliki.
 
 ## Użycie i uruchamianie
 
 ### Uruchamianie
 
-Powtórz kroki od 3. w instrukcji instalacji. Wersja GUI dla bezpieczeństwa wymaga dostępu do internetu, aby przeprowadzać redownload wszystkich potrzebnych plików. W razie potrzeby możemy Ci jednak dostarczyć wersję nie korzystającą z niego.
+Powtórz kroki od 5. w instrukcji instalacji. Wersja GUI dla bezpieczeństwa wymaga dostępu do internetu, aby przeprowadzać redownload wszystkich potrzebnych plików. W razie potrzeby możemy Ci jednak dostarczyć wersję nie korzystającą z niego.
 
 ### Użycie GUI
 
