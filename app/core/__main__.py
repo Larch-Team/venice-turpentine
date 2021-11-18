@@ -21,7 +21,7 @@ if __name__ == "__main__":
             sys.exit()
             
         manager = FileManager(DEBUG, VERSION)
-        manager.download_required()
+        manager.download_required(FORCE_DOWNLOAD)
 
         # Log clearing
         if os.path.exists('log.log'):
