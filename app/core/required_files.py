@@ -19,6 +19,11 @@ NEED = [
         'plugins/Formal/analytic_freedom/solver.py',
         'plugins/Formal/analytic_freedom/syntax_check.py',
         
+        # Formal/analytic_signed
+        'plugins/Formal/analytic_signed/__init__.py',
+        'plugins/Formal/analytic_signed/solver.py',
+        'plugins/Formal/analytic_signed/signed.py',
+        
         # Lexicon
         'plugins/Lexicon/__template__.py',
         'plugins/Lexicon/__utils__.py',
@@ -39,16 +44,19 @@ NEED = [
         'plugins/UserInterface/CLI.py',
         
         # UserInterface/flask_local
+        "plugins/UserInterface/flask_local/app.py", 
         "plugins/UserInterface/flask_local/libs.py", 
         "plugins/UserInterface/flask_local/__init__.py", 
-        "plugins/UserInterface/flask_local/app.py", 
+        "plugins/UserInterface/flask_local/static/favicon.ico", 
         "plugins/UserInterface/flask_local/static/larch.js", 
         "plugins/UserInterface/flask_local/static/logo.png", 
-        "plugins/UserInterface/flask_local/static/normal_u95.png", 
+        "plugins/UserInterface/flask_local/static/normal_u95.png",
+        "plugins/UserInterface/flask_local/static/szyszka.png", 
+        "plugins/UserInterface/flask_local/static/css/knowledge-base.css", 
+        "plugins/UserInterface/flask_local/static/css/larch-logo.png", 
         "plugins/UserInterface/flask_local/static/css/larch.css", 
         "plugins/UserInterface/flask_local/static/css/styles.css", 
-        "plugins/UserInterface/flask_local/static/favicon.ico", 
         "plugins/UserInterface/flask_local/templates/index.html", 
-        "plugins/UserInterface/flask_local/templates/larch.html",
-        "plugins/UserInterface/flask_local/templates/knowledge-base.html",
+        "plugins/UserInterface/flask_local/templates/knowledge-base.html", 
+        "plugins/UserInterface/flask_local/templates/larch.html"
     ]
