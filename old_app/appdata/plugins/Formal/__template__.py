@@ -1,6 +1,3 @@
-"""
-Tutaj umieść dokumentację swojego pluginu
-"""
 import typing as tp
 from exceptions import UserMistake
 import plugins.Formal.__utils__ as utils
@@ -8,9 +5,6 @@ from history import History
 from proof import Proof
 from sentence import Sentence
 from usedrule import UsedRule
-
-SOCKET = 'Formal'
-VERSION = '0.4.0'
 
 def generate_formula(sess: utils.Session_, length: int, vars: int) -> Sentence:
     f = utils.generate_wff(length, {
