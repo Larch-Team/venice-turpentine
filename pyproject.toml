@@ -1,0 +1,19 @@
+[project]
+name = "venice-turpentine"
+version = "0.1.0"
+description = "Trying to create a slimmed down packagable version of Larch to run in a Pyodide environment"
+authors = [
+    {name = "Kuba Dakowski", email = "jakubdakowski@gmail.com"},
+]
+dependencies = []
+requires-python = ">=3.13"
+readme = "README.md"
+license = {text = "MIT"}
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+
+[tool.pdm]
+distribution = true
