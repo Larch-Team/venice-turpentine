@@ -16,7 +16,7 @@ from rule import ContextDef
 from sentence import Sentence
 from tree import ProofNode
 from close import Close
-import lexer
+import venice_turpentine.lexers.wrapper.lexer as lexer
 from usedrule import *
 
 Module = pop.Module
