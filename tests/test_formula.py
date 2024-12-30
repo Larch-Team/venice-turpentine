@@ -84,3 +84,48 @@ def test_splitByIndex(str_formula, index, expected_str_formula_left, expected_st
         assert formula_right is None
     else:
         assert formula_right.getTypes() == expected_formula_right
+
+@pytest.mark.parametrize("str_formula, expected_connective, expected_left_result, expected_right_result", [
+    ("a and b or c", "or", "a and b", "c"),
+    ("a and neg c", "and", "a", "neg c"),
+    ("( a ) and ( b )", "and", "a", "b"),
+    ("a and b imp c", "imp", "a and b", "c"),
+    ("neg neg c", "neg", None, "neg c"),
+    ("neg neg ( neg b )", "neg", None, "neg ( neg b )"),
+    ("neg neg ( a ) or neg b", "or", "neg neg ( a )", "neg b"),
+    ("neg a or neg b", "or", "neg a", "neg b"),
+    ("neg ( a or b )", "neg", None, "a or b"),
+    ("a", None, None, None),
+    ("a and b imp c and d", "imp", "a and b", "c and d"),
+    ("a and b imp c and d", "imp", "a and b", "c and d"),
+])
+def test_getComponents(str_formula, expected_connective, expected_left_result, expected_right_result):
+    formula = Formula([Token.literal(i) for i in str_formula.split()], DebugFormalSystem())
+
+    if expected_left_result is None:
+        expected_formula_left = None
+    else:
+        expected_formula_left = Formula([Token.literal(i) for i in expected_left_result.split()], DebugFormalSystem()).getTypes()
+
+    if expected_right_result is None:
+        expected_formula_right = None
+    else:
+        expected_formula_right = Formula([Token.literal(i) for i in expected_right_result.split()], DebugFormalSystem()).getTypes()
+
+    connective_result, (formula_left, formula_right) = formula.getComponents()
+
+    # ifs are for managing None values
+    if expected_connective is None:
+        assert connective_result is None
+    else:
+        assert expected_connective == connective_result.type_
+
+    if expected_formula_left is None:
+        assert formula_left is None
+    else:
+        assert formula_left.getTypes() == expected_formula_left
+
+    if expected_formula_right is None:
+        assert formula_right is None
+    else:
+        assert formula_right.getTypes() == expected_formula_right

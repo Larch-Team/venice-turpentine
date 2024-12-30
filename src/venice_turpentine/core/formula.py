@@ -182,8 +182,8 @@ class Formula(list[Token]):
     # Not finished
 
     def getComponents(
-        self, precedence: dict[str, int] = None
-    ) -> tuple[Optional[str], Optional[tuple[Formula, Formula]]]:
+        self
+    ) -> tuple[Token|None, tuple[Formula|None, Formula|None]]:
         """
         Na podstawie kolejności wykonywania działań wyznacza najwyżej położony spójnik oraz dzieli zdanie na dwa części.
         Zwraca None gdy nie udało się znaleźć spójnika
@@ -194,9 +194,9 @@ class Formula(list[Token]):
         :rtype: tuple[Optional[str], Optional[tuple[Formula, Formula]]]
         """
         sentence = self.reduceBrackets()
-        con_index = self.getMainConnective(precedence)
+        con_index = self.getMainConnective()
         if con_index is None:
-            return None, None
+            return None, (None, None)
         return sentence[con_index], sentence.splitByIndex(con_index)
 
     def getNonNegated(self) -> Formula:
