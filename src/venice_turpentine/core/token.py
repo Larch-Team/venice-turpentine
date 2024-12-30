@@ -13,8 +13,19 @@ class Token:
         return self.lexem
 
     def __repr__(self):
-        return f"{self.type_.upper()}({self.lexem})"
+        if self.is_literal:
+            return f"Literal({self.lexem})"
+        else:
+            return f"{self.type_.upper()}({self.lexem})"
 
     @classmethod
     def literal(cls, s: str):
         return cls(s, s, is_literal=True)
+    
+    @classmethod
+    def LEFT_BRACKET(cls):
+        return cls.literal("(")
+    
+    @classmethod
+    def RIGHT_BRACKET(cls):
+        return cls.literal(")")

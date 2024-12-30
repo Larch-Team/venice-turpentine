@@ -1,17 +1,18 @@
 from __future__ import annotations
 
 from collections import OrderedDict
-from typing import Callable, Optional, SupportsIndex, TypeVar, Union, overload
+from functools import cached_property
+from typing import Any, Callable, Optional, SupportsIndex, TypeVar, Union, overload
 
 from ..formal_systems import FormalSystem
 from .token import Token
 
 T = TypeVar("T")
+V = TypeVar("V")
+Z = TypeVar("Z")
 
-
-def apply_on_keys(dictionary: dict, op: Callable) -> dict:
+def apply_on_keys(dictionary: dict[T, Z], op: Callable[[T], V]) -> dict[V, Z]:
     return {op(i): j for i, j in dictionary.items()}
-
 
 def slice_dict_by_key(
     dictionary: dict[int, T], key: int
@@ -21,18 +22,20 @@ def slice_dict_by_key(
         {i - key - 1: j for i, j in dictionary.items() if i > key},  # right
     )
 
-
 class Formula(list[Token]):
 
     def __init__(
         self,
         token_list: list[Token],
         formal_system: FormalSystem,
-        precedenceBaked: Optional[dict[str, float]] = None,
+        precedenceBaked: Optional[dict[int, float]] = None,
     ):
         self.formal_system = formal_system
+        # Indeksy spójników oraz siła wiązania - im wyższa wartość, tym mocniej wiąże
         self.precedenceBaked = precedenceBaked or {}
         super().__init__(token_list)
+
+    # MARK: Getters
 
     def getTypes(self) -> list[str]:
         """Zwraca listę kolejno występujących typów w zdaniu"""
@@ -65,14 +68,46 @@ class Formula(list[Token]):
                 ret.append(token.lexem)
         return ret
 
-    def getPrecedence(self) -> dict[str, int]:
-        return self.formal_system.get_operator_precedence()
+    def isLiteral(self) -> bool:
+        main = self.getMainConnective()
+        return main is None or (main == 0 and len(self.precedence()) == 1)
 
-    # Manipulacja zdaniem
+    # MARK: Kolejność wykonywania działań
+
+    def calcPrecedenceVal(
+        self, connective: str, lvl: int = 0
+    ) -> float:
+        return lvl + self.formal_system.operator_precedence[connective] / self.formal_system.operator_precedence_scale
+    
+    def precedence(self) -> dict[int, float]:
+        """Oblicza siłę wiązania spójników w zdaniu, zwraca słownik indeksów spójników i ich sił wiązania"""
+        if self.precedenceBaked:
+            return self.precedenceBaked
+        self.precedenceBaked = {}
+
+        lvl = 0
+        for i, t in enumerate(self.getTypes()):
+            if t == "(":
+                lvl += 1
+            elif t == ")":
+                lvl -= 1
+            elif t in self.formal_system.operator_precedence:
+                self.precedenceBaked[i] = self.calcPrecedenceVal(
+                    t, lvl
+                )
+
+        return self.precedenceBaked
+
+    # MARK: Usuwanie nawiasów
+
+    @staticmethod
+    def _fixPrecedence_reduceBrackets(precedenceBaked: dict[int, float], removed_brackets_count: int, lowest_unopened_left: int) -> dict[int, float]:
+        return apply_on_keys(
+                precedenceBaked, lambda x: x - (removed_brackets_count - lowest_unopened_left)
+            )
 
     def reduceBrackets(self) -> Formula:
         """Minimalizuje nawiasy w zdaniu; zakłada poprawność ich rozmieszczenia"""
-        # TODO: Redukcja nawiasów w *całości* zdania
 
         if len(self) < 2:
             return self[:]
@@ -80,102 +115,53 @@ class Formula(list[Token]):
         reduced = self[:]
 
         # Deleting brackets
-        while reduced[0] == "(" and reduced[-1] == ")":
+        removed_brackets_count = 0
+        while reduced[0] == Token.LEFT_BRACKET() and reduced[-1] == Token.RIGHT_BRACKET():
             reduced = reduced[1:-1]
+            removed_brackets_count += 1
 
-        diff = (len(self) - len(reduced)) / 2
-
-        # Fill missing brackets
+        # Poszukuje
+        # Wprowadzone aby obsługiwać przypadki typu "((A))or((A))"
         opened_left = 0
         opened_right = 0
-        min_left = 0
+        lowest_unopened_left = 0
         for i in reduced:
-            if i == "(":
+            if i == Token.LEFT_BRACKET():
                 opened_left += 1
-            elif i == ")":
+            elif i == Token.RIGHT_BRACKET():
                 opened_right += 1
             else:
                 continue
-            delta_left = opened_left - opened_right
-            min_left = min(min_left, delta_left)
+            unopened_left =  opened_right - opened_left
+            lowest_unopened_left = max(lowest_unopened_left, unopened_left)
 
-        if self.precedenceBaked:
-            new_baked = apply_on_keys(
-                self.precedenceBaked, lambda x: x - (diff + min_left)
-            )
-        else:
-            new_baked = {}
-
-        right = opened_left - opened_right - min_left
+        unclosed_right = opened_left - opened_right + lowest_unopened_left
         return Formula(
-            -min_left * ["("] + reduced + right * [")"], self.formal_system, new_baked
+            lowest_unopened_left * [Token.LEFT_BRACKET()] + reduced + unclosed_right * [Token.RIGHT_BRACKET()],
+            self.formal_system, self._fixPrecedence_reduceBrackets(self.precedenceBaked, removed_brackets_count, lowest_unopened_left)
         )
 
-    @staticmethod
-    def static_calcPrecedenceVal(
-        connective: str, precedence: dict[str, int], lvl: int = 0, prec_div: int = None
-    ) -> float:
-        if prec_div is not None:
-            return lvl + precedence[connective] / prec_div
-        else:
-            return lvl + precedence[connective] / max(precedence.values()) + 1
+    # MARK: Operacje na zdaniu
 
-    def getLowest(
-        self, dictionary: dict[int, float], precedence: dict[str, int] = None
-    ):
-        if not dictionary:
+    def getMainConnective(self) -> int | None:
+        """
+        Zwraca indeks głównego spójnika w zdaniu. None jeśli zdanie jest literałem.
+        W przypadku równych sił wiązania zwraca indeks najbardziej na prawo, z wyjątkiem jednoargumentowych spójników
+        """
+        if not self.precedence():
             return None
-        if precedence is None:
-            precedence = self.getPrecedence()
-        min_prec = min(dictionary.values())
-        min_prec_indexes = (i for i, j in dictionary.items() if j == min_prec)
-        max_prec = max(precedence.values())
-        if min_prec == max_prec / (max_prec + 1):
+        
+        min_prec = min(self.precedence().values())
+        min_prec_indexes = [i for i, j in self.precedence().items() if j == min_prec]
+        
+        # Spójniki jednoargumentowe jako jedyne działają "od prawej"
+        if all(self[i].type_ in self.formal_system.unary_operators for i in min_prec_indexes):
             return min(min_prec_indexes)
         else:
             return max(min_prec_indexes)
 
-    def calcPrecedenceVal(
-        self, connective: str, lvl: int = 0, prec_div: int = None
-    ) -> float:
-        precedence = self.getPrecedence()
-        return self.static_calcPrecedenceVal(connective, precedence, lvl, prec_div)
-
-    def readPrecedence(self, precedence: dict[str, int] = None) -> dict[int, float]:
-        """
-        Oblicza, bądź zwraca informacje o sile spójników w danym zdaniu. *Powinno być przywołane przed dowolnym użyciem precedenceBaked*
-        W testach używać można argument opcjonalny, aby nie odwoływać się do
-
-        :param precedence: Siła wiązania spójników (podane same typy) - im wyższa wartość, tym mocniej wiąże, optional
-        :type precedence: dict[str, int]
-        :return: Indeksy spójników oraz siła wiązania - im wyższa wartość, tym mocniej wiąże
-        :rtype: dict[str, float]
-        """
-        if precedence is None:
-            if self.precedenceBaked:
-                return self.precedenceBaked
-            precedence = self.getPrecedence()
-
-        self.precedenceBaked = OrderedDict()
-
-        lvl = 0
-        prec_div = max(precedence.values()) + 1
-        for i, t in enumerate(self.getTypes()):
-            if t == "(":
-                lvl += 1
-            elif t == ")":
-                lvl -= 1
-            elif t in precedence:
-                self.precedenceBaked[i] = self.static_calcPrecedenceVal(
-                    t, precedence, lvl, prec_div
-                )
-
-        return self.precedenceBaked
-
-    def splitByIndex(self, index: int):
-        """
-        Dzieli zdanie na dwa na podstawie podanego indeksu.
-        """
+    def splitByIndex(self, index: int) -> tuple[Formula | None, Formula | None]:
+        """Dzieli zdanie na dwa na podstawie podanego indeksu. Zwraca lewą i prawą część"""
         p_left, p_right = slice_dict_by_key(self.precedenceBaked, index)
         left = (
             Formula(self[:index], self.formal_system, p_left)
@@ -193,12 +179,7 @@ class Formula(list[Token]):
         )
         return left, right
 
-    def getMainConnective(self, precedence: dict[str, int] = None) -> Union[int, None]:
-        prec = self.readPrecedence(precedence)
-
-        if len(prec) == 0:
-            return None
-        return self.getLowest(prec, precedence)
+    # Not finished
 
     def getComponents(
         self, precedence: dict[str, int] = None
@@ -220,7 +201,7 @@ class Formula(list[Token]):
 
     def getNonNegated(self) -> Formula:
         """
-        Zwracane zdanie jest konceptualnie podobne do literału, ale rozszerzone na całe zdanie. W skrócie redukowane są wszystkie negacje obejmujące całe zdanie
+        Redukuje negacje obejmujące całość zdania
         """
         conn, new = self.getComponents()
         if not conn or not conn.startswith("not"):
@@ -228,11 +209,7 @@ class Formula(list[Token]):
         else:
             return new[1].getNonNegated()
 
-    def isLiteral(self) -> bool:
-        main = self.getMainConnective()
-        return main is None or (main == 0 and len(self.readPrecedence()) == 1)
-
-    # Overwriting list methods
+    # MARK: Overwriting list methods
 
     def __hash__(self):
         return hash(" ".join(self.getUnique()))
@@ -253,7 +230,7 @@ class Formula(list[Token]):
         return Formula(super().copy(), self.formal_system, self.precedenceBaked)
 
     def __repr__(self) -> str:
-        return " ".join(self)
+        return f'Formula[{" ".join(self.getLexems())}]'
 
     def __rmul__(self, n: int) -> Formula:
         return Formula(super().__rmul__(n), self.formal_system)
