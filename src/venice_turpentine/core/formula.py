@@ -4,6 +4,7 @@ from collections import OrderedDict
 from functools import cached_property
 from typing import Any, Callable, Optional, SupportsIndex, TypeVar, Union, overload
 
+from ..exceptions import FormulaError
 from ..formal_systems import FormalSystem
 from .token import Token
 
@@ -166,14 +167,14 @@ class Formula(list[Token]):
         left = (
             Formula(self[:index], self.formal_system, p_left)
             .reduceBrackets()
-            .reduceBrackets()
+            .reduceBrackets() # Podwójne wywołanie najpierw normalizuje nawiasy, a potem usuwa zbędne
             if self[:index]
             else None
         )
         right = (
             Formula(self[index + 1 :], self.formal_system, p_right)
             .reduceBrackets()
-            .reduceBrackets()
+            .reduceBrackets() # Podwójne wywołanie najpierw normalizuje nawiasy, a potem usuwa zbędne
             if self[index + 1 :]
             else None
         )
@@ -199,15 +200,23 @@ class Formula(list[Token]):
             return None, (None, None)
         return sentence[con_index], sentence.splitByIndex(con_index)
 
-    def getNonNegated(self) -> Formula:
+    def removeMainUnary(self, selected_unary_operators: Optional[list[str]] = None) -> Formula:
         """
-        Redukuje negacje obejmujące całość zdania
+        Usuwa spójniki jednoargumentowe obejmujące całe zdanie
         """
+        selected_unary_operators = selected_unary_operators or self.formal_system.unary_operators
         conn, new = self.getComponents()
-        if not conn or not conn.startswith("not"):
+        if not conn or conn.type_ not in selected_unary_operators:
             return self.reduceBrackets()
         else:
-            return new[1].getNonNegated()
+            if new[1] is None:
+                raise FormulaError("Unary operator without argument")
+            return new[1].removeMainUnary(selected_unary_operators)
+
+    def combine(self, x: list[Token]) -> Formula:
+        if not all(isinstance(i, Token) for i in x):
+            raise FormulaError("List must contain only Token objects")
+        return Formula(super().__add__(x), self.formal_system)
 
     # MARK: Overwriting list methods
 
@@ -220,23 +229,20 @@ class Formula(list[Token]):
         else:
             return list(self) == o
 
-    def __add__(self, x: Union[Formula, list[str]]) -> Formula:
-        return Formula(super().__add__(x), self.formal_system)
-
-    def __mul__(self, n: int) -> Formula:
+    def __mul__(self, n: SupportsIndex) -> Formula:
         return Formula(super().__mul__(n), self.formal_system)
 
     def copy(self) -> Formula:
         return Formula(super().copy(), self.formal_system, self.precedenceBaked)
 
     def __repr__(self) -> str:
-        return f'Formula[{" ".join(self.getLexems())}]'
+        return f'Formula[{str(self)}]'
 
-    def __rmul__(self, n: int) -> Formula:
+    def __rmul__(self, n: SupportsIndex) -> Formula:
         return Formula(super().__rmul__(n), self.formal_system)
 
     def __str__(self) -> str:
-        return self.getReadable()
+        return " ".join(self.getLexems())
 
     @overload
     def __getitem__(self, key: SupportsIndex) -> Token: ...

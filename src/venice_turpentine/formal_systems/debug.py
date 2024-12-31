@@ -6,6 +6,7 @@ class DebugFormalSystem(FormalSystem):
     def operator_precedence(self) -> dict[str, int]:
         return {
             "neg": 3,
+            "unary": 3,
             "and": 2,
             "or": 2,
             "imp": 1,
@@ -13,4 +14,4 @@ class DebugFormalSystem(FormalSystem):
 
     @property
     def unary_operators(self) -> list[str]:
-        return ["neg"]
+        return ["neg", "unary"]

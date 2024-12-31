@@ -129,3 +129,35 @@ def test_getComponents(str_formula, expected_connective, expected_left_result, e
         assert formula_right is None
     else:
         assert formula_right.getTypes() == expected_formula_right
+
+@pytest.mark.parametrize("str_formula, expected_str_formula", [
+    ("neg neg c", "c"),
+    ("neg neg ( neg b )", "b"),
+    ("neg neg ( a or neg b )", "a or neg b"),
+    ("neg a or neg b", "neg a or neg b"),
+    ("neg ( a or neg b )", "a or neg b"),
+    ("neg ( a or b ) and c", "neg ( a or b ) and c"),
+    ("neg unary a", "a"),
+    ("neg neg unary a", "a"),
+    ("neg neg unary neg a", "a"),
+    ("neg neg unary neg neg unary neg a", "a"),
+    ("neg unary ( unary a or neg b )", "unary a or neg b"),
+])
+def test_removeMainUnary_all(str_formula, expected_str_formula):
+    formula = Formula([Token.literal(i) for i in str_formula.split()], DebugFormalSystem())
+    expected_formula = Formula([Token.literal(i) for i in expected_str_formula.split()], DebugFormalSystem())
+    assert formula.removeMainUnary().getTypes() == expected_formula.getTypes()
+
+@pytest.mark.parametrize("str_formula, expected_str_formula", [
+    ("neg unary a", "unary a"),
+    ("neg neg unary a", "unary a"),
+    ("neg neg unary neg a", "unary neg a"),
+    ("unary unary neg a", "unary unary neg a"),
+    ("neg neg unary neg neg unary neg a", "unary neg neg unary neg a"),
+    ("neg unary ( unary a or neg b )", "unary ( unary a or neg b )"),
+    ("unary neg  ( unary a or neg b )", "unary neg ( unary a or neg b )"),
+])
+def test_removeMainUnary_selected(str_formula, expected_str_formula):
+    formula = Formula([Token.literal(i) for i in str_formula.split()], DebugFormalSystem())
+    expected_formula = Formula([Token.literal(i) for i in expected_str_formula.split()], DebugFormalSystem())
+    assert formula.removeMainUnary(["neg"]).getTypes() == expected_formula.getTypes()
