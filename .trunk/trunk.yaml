@@ -32,3 +32,6 @@ lint:
       paths:
         - old_app
         - old_tests
+    - linters: [bandit]
+      paths:
+        - tests
